@@ -1,6 +1,7 @@
 package com.startingblue.fourtooncookie.diary.domain;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
+import com.startingblue.fourtooncookie.DiaryHashtag;
 import com.startingblue.fourtooncookie.hashtag.domain.Hashtag;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import jakarta.persistence.*;
@@ -18,7 +19,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Diary {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "diary_id")
     private Long id;
 
@@ -32,9 +34,22 @@ public class Diary {
 
     private String thumbnailUrl;
 
-
     @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Hashtag> hashtags = new ArrayList<>();
+    private List<DiaryHashtag> hashtags = new ArrayList<>();
 
+    public Diary(Member member, Character character, String content, String thumbnailUrl) {
+        this.member = member;
+        this.character = character;
+        this.content = content;
+        this.thumbnailUrl = thumbnailUrl;
+    }
 
+    public void addHashtag(Hashtag hashtag) {
+        DiaryHashtag diaryHashtag = new DiaryHashtag(this, hashtag);
+        hashtags.add(diaryHashtag);
+    }
+
+    public void removeHashtag(Hashtag hashtag) {
+        hashtags.removeIf(diaryHashtag -> diaryHashtag.getHashtag().equals(hashtag));
+    }
 }
