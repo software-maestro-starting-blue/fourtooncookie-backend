@@ -30,6 +30,13 @@ public class HashtagInMemoryRepository implements HashtagRepository {
     }
 
     @Override
+    public Optional<Hashtag> findByName(String hashtagName) {
+        return hashtags.values().stream()
+                .filter(hashtag -> hashtag.getName().equals(hashtagName))
+                .findFirst();
+    }
+
+    @Override
     public Optional<Hashtag> findByNameAndHashtagType(String hashtagName, HashtagType hashtagType) {
         return hashtags.values().stream()
                 .filter(hashtag -> hashtag.getName().equals(hashtagName) && hashtag.getHashtagType().equals(hashtagType))
