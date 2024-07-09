@@ -20,9 +20,10 @@ public class HashtagController {
 
     private final HashtagService hashtagService;
 
+    // TODO : 해당 요청은 필요 없어보임. Hashtag는 다이어리에서 가져오기 떄문
     @GetMapping()
     public ResponseEntity<List<HashtagSavedResponse>> hashtags(@RequestParam String hashtagType) {
-        List<Hashtag> allFromHashtagType = hashtagService.findHashtagsFromHashtagType(hashtagType);
+        List<Hashtag> allFromHashtagType = hashtagService.findHashtagsByHashtagType(hashtagType);
 
         String iconUrl = ""; // 변경 예정
         List<HashtagSavedResponse> responseList = allFromHashtagType.stream()
