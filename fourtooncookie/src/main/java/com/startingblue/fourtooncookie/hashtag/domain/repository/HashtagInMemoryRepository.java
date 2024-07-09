@@ -16,10 +16,13 @@ public class HashtagInMemoryRepository implements HashtagRepository {
 
     private final Map<Long, Hashtag> hashtags = new ConcurrentHashMap<>();
 
-    public Hashtag save(Hashtag hashtag) {
-        return hashtags.put(hashtag.getId(), hashtag);
+    @Override
+    public <S extends Hashtag> S save(S entity) {
+        hashtags.put(entity.getId(), entity);
+        return entity;
     }
 
+    @Override
     public void delete(Hashtag hashtag) {
         hashtags.remove(hashtag.getId());
     }
