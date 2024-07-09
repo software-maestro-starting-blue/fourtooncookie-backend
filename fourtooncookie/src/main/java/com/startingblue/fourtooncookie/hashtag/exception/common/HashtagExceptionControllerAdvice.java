@@ -14,8 +14,8 @@ public class HashtagExceptionControllerAdvice {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(HashtagNotFoundException.class)
-    public ResponseEntity<?> handleHashtagNotFoundException(HashtagNotFoundException e) {
+    @ExceptionHandler(HashtagNoSuchElementException.class)
+    public ResponseEntity<?> handleHashtagNotFoundException(HashtagNoSuchElementException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 

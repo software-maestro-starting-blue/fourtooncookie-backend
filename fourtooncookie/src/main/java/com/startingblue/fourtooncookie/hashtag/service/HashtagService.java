@@ -5,9 +5,8 @@ import com.startingblue.fourtooncookie.hashtag.domain.repository.HashtagReposito
 import com.startingblue.fourtooncookie.hashtag.dto.request.HashtagDeleteRequest;
 import com.startingblue.fourtooncookie.hashtag.dto.request.HashtagSaveRequest;
 import com.startingblue.fourtooncookie.hashtag.exception.common.HashtagExistsException;
-import com.startingblue.fourtooncookie.hashtag.exception.common.HashtagNotFoundException;
+import com.startingblue.fourtooncookie.hashtag.exception.common.HashtagNoSuchElementException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +39,38 @@ public class HashtagService {
         hashtagInMemoryRepository.save(createdHashtag);
     }
 
-    public List<Hashtag> findHashtagsFromHashtagType(String hashtagTypeName) {
+    public Optional<Hashtag> findById(Long id) {
+
+        Optional<Hashtag> foundHashtags = hashtagInMemoryRepository.findById(id);
+        if (foundHashtags.isEmpty()) {
+            foundHashtags = hashtagJpaRepository.findById(id);
+
+            if (foundHashtags.isEmpty() || foundHashtags.isEmpty()) {
+                throw new HashtagNoSuchElementException("No hashtags found for type: " + id);
+            }
+
+            hashtagInMemoryRepository.save(foundHashtags.get());
+        }
+
+        return hashtagInMemoryRepository.findById(id);
+    }
+
+    public Optional<Hashtag> findHashtagByHashtagName(String hashtagTypeName) {
+        Optional<Hashtag> foundHashtag = hashtagInMemoryRepository.findByName(hashtagTypeName);
+        if (foundHashtag.isEmpty()) {
+            foundHashtag = hashtagJpaRepository.findByName(hashtagTypeName);
+
+            if (foundHashtag.isEmpty()) {
+                throw new HashtagNoSuchElementException("No hashtags found for type: " + hashtagTypeName);
+            }
+
+            hashtagInMemoryRepository.save(foundHashtag.get());
+        }
+
+        return foundHashtag;
+    }
+
+    public List<Hashtag> findHashtagsByHashtagType(String hashtagTypeName) {
         HashtagType foundHashtagType = HashtagType.findFromString(hashtagTypeName);
 
         List<Hashtag> foundHashtags = hashtagInMemoryRepository.findAllByHashtagType(foundHashtagType);
@@ -48,7 +78,7 @@ public class HashtagService {
             foundHashtags = hashtagJpaRepository.findAllByHashtagType(foundHashtagType);
 
             if (foundHashtags == null || foundHashtags.isEmpty()) {
-                throw new HashtagNotFoundException("No hashtags found for type: " + hashtagTypeName);
+                throw new HashtagNoSuchElementException("No hashtags found for type: " + hashtagTypeName);
             }
 
             foundHashtags.forEach(hashtagInMemoryRepository::save);
@@ -60,7 +90,7 @@ public class HashtagService {
     public void deleteHashtag(HashtagDeleteRequest hashtagDeleteRequest) {
         Long deleteHashtagId = hashtagDeleteRequest.hashtagId();
         Hashtag foundHashtag = hashtagJpaRepository.findById(deleteHashtagId)
-                .orElseThrow(() -> new HashtagNotFoundException("Hashtag not found: " + deleteHashtagId));
+                .orElseThrow(() -> new HashtagNoSuchElementException("Hashtag not found: " + deleteHashtagId));
 
         hashtagJpaRepository.delete(foundHashtag);
         hashtagInMemoryRepository.delete(foundHashtag);

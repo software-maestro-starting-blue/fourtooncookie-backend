@@ -6,7 +6,6 @@ import com.startingblue.fourtooncookie.diary.dto.request.DiaryDeleteRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNoSuchElementException;
 import com.startingblue.fourtooncookie.hashtag.domain.Hashtag;
-import com.startingblue.fourtooncookie.hashtag.exception.common.HashtagNoSuchElementException;
 import com.startingblue.fourtooncookie.hashtag.service.HashtagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

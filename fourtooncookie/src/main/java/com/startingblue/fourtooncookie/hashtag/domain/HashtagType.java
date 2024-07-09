@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.hashtag.domain;
 
-import com.startingblue.fourtooncookie.hashtag.exception.common.HashtagNotFoundException;
+import com.startingblue.fourtooncookie.hashtag.exception.common.HashtagNoSuchElementException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +30,6 @@ public enum HashtagType {
             }
         }
 
-        throw new HashtagNotFoundException();
+        throw new HashtagNoSuchElementException();
     }
 }
