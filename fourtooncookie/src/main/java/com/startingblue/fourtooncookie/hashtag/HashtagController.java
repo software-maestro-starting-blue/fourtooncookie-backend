@@ -39,8 +39,8 @@ public class HashtagController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteHashtag(@RequestBody HashtagDeleteRequest hashtagDeleteRequest) {
+    public ResponseEntity<Void> deleteHashtag(@RequestBody HashtagDeleteRequest hashtagDeleteRequest) {
         hashtagService.deleteHashtag(hashtagDeleteRequest);
-        return ResponseEntity.ok(hashtagDeleteRequest.hashtagId() + " hashtag deleted");
+        return ResponseEntity.noContent().build();
     }
 }

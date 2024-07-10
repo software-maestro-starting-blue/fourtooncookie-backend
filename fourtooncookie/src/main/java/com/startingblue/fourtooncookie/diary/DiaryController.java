@@ -29,14 +29,14 @@ public class DiaryController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createDiary(@RequestBody DiarySaveRequest diarySaveRequest) {
+    public ResponseEntity<Void> createDiary(@RequestBody DiarySaveRequest diarySaveRequest) {
         diaryService.createDiary(diarySaveRequest);
-        return ResponseEntity.ok("Diary created successfully");
+        return ResponseEntity.ok().build();
     }
 
 
     @GetMapping("/timeline")
-    public ResponseEntity<?> readDiaries(@ModelAttribute DiaryPageRequest pageRequest) {
+    public ResponseEntity<List<DiarySavedResponse>> readDiaries(@ModelAttribute DiaryPageRequest pageRequest) {
         Page<Diary> diaryPage = diaryService.getDiaries(pageRequest.page(), pageRequest.size());
 
         if (diaryPage.isEmpty()) {
@@ -60,8 +60,8 @@ public class DiaryController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteDiary(@RequestBody DiaryDeleteRequest diaryDeleteRequest) {
+    public ResponseEntity<Void> deleteDiary(@RequestBody DiaryDeleteRequest diaryDeleteRequest) {
         diaryService.deleteDiary(diaryDeleteRequest);
-        return ResponseEntity.ok("Diary deleted successfully");
+        return ResponseEntity.noContent().build();
     }
 }
