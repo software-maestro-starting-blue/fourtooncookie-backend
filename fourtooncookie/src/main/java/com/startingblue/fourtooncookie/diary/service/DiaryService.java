@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -44,14 +45,17 @@ public class DiaryService {
     }
 
     public List<DiarySavedResponse> readDiaries(final DiaryPageRequest diaryPageRequest) {
-        return diaryRepository.findAll(PageRequest.of(diaryPageRequest.pageNumber(), diaryPageRequest.pageSize()))
+        return diaryRepository.findAll(
+                        PageRequest.of(diaryPageRequest.pageNumber(), diaryPageRequest.pageSize(), Sort.by(Sort.Direction.DESC, "createdAt"))
+                )
                 .stream()
                 .map(diary -> new DiarySavedResponse(
                         diary.getContent(),
                         diary.getIsFavorite(),
+                        diary.getCreatedAt().toString(),
+                        diary.getModifiedAt().toString(),
                         diary.getPaintingImages().stream().map(PaintingImage::getPath).toList(),
-                        diary.getHashtags().stream().map(diaryHashtag -> diaryHashtag.getHashtag().getId()).toList(),
-                        diary.getModifiedAt().toString()
+                        diary.getHashtags().stream().map(diaryHashtag -> diaryHashtag.getHashtag().getId()).toList()
                 ))
                 .toList();
     }
