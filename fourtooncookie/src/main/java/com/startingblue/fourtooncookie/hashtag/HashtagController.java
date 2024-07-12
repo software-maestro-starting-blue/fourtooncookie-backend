@@ -20,27 +20,15 @@ public class HashtagController {
 
     private final HashtagService hashtagService;
 
-    // TODO : 해당 요청은 필요 없어보임. Hashtag는 다이어리에서 가져오기 떄문
-    @GetMapping()
-    public ResponseEntity<List<HashtagSavedResponse>> hashtags(@RequestParam String hashtagType) {
-        List<Hashtag> allFromHashtagType = hashtagService.findHashtagsByHashtagType(hashtagType);
-
-        String iconUrl = ""; // 변경 예정
-        List<HashtagSavedResponse> responseList = allFromHashtagType.stream()
-                .map(hashtag -> new HashtagSavedResponse(hashtag.getHashtagType().toString(), hashtag.getName(), iconUrl))
-                .toList();
-        return ResponseEntity.ok(responseList);
-    }
-
     @PostMapping()
-    public ResponseEntity<HashtagSaveRequest> createHashtag(@RequestBody HashtagSaveRequest hashtagSaveRequest) {
-        hashtagService.createHashtag(hashtagSaveRequest);
-        return ResponseEntity.ok(hashtagSaveRequest);
+    public ResponseEntity<HashtagSaveRequest> createHashtag(@RequestBody HashtagSaveRequest request) {
+        hashtagService.createHashtag(request);
+        return ResponseEntity.ok(request);
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteHashtag(@RequestBody HashtagDeleteRequest hashtagDeleteRequest) {
-        hashtagService.deleteHashtag(hashtagDeleteRequest);
+    public ResponseEntity<Void> deleteHashtag(@RequestBody HashtagDeleteRequest request) {
+        hashtagService.deleteHashtag(request);
         return ResponseEntity.noContent().build();
     }
 }
