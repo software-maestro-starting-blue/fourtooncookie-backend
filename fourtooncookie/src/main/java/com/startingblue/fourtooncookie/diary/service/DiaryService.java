@@ -60,7 +60,7 @@ public class DiaryService {
         Diary existedDiary = diaryRepository.findById(diaryId)
                         .orElseThrow(DiaryNoSuchElementException::new);
 
-        List<Hashtag> foundHashtags = hashtagService.findHashtagsByHashtagIds(request.hashtagIds());
+        List<Hashtag> foundHashtags = hashtagService.findAllByHashtagIds(request.hashtagIds());
         LocalDateTime modifiedAt = LocalDateTime.now();
 //        Character character = characterServer.findById(request.characterId());
         existedDiary.update(request.content(), request.isFavorite(), foundHashtags, modifiedAt, null);
