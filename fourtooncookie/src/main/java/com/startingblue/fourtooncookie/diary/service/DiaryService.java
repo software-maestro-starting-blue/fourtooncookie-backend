@@ -38,8 +38,8 @@ public class DiaryService {
 //                .orElseThrow(() -> new RuntimeException("Character with ID " + diarySaveRequest.characterId() + " not found"));
 //        Member member = memberRepository.findById(diarySaveRequest.memberId())
 //                .orElseThrow(() -> new RuntimeException("Member with ID " + diarySaveRequest.memberId() + " not found"));
-        Diary diary = new Diary(request.content(), LocalDateTime.now(), null, null);
-        addHashtagsToDiary(request, diary);
+        List<Hashtag> foundHashtags = hashtagService.findAllByHashtagIds(request.hashtagIds());
+        Diary diary = new Diary(request.content(), LocalDateTime.now(), foundHashtags,null, null);
         diaryRepository.save(diary);
     }
 
@@ -63,7 +63,7 @@ public class DiaryService {
         List<Hashtag> foundHashtags = hashtagService.findAllByHashtagIds(request.hashtagIds());
         LocalDateTime modifiedAt = LocalDateTime.now();
 //        Character character = characterServer.findById(request.characterId());
-        existedDiary.update(request.content(), request.isFavorite(), foundHashtags, modifiedAt, null);
+        existedDiary.update(request.content(), request.isFavorite(), modifiedAt, foundHashtags, null);
         diaryRepository.save(existedDiary);
     }
 
@@ -71,17 +71,5 @@ public class DiaryService {
         Diary foundDiary = diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new DiaryNoSuchElementException("diary not found: " + diaryId));
         diaryRepository.delete(foundDiary);
-    }
-
-    private void addHashtagsToDiary(DiarySaveRequest diarySaveRequest, Diary diary) {
-        for (Long hashtagId : diarySaveRequest.hashtagIds()) {
-            Hashtag foundHashtag = hashtagService.findById(hashtagId)
-                    .orElseThrow(() -> new RuntimeException("Hashtag not found: " + hashtagId));
-            addHashtagToDiary(diary, foundHashtag);
-        }
-    }
-
-    private void addHashtagToDiary(Diary diary, Hashtag hashtag) {
-        diary.addHashtag(hashtag);
     }
 }

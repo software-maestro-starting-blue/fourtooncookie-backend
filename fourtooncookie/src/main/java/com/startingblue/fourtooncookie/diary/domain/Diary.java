@@ -46,23 +46,51 @@ public class Diary {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    public Diary(String content, LocalDateTime createdAt, Character character, Member member) {
+    public Diary(String content, LocalDateTime createdAt, List<Hashtag> hashtags, Character character, Member member) {
         this.content = content;
         this.isFavorite = false;
+        updateHashtags(hashtags);
         this.character = character;
         this.member = member;
         this.createdAt = createdAt;
         this.modifiedAt = createdAt;
     }
 
-    public void addHashtag(Hashtag hashtag) {
-        DiaryHashtag diaryHashtag = new DiaryHashtag(this, hashtag);
-        hashtags.add(diaryHashtag);
+    public void update(String content, boolean isFavorite, LocalDateTime modifiedAt, List<Hashtag> hashtags, Character character) {
+        this.content = content;
+        this.isFavorite = isFavorite;
+        this.modifiedAt = modifiedAt;
+        updateHashtags(hashtags);
+        this.character = character;
     }
 
-    public void addHashtags(List<Hashtag> hashtags) {
+    private void updatePaintingImages(List<PaintingImage> paintingImages) {
+        removePaintingImages();
+        for (PaintingImage paintingImage : paintingImages) {
+            addPaintingImage(paintingImage);
+        }
+    }
+
+    private void addPaintingImage(PaintingImage paintingImage) {
+        paintingImages.add(paintingImage);
+        paintingImage.assignDiary(this);
+    }
+
+    private void removePaintingImages() {
+        for (PaintingImage paintingImage : paintingImages) {
+            paintingImage.assignDiary(null);
+        }
+        paintingImages.clear();
+    }
+
+    private void updateHashtags(List<Hashtag> hashtags) {
+        removeHashtags(hashtags);
+        addHashtags(hashtags);
+    }
+
+    private void removeHashtags(List<Hashtag> hashtags) {
         for (Hashtag hashtag : hashtags) {
-            addHashtag(hashtag);
+            removeHashtag(hashtag);
         }
     }
 
@@ -72,28 +100,15 @@ public class Diary {
         diaryHashtag.assignDiary(null);
     }
 
-    public void removeHashtags(List<Hashtag> hashtags) {
+    private void addHashtags(List<Hashtag> hashtags) {
         for (Hashtag hashtag : hashtags) {
-            removeHashtag(hashtag);
+            addHashtag(hashtag);
         }
     }
 
-    public void addPaintingImage(PaintingImage paintingImage) {
-        paintingImages.add(paintingImage);
-        paintingImage.assignDiary(this);
+    private void addHashtag(Hashtag hashtag) {
+        DiaryHashtag diaryHashtag = new DiaryHashtag(this, hashtag);
+        hashtags.add(diaryHashtag);
     }
 
-    public void removePaintingImage(PaintingImage paintingImage) {
-        paintingImages.remove(paintingImage);
-        paintingImage.assignDiary(null);
-    }
-
-    public void update(String content, boolean isFavorite, List<Hashtag> hashtags, LocalDateTime modifiedAt, Character character) {
-        this.content = content;
-        this.isFavorite = isFavorite;
-        removeHashtags(hashtags);
-        addHashtags(hashtags);
-        this.modifiedAt = modifiedAt;
-        this.character = character;
-    }
 }

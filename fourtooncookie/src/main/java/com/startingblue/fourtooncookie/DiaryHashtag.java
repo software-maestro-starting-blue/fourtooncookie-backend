@@ -27,4 +27,14 @@ public class DiaryHashtag {
         this.diary = diary;
         this.hashtag = hashtag;
     }
+
+    public void assignDiary(Diary diary) {
+        if (this.diary != null) {
+            this.diary.getHashtags().remove(this);
+        }
+        this.diary = diary;
+        if (diary != null) {
+            diary.getHashtags().add(this);
+        }
+    }
 }

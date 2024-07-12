@@ -1,12 +1,8 @@
 package com.startingblue.fourtooncookie.hashtag.domain;
 
-import com.startingblue.fourtooncookie.DiaryHashtag;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -23,9 +19,6 @@ public class Hashtag {
 
     @Enumerated(EnumType.STRING)
     private HashtagType hashtagType;
-
-    @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DiaryHashtag> diaryHashtags = new ArrayList<>();
 
     public Hashtag(String name, HashtagType hashtagType) {
         this.name = name;
