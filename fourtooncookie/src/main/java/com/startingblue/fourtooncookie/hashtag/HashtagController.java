@@ -3,14 +3,11 @@ package com.startingblue.fourtooncookie.hashtag;
 import com.startingblue.fourtooncookie.hashtag.domain.Hashtag;
 import com.startingblue.fourtooncookie.hashtag.dto.request.HashtagDeleteRequest;
 import com.startingblue.fourtooncookie.hashtag.dto.request.HashtagSaveRequest;
-import com.startingblue.fourtooncookie.hashtag.dto.response.HashtagSavedResponse;
 import com.startingblue.fourtooncookie.hashtag.service.HashtagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

@@ -1,6 +1,5 @@
 package com.startingblue.fourtooncookie.image.paintingimage.domain;
 
-import com.startingblue.fourtooncookie.character.domain.ModelType;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.image.domain.Image;
 import jakarta.persistence.*;
