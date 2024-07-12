@@ -21,18 +21,30 @@ public class PaintingImage extends Image {
     @Column(name = "painting_image_id")
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private ModelType modelType;
-
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "diary_id")
     private Diary diary;
 
     private Integer gridPosition;
 
-    protected PaintingImage(String path, ModelType modelType, Diary diary, Integer gridPosition) {
+    public PaintingImage(String path, Diary diary, Integer gridPosition) {
         super(path, WIDTH_SIZE, HEIGHT_SIZE);
-        this.modelType = modelType;
         this.diary = diary;
         this.gridPosition = gridPosition;
+    }
+
+    public void assignDiary(Diary diary) {
+        if (this.diary != null) {
+            this.diary.getPaintingImages().remove(this);
+        }
+        this.diary = diary;
+        if (diary != null) {
+            if (diary.getPaintingImages()
+                    .stream()
+                    .anyMatch(img -> img.getGridPosition().equals(this.gridPosition))) {
+                throw new IllegalArgumentException("이미 존재하는 그리드 입니다.");
+            }
+            diary.getPaintingImages().add(this);
+        }
     }
 }
