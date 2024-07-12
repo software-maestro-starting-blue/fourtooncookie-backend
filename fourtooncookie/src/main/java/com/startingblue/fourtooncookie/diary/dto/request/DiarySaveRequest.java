@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.diary.dto.request;
 
-import java.util.Set;
+import java.util.List;
 
-public record DiarySaveRequest(Long memberId, Long characterId, String content, String thumbnailUrl, Set<Long> hashtagIds) {
+public record DiarySaveRequest(String content, List<Long> hashtagIds) {
 }
