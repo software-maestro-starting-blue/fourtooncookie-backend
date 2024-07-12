@@ -40,7 +40,7 @@ public class HashtagService {
         hashtagInMemoryRepository.save(createdHashtag);
     }
 
-    public Optional<Hashtag> findById(Long id) {
+    private Optional<Hashtag> findById(Long id) {
         Optional<Hashtag> foundHashtags = hashtagInMemoryRepository.findById(id);
         if (foundHashtags.isEmpty()) {
             log.info("hashtag cache fail");
@@ -56,7 +56,7 @@ public class HashtagService {
     public List<Hashtag> findAllByHashtagIds(List<Long> hashtagIds) {
         List<Hashtag> foundHashtags = new ArrayList<>();
         for (Long hashtagId : hashtagIds) {
-            Optional<Hashtag> foundHashtag = hashtagInMemoryRepository.findById(hashtagId);
+            Optional<Hashtag> foundHashtag = findById(hashtagId);
             if (foundHashtag.isEmpty()) {
                 foundHashtag = hashtagJpaRepository.findById(hashtagId);
                 if (foundHashtag.isEmpty()) {
@@ -64,6 +64,7 @@ public class HashtagService {
                 }
                 hashtagInMemoryRepository.save(foundHashtag.get());
             }
+            foundHashtags.add(foundHashtag.get());
         }
         return foundHashtags;
     }
