@@ -1,67 +1,49 @@
 package com.startingblue.fourtooncookie.diary;
 
-import com.startingblue.fourtooncookie.DiaryHashtag;
-import com.startingblue.fourtooncookie.diary.domain.Diary;
-import com.startingblue.fourtooncookie.diary.dto.request.DiaryDeleteRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryPageRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
+import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
 import com.startingblue.fourtooncookie.diary.service.DiaryService;
-import com.startingblue.fourtooncookie.hashtag.domain.Hashtag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/diary")
+@RequiredArgsConstructor
+@Slf4j
 public class DiaryController {
 
     private final DiaryService diaryService;
 
-    @Autowired
-    public DiaryController(DiaryService diaryService) {
-        this.diaryService = diaryService;
-    }
-
     @PostMapping
-    public ResponseEntity<Void> createDiary(@RequestBody DiarySaveRequest diarySaveRequest) {
-        diaryService.createDiary(diarySaveRequest);
+    public ResponseEntity<Void> createDiary(@RequestBody final DiarySaveRequest request) {
+        diaryService.createDiary(request, 0L); // TODO : 우선 디폴트 값 넣어 놓음.
         return ResponseEntity.ok().build();
     }
 
-
     @GetMapping("/timeline")
-    public ResponseEntity<List<DiarySavedResponse>> readDiaries(@ModelAttribute DiaryPageRequest pageRequest) {
-        Page<Diary> diaryPage = diaryService.getDiaries(pageRequest.page(), pageRequest.size());
-
-        if (diaryPage.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        List<DiarySavedResponse> responses = diaryPage.getContent().stream()
-                .map(diary -> new DiarySavedResponse(
-                        diary.getCharacter() != null ? diary.getCharacter().getName() : null,
-                        diary.getContent(),
-                        diary.getThumbnailUrl(),
-                        diary.getHashtags() != null ? diary.getHashtags().stream()
-                                .map(DiaryHashtag::getHashtag)
-                                .filter(Objects::nonNull) // Filter out any null hashtags
-                                .map(Hashtag::getName)
-                                .collect(Collectors.toList()) : null
-                ))
-                .collect(Collectors.toList());
-
+    public ResponseEntity<List<DiarySavedResponse>> readDiaries(
+            @RequestParam(defaultValue = "0") Integer pageNumber,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        DiaryPageRequest diaryPageRequest = new DiaryPageRequest(pageNumber, pageSize);
+        List<DiarySavedResponse> responses = diaryService.readDiaries(diaryPageRequest);
         return ResponseEntity.ok(responses);
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteDiary(@RequestBody DiaryDeleteRequest diaryDeleteRequest) {
-        diaryService.deleteDiary(diaryDeleteRequest);
+    @PutMapping("/{diaryId}")
+    public ResponseEntity<Void> updateDiary(@PathVariable final Long diaryId, @RequestBody final DiaryUpdateRequest request) {
+        diaryService.updateDiary(diaryId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{diaryId}")
+    public ResponseEntity<Void> deleteDiary(@PathVariable final Long diaryId) {
+        diaryService.deleteDiary(diaryId);
         return ResponseEntity.noContent().build();
     }
 }
