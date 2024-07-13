@@ -1,7 +1,5 @@
 package com.startingblue.fourtooncookie.hashtag;
 
-import com.startingblue.fourtooncookie.hashtag.domain.Hashtag;
-import com.startingblue.fourtooncookie.hashtag.dto.request.HashtagDeleteRequest;
 import com.startingblue.fourtooncookie.hashtag.dto.request.HashtagSaveRequest;
 import com.startingblue.fourtooncookie.hashtag.service.HashtagService;
 import lombok.RequiredArgsConstructor;

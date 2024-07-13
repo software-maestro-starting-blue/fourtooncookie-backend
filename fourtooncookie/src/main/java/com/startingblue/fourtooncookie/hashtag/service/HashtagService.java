@@ -2,7 +2,6 @@ package com.startingblue.fourtooncookie.hashtag.service;
 
 import com.startingblue.fourtooncookie.hashtag.domain.*;
 import com.startingblue.fourtooncookie.hashtag.domain.repository.HashtagRepository;
-import com.startingblue.fourtooncookie.hashtag.dto.request.HashtagDeleteRequest;
 import com.startingblue.fourtooncookie.hashtag.dto.request.HashtagSaveRequest;
 import com.startingblue.fourtooncookie.hashtag.exception.common.HashtagExistsException;
 import com.startingblue.fourtooncookie.hashtag.exception.common.HashtagNoSuchElementException;
