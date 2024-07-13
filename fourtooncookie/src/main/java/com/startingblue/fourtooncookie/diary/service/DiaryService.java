@@ -60,7 +60,7 @@ public class DiaryService {
     }
 
     public List<DiarySavedResponse> readDiaries(final DiaryPageRequest request, final Long memberId) {
-        return diaryRepository.findAllByMemberId(memberId,
+        return diaryRepository.findAllByMemberId(null, // todo : 임시 데이터
                         PageRequest.of(request.pageNumber(), request.pageSize(), Sort.by(Sort.Direction.DESC, "createdAt"))
                 )
                 .stream()
@@ -77,6 +77,7 @@ public class DiaryService {
                                 .map(DiaryHashtag::getHashtag)
                                 .map(Hashtag::getId)
                                 .toList())
+                        .characterId(1L) // todo: 임시 데이터
                         .build()
                 )
                 .toList();
