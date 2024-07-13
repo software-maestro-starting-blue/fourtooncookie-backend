@@ -11,5 +11,6 @@ public record DiarySavedResponse(
         Boolean isFavorite,
         LocalDateTime diaryDate,
         List<String> paintingImageUrls,
-        List<Long> hashtagIds
+        List<Long> hashtagIds,
+        Long characterId
 ) {}
