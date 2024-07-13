@@ -22,15 +22,15 @@ public class HashtagService {
 
     private final HashtagRepository hashtagInMemoryRepository;
 
-    public void createHashtag(HashtagSaveRequest hashtagSaveRequest) {
+    public void createHashtag(HashtagSaveRequest request) {
         Optional<Hashtag> foundHashtag = hashtagJpaRepository.findByNameAndHashtagType(
-                hashtagSaveRequest.hashtagName(), HashtagType.findFromString(hashtagSaveRequest.hashtagType()));
+                request.hashtagName(), HashtagType.from(request.hashtagType()));
         if (foundHashtag.isPresent()) {
-            throw new HashtagExistsException("Hashtag with ID " + hashtagSaveRequest.hashtagName() + " already exists");
+            throw new HashtagExistsException("Hashtag with ID " + request.hashtagName() + " already exists");
         }
         Hashtag createdHashtag = HashtagFactory.create(
-                hashtagSaveRequest.hashtagName(),
-                HashtagType.findFromString(hashtagSaveRequest.hashtagType())
+                request.hashtagName(),
+                HashtagType.from(request.hashtagType())
         );
         hashtagJpaRepository.save(createdHashtag);
         hashtagInMemoryRepository.save(createdHashtag);

@@ -21,11 +21,9 @@ public enum HashtagType {
         this.name = name;
     }
 
-
-    public static HashtagType findFromString(String text) {
+    public static HashtagType from(String text) {
         for (HashtagType hashtagType : HashtagType.values()) {
             if (text.equalsIgnoreCase(hashtagType.name())) {
-                log.info("{} hashtag type found", text);
                 return hashtagType;
             }
         }
