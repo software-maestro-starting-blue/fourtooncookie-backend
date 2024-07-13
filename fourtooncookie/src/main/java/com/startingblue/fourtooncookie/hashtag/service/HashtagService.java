@@ -67,10 +67,9 @@ public class HashtagService {
         return foundHashtags.stream().toList();
     }
 
-    public void deleteHashtag(HashtagDeleteRequest hashtagDeleteRequest) {
-        Long deleteHashtagId = hashtagDeleteRequest.hashtagId();
-        Hashtag foundHashtag = hashtagJpaRepository.findById(deleteHashtagId)
-                .orElseThrow(() -> new HashtagNoSuchElementException("Hashtag not found: " + deleteHashtagId));
+    public void deleteHashtag(final Long hashtagId) {
+        Hashtag foundHashtag = hashtagJpaRepository.findById(hashtagId)
+                .orElseThrow(() -> new HashtagNoSuchElementException("Hashtag not found: " + hashtagId));
         hashtagJpaRepository.delete(foundHashtag);
         hashtagInMemoryRepository.delete(foundHashtag);
     }

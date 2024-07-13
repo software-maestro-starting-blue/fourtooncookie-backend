@@ -18,14 +18,14 @@ public class HashtagController {
     private final HashtagService hashtagService;
 
     @PostMapping()
-    public ResponseEntity<HashtagSaveRequest> createHashtag(@RequestBody HashtagSaveRequest request) {
+    public ResponseEntity<HashtagSaveRequest> createHashtag(@RequestBody final HashtagSaveRequest request) {
         hashtagService.createHashtag(request);
         return ResponseEntity.ok(request);
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteHashtag(@RequestBody HashtagDeleteRequest request) {
-        hashtagService.deleteHashtag(request);
+    @DeleteMapping("/{hashtagId}")
+    public ResponseEntity<Void> deleteHashtag(@PathVariable final Long hashtagId) {
+        hashtagService.deleteHashtag(hashtagId);
         return ResponseEntity.noContent().build();
     }
 }
