@@ -26,7 +26,7 @@ public final class CharacterController {
     private final CharacterService characterService;
 
     @GetMapping("/character")
-    public ResponseEntity<CharacterResponses> showCharacter() {
+    public ResponseEntity<CharacterResponses> showCharacters() {
         final List<Character> characters = characterService.showCharacters();
         CharacterResponses characterResponses = new CharacterResponses(characters.stream()
                 .map(character -> new CharacterResponse(
