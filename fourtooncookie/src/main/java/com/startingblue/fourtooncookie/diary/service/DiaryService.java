@@ -38,9 +38,9 @@ public class DiaryService {
     }
 
     public void createDiary(final DiarySaveRequest request, final Long memberId) {
-//        Character character = characterRepository.findById(diarySaveRequest.characterId())
+//        Character character = characterRepository.findById(request.characterId())
 //                .orElseThrow(() -> new RuntimeException("Character with ID " + diarySaveRequest.characterId() + " not found"));
-//        Member member = memberRepository.findById(diarySaveRequest.memberId())
+//        Member member = memberRepository.findById(memberId())
 //                .orElseThrow(() -> new RuntimeException("Member with ID " + diarySaveRequest.memberId() + " not found"));
 
         Diary diary = Diary.builder()
