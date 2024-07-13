@@ -12,9 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +52,7 @@ public class HashtagService {
     }
 
     public List<Hashtag> findAllByHashtagIds(List<Long> hashtagIds) {
-        List<Hashtag> foundHashtags = new ArrayList<>();
+        Set<Hashtag> foundHashtags = new LinkedHashSet<>();
         for (Long hashtagId : hashtagIds) {
             Optional<Hashtag> foundHashtag = findById(hashtagId);
             if (foundHashtag.isEmpty()) {
@@ -66,7 +64,7 @@ public class HashtagService {
             }
             foundHashtags.add(foundHashtag.get());
         }
-        return foundHashtags;
+        return foundHashtags.stream().toList();
     }
 
     public void deleteHashtag(HashtagDeleteRequest hashtagDeleteRequest) {

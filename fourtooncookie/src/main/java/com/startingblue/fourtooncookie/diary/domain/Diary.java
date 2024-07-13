@@ -6,18 +6,17 @@ import com.startingblue.fourtooncookie.hashtag.domain.Hashtag;
 import com.startingblue.fourtooncookie.image.paintingimage.domain.PaintingImage;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Slf4j
 @Getter
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Diary {
 
@@ -30,15 +29,17 @@ public class Diary {
 
     private Boolean isFavorite;
 
+    private LocalDateTime diaryDate;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime modifiedAt;
 
     @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<PaintingImage> paintingImages = new ArrayList<>();
+    private List<PaintingImage> paintingImages;
 
     @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<DiaryHashtag> hashtags = new ArrayList<>();
+    private List<DiaryHashtag> hashtags;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Character character;
@@ -46,29 +47,28 @@ public class Diary {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    public Diary(String content, LocalDateTime createdAt, List<Hashtag> hashtags, Character character, Member member) {
-        this.content = content;
-        this.isFavorite = false;
-        updateHashtags(hashtags);
-        this.character = character;
-        this.member = member;
-        this.createdAt = createdAt;
-        this.modifiedAt = createdAt;
-    }
-
     public void update(String content, boolean isFavorite, LocalDateTime modifiedAt, List<Hashtag> hashtags, Character character) {
         this.content = content;
         this.isFavorite = isFavorite;
         this.modifiedAt = modifiedAt;
-        updateHashtags(hashtags);
         this.character = character;
+        updateHashtags(hashtags);
     }
 
-    private void updatePaintingImages(List<PaintingImage> paintingImages) {
-        removePaintingImages();
+    public void updatePaintingImages(List<PaintingImage> paintingImages) {
+        if (hasPaintingImages()) {
+            removePaintingImages();
+        }
         for (PaintingImage paintingImage : paintingImages) {
             addPaintingImage(paintingImage);
         }
+    }
+
+    public void updateHashtags(List<Hashtag> hashtags) {
+        if (hasHashtags()) {
+            removeHashtags(hashtags);
+        }
+        addHashtags(hashtags);
     }
 
     private void addPaintingImage(PaintingImage paintingImage) {
@@ -83,9 +83,8 @@ public class Diary {
         paintingImages.clear();
     }
 
-    private void updateHashtags(List<Hashtag> hashtags) {
-        removeHashtags(hashtags);
-        addHashtags(hashtags);
+    private boolean hasPaintingImages() {
+        return paintingImages != null && !paintingImages.isEmpty();
     }
 
     private void removeHashtags(List<Hashtag> hashtags) {
@@ -111,4 +110,8 @@ public class Diary {
         hashtags.add(diaryHashtag);
     }
 
+
+    private boolean hasHashtags() {
+        return hashtags != null && !hashtags.isEmpty();
+    }
 }

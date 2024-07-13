@@ -1,6 +1,15 @@
 package com.startingblue.fourtooncookie.diary.dto.response;
 
+import lombok.Builder;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
-public record DiarySavedResponse(String content, Boolean isFavorite, String createdAt, String updatedAt, List<String> paintingImageUrls, List<Long> hashtagIds) {
-}
+@Builder
+public record DiarySavedResponse(
+        String content,
+        Boolean isFavorite,
+        LocalDateTime diaryDate,
+        List<String> paintingImageUrls,
+        List<Long> hashtagIds
+) {}

@@ -26,12 +26,13 @@ public class DiaryController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/timeline")
+    @GetMapping("/timeline/{memberId}")
     public ResponseEntity<List<DiarySavedResponse>> readDiaries(
-            @RequestParam(defaultValue = "0") Integer pageNumber,
-            @RequestParam(defaultValue = "10") Integer pageSize) {
+            @PathVariable final Long memberId,
+            @RequestParam(defaultValue = "0") final Integer pageNumber,
+            @RequestParam(defaultValue = "10") final Integer pageSize) {
         DiaryPageRequest diaryPageRequest = new DiaryPageRequest(pageNumber, pageSize);
-        List<DiarySavedResponse> responses = diaryService.readDiaries(diaryPageRequest);
+        List<DiarySavedResponse> responses = diaryService.readDiaries(diaryPageRequest, memberId);
         return ResponseEntity.ok(responses);
     }
 
