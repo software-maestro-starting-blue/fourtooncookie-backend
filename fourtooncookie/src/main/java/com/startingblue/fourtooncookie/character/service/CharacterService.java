@@ -5,6 +5,8 @@ import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.ModelType;
 import com.startingblue.fourtooncookie.character.dto.request.AddCharacterRequest;
 import com.startingblue.fourtooncookie.character.dto.request.ModifyCharacterRequest;
+import com.startingblue.fourtooncookie.character.dto.response.CharacterResponse;
+import com.startingblue.fourtooncookie.character.dto.response.CharacterResponses;
 import com.startingblue.fourtooncookie.character.exception.CharacterNoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,7 +49,17 @@ public class CharacterService {
     }
 
     @Transactional(readOnly = true)
-    public List<Character> showCharacters() {
-        return characterRepository.findAll();
+    public CharacterResponses showCharacters() {
+        final List<Character> characters = characterRepository.findAll();
+        final CharacterResponses characterResponses = new CharacterResponses(characters.stream()
+                .map(character -> new CharacterResponse(
+                        character.getId(),
+                        character.getModelType().name(),
+                        character.getName(),
+                        character.getSelectionThumbnailUrl(),
+                        character.getCalendarThumbnailUrl()))
+                .toList());
+
+        return characterResponses;
     }
 }

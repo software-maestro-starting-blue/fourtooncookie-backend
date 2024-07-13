@@ -1,9 +1,7 @@
 package com.startingblue.fourtooncookie.character;
 
-import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.dto.request.AddCharacterRequest;
 import com.startingblue.fourtooncookie.character.dto.request.ModifyCharacterRequest;
-import com.startingblue.fourtooncookie.character.dto.response.CharacterResponse;
 import com.startingblue.fourtooncookie.character.dto.response.CharacterResponses;
 import com.startingblue.fourtooncookie.character.service.CharacterService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +15,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @RestController
 public final class CharacterController {
@@ -27,15 +23,7 @@ public final class CharacterController {
 
     @GetMapping("/character")
     public ResponseEntity<CharacterResponses> showCharacters() {
-        final List<Character> characters = characterService.showCharacters();
-        CharacterResponses characterResponses = new CharacterResponses(characters.stream()
-                .map(character -> new CharacterResponse(
-                        character.getId(),
-                        character.getModelType().name(),
-                        character.getName(),
-                        character.getSelectionThumbnailUrl(),
-                        character.getCalendarThumbnailUrl()))
-                .toList());
+        final CharacterResponses characterResponses = characterService.showCharacters();
 
         return ResponseEntity.ok(characterResponses);
     }
