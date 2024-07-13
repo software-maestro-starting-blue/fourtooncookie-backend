@@ -6,8 +6,7 @@ import com.startingblue.fourtooncookie.hashtag.dto.request.HashtagSaveRequest;
 import com.startingblue.fourtooncookie.hashtag.exception.common.HashtagExistsException;
 import com.startingblue.fourtooncookie.hashtag.exception.common.HashtagNoSuchElementException;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +15,9 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class HashtagService {
 
-    private static final Logger log = LoggerFactory.getLogger(HashtagService.class);
     private final HashtagRepository hashtagJpaRepository;
 
     private final HashtagRepository hashtagInMemoryRepository;
