@@ -11,6 +11,8 @@ import com.startingblue.fourtooncookie.diary.exception.DiaryNoSuchElementExcepti
 import com.startingblue.fourtooncookie.hashtag.domain.Hashtag;
 import com.startingblue.fourtooncookie.hashtag.service.HashtagService;
 import com.startingblue.fourtooncookie.image.paintingimage.domain.PaintingImage;
+import com.startingblue.fourtooncookie.member.domain.Member;
+import com.startingblue.fourtooncookie.member.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +32,8 @@ import java.util.List;
 public class DiaryService {
 
     private final DiaryRepository diaryRepository;
-
     private final HashtagService hashtagService;
+    private final MemberService memberService;
 
     public Diary findById(final Long id) {
         return diaryRepository.findById(id)
@@ -40,8 +43,8 @@ public class DiaryService {
     public void createDiary(final DiarySaveRequest request, final Long memberId) {
 //        Character character = characterRepository.findById(request.characterId())
 //                .orElseThrow(() -> new RuntimeException("Character with ID " + diarySaveRequest.characterId() + " not found"));
-//        Member member = memberRepository.findById(memberId())
-//                .orElseThrow(() -> new RuntimeException("Member with ID " + diarySaveRequest.memberId() + " not found"));
+        Member member = memberService.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member with ID " + memberId + " not found"));
 
         Diary diary = Diary.builder()
                 .content(request.content())
@@ -52,36 +55,29 @@ public class DiaryService {
                 .hashtags(new ArrayList<>())
                 .paintingImages(new ArrayList<>())
                 .character(null)
-                .member(null)
+                .member(member)
                 .build();
         List<Hashtag> foundHashtags = hashtagService.findAllByHashtagIds(request.hashtagIds());
         diary.updateHashtags(foundHashtags);
         diaryRepository.save(diary);
+        log.info("Create diary: {}", diary);
     }
 
-    public List<DiarySavedResponse> readDiaries(final DiaryPageRequest request, final Long memberId) {
-        return diaryRepository.findAllByMemberId(null, // todo : 임시 데이터
-                        PageRequest.of(request.pageNumber(), request.pageSize(), Sort.by(Sort.Direction.DESC, "createdAt"))
-                )
+    public List<DiarySavedResponse> readDiariesByMember(final DiaryPageRequest request, final Long memberId) {
+        return diaryRepository.findAllByMemberId(memberId,
+                        PageRequest.of(request.pageNumber(), request.pageSize(), Sort.by(Sort.Direction.DESC, "createdAt")))
                 .stream()
-                .map(diary -> DiarySavedResponse.builder()
-                        .content(diary.getContent())
-                        .isFavorite(diary.getIsFavorite())
-                        .diaryDate(diary.getDiaryDate())
-                        .paintingImageUrls(diary.getPaintingImages()
-                                .stream()
-                                .map(PaintingImage::getPath)
-                                .toList())
-                        .hashtagIds(diary.getHashtags()
-                                .stream()
-                                .map(DiaryHashtag::getHashtag)
-                                .map(Hashtag::getId)
-                                .toList())
-                        .characterId(1L) // todo: 임시 데이터
-                        .build()
-                )
+                .map(DiarySavedResponse::of)
                 .toList();
     }
+
+    public List<DiarySavedResponse> readAllDiaries() {
+        return diaryRepository.findAll()
+                .stream()
+                .map(DiarySavedResponse::of)
+                .toList();
+    }
+
 
     public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
         Diary existedDiary = diaryRepository.findById(diaryId)

@@ -56,7 +56,7 @@ public class HashtagService {
             if (foundHashtag.isEmpty()) {
                 foundHashtag = hashtagJpaRepository.findById(hashtagId);
                 if (foundHashtag.isEmpty()) {
-                    throw new HashtagNoSuchElementException("No hashtags found for type: " + hashtagId);
+                    throw new HashtagNoSuchElementException("Hashtag with ID " + hashtagId + " not found");
                 }
                 hashtagInMemoryRepository.save(foundHashtag.get());
             }
