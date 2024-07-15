@@ -41,6 +41,7 @@ public class DiaryService {
     }
 
     public void createDiary(final DiarySaveRequest request, final Long memberId) {
+        // TODO
 //        Character character = characterRepository.findById(request.characterId())
 //                .orElseThrow(() -> new RuntimeException("Character with ID " + diarySaveRequest.characterId() + " not found"));
         Member member = memberService.findById(memberId)
@@ -65,7 +66,7 @@ public class DiaryService {
 
     public List<DiarySavedResponse> readDiariesByMember(final DiaryPageRequest request, final Long memberId) {
         return diaryRepository.findAllByMemberId(memberId,
-                        PageRequest.of(request.pageNumber(), request.pageSize(), Sort.by(Sort.Direction.DESC, "createdAt")))
+                        PageRequest.of(request.pageNumber(), request.pageSize(), Sort.by(Sort.Direction.DESC, "diaryDate")))
                 .stream()
                 .map(DiarySavedResponse::of)
                 .toList();
@@ -86,6 +87,7 @@ public class DiaryService {
         List<Hashtag> foundHashtags = hashtagService.findAllByHashtagIds(request.hashtagIds());
         LocalDateTime modifiedAt = LocalDateTime.now();
 //        Character character = characterServer.findById(request.characterId());
+        //TODO
         existedDiary.update(request.content(), modifiedAt, foundHashtags, null);
         diaryRepository.save(existedDiary);
     }
