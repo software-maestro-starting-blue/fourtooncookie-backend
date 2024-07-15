@@ -63,16 +63,8 @@ public class Diary {
         }
     }
 
-    public void updateHashtags(List<Hashtag> hashtags) {
-        if (hasHashtags()) {
-            removeHashtags(hashtags);
-        }
-        addHashtags(hashtags);
-    }
-
-    private void addPaintingImage(PaintingImage paintingImage) {
-        paintingImages.add(paintingImage);
-        paintingImage.assignDiary(this);
+    private boolean hasPaintingImages() {
+        return paintingImages != null && !paintingImages.isEmpty();
     }
 
     private void removePaintingImages() {
@@ -82,8 +74,20 @@ public class Diary {
         paintingImages.clear();
     }
 
-    private boolean hasPaintingImages() {
-        return paintingImages != null && !paintingImages.isEmpty();
+    private void addPaintingImage(PaintingImage paintingImage) {
+        paintingImages.add(paintingImage);
+        paintingImage.assignDiary(this);
+    }
+
+    public void updateHashtags(List<Hashtag> hashtags) {
+        if (hasHashtags()) {
+            removeHashtags(hashtags);
+        }
+        addHashtags(hashtags);
+    }
+
+    private boolean hasHashtags() {
+        return hashtags != null && !hashtags.isEmpty();
     }
 
     private void removeHashtags(List<Hashtag> hashtags) {
@@ -109,8 +113,4 @@ public class Diary {
         hashtags.add(diaryHashtag);
     }
 
-
-    private boolean hasHashtags() {
-        return hashtags != null && !hashtags.isEmpty();
-    }
 }
