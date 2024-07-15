@@ -17,17 +17,6 @@ public class HashtagInMemoryRepository implements HashtagRepository {
     private final Map<Long, Hashtag> hashtags = new ConcurrentHashMap<>();
 
     @Override
-    public <S extends Hashtag> S save(S entity) {
-        hashtags.put(entity.getId(), entity);
-        return entity;
-    }
-
-    @Override
-    public void delete(Hashtag hashtag) {
-        hashtags.remove(hashtag.getId());
-    }
-
-    @Override
     public Optional<Hashtag> findById(Long id) {
         return Optional.ofNullable(hashtags.get(id));
     }
@@ -44,6 +33,17 @@ public class HashtagInMemoryRepository implements HashtagRepository {
         return hashtags.values().stream()
                 .filter(hashtag -> hashtag.getName().equals(hashtagName) && hashtag.getHashtagType().equals(hashtagType))
                 .findFirst();
+    }
+
+    @Override
+    public <S extends Hashtag> S save(S entity) {
+        hashtags.put(entity.getId(), entity);
+        return entity;
+    }
+
+    @Override
+    public void delete(Hashtag hashtag) {
+        hashtags.remove(hashtag.getId());
     }
 
     @Override
