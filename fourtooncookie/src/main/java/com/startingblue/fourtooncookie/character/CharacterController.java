@@ -47,7 +47,7 @@ public final class CharacterController {
     }
 
     @DeleteMapping("/character/{characterId}")
-    public ResponseEntity<HttpStatus> modifyCharacter(@PathVariable final Long characterId) {
+    public ResponseEntity<HttpStatus> deleteCharacter(@PathVariable final Long characterId) {
         characterService.deleteCharacter(characterId);
 
         return ResponseEntity
