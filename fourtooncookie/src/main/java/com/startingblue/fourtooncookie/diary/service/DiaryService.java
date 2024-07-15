@@ -86,7 +86,7 @@ public class DiaryService {
         List<Hashtag> foundHashtags = hashtagService.findAllByHashtagIds(request.hashtagIds());
         LocalDateTime modifiedAt = LocalDateTime.now();
 //        Character character = characterServer.findById(request.characterId());
-        existedDiary.update(request.content(), request.isFavorite(), modifiedAt, foundHashtags, null);
+        existedDiary.update(request.content(), modifiedAt, foundHashtags, null);
         diaryRepository.save(existedDiary);
     }
 

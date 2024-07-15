@@ -47,9 +47,8 @@ public class Diary {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    public void update(String content, boolean isFavorite, LocalDateTime modifiedAt, List<Hashtag> hashtags, Character character) {
+    public void update(String content, LocalDateTime modifiedAt, List<Hashtag> hashtags, Character character) {
         this.content = content;
-        this.isFavorite = isFavorite;
         this.modifiedAt = modifiedAt;
         this.character = character;
         updateHashtags(hashtags);

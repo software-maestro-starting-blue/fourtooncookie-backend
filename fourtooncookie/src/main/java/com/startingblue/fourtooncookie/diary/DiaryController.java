@@ -42,6 +42,9 @@ public class DiaryController {
             @RequestParam(defaultValue = "10") final Integer pageSize) {
         DiaryPageRequest diaryPageRequest = new DiaryPageRequest(pageNumber, pageSize);
         List<DiarySavedResponse> responses = diaryService.readDiariesByMember(diaryPageRequest, memberId);
+        if (responses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
         return ResponseEntity.ok(responses);
     }
 
@@ -57,7 +60,7 @@ public class DiaryController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/favorite/{diaryId}")
+    @PatchMapping("/favorite/{diaryId}")
     public ResponseEntity<Void> favoriteDiary(@PathVariable final Long diaryId, @RequestBody final boolean isFavorite) {
         log.info("favorite: {} diary {}", isFavorite, diaryId);
         return ResponseEntity.ok().build();
