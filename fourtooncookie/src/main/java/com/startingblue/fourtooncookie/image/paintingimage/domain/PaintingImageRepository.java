@@ -1,6 +1,5 @@
-package com.startingblue.fourtooncookie.image.paintingimage;
+package com.startingblue.fourtooncookie.image.paintingimage.domain;
 
-import com.startingblue.fourtooncookie.image.paintingimage.domain.PaintingImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PaintingImageRepository extends JpaRepository<PaintingImage, Long> {

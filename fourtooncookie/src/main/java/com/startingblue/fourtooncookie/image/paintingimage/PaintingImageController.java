@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.image;
+package com.startingblue.fourtooncookie.image.paintingimage;
 
 import com.startingblue.fourtooncookie.image.paintingimage.dto.PaintingImageSaveRequest;
 import com.startingblue.fourtooncookie.image.paintingimage.service.PaintingImageService;

@@ -3,7 +3,7 @@ package com.startingblue.fourtooncookie.image.paintingimage.service;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.service.DiaryService;
 import com.startingblue.fourtooncookie.image.paintingimage.domain.PaintingImage;
-import com.startingblue.fourtooncookie.image.paintingimage.PaintingImageRepository;
+import com.startingblue.fourtooncookie.image.paintingimage.domain.PaintingImageRepository;
 import com.startingblue.fourtooncookie.image.paintingimage.dto.PaintingImageSaveRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
