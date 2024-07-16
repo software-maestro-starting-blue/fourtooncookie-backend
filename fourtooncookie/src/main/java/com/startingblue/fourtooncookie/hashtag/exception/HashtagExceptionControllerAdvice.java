@@ -1,6 +1,5 @@
-package com.startingblue.fourtooncookie.hashtag.exception.common;
+package com.startingblue.fourtooncookie.hashtag.exception;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -8,11 +7,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice("com.startingblue.fourtooncookie.hashtag")
 public class HashtagExceptionControllerAdvice {
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<?> handleEntityNotFoundException(EntityNotFoundException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-    }
 
     @ExceptionHandler(HashtagNoSuchElementException.class)
     public ResponseEntity<?> handleHashtagNotFoundException(HashtagNoSuchElementException e) {
@@ -22,11 +16,6 @@ public class HashtagExceptionControllerAdvice {
     @ExceptionHandler(HashtagTypeNotFoundException.class)
     public ResponseEntity<?> handleHashtagTypeNotFoundException(HashtagTypeNotFoundException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(HashtagExistsException.class)
-    public ResponseEntity<?> handleHashtagExistsException(HashtagExistsException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

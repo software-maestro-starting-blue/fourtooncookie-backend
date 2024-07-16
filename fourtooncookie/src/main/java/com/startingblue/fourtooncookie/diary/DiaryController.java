@@ -1,12 +1,13 @@
 package com.startingblue.fourtooncookie.diary;
 
-import com.startingblue.fourtooncookie.diary.dto.request.DiaryPageRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
 import com.startingblue.fourtooncookie.diary.service.DiaryService;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.service.MemberService;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -38,10 +39,9 @@ public class DiaryController {
     @GetMapping("/timeline/{memberId}")
     public ResponseEntity<List<DiarySavedResponse>> readDiariesByMember (
             @PathVariable final Long memberId,
-            @RequestParam(defaultValue = "0") final Integer pageNumber,
-            @RequestParam(defaultValue = "10") final Integer pageSize) {
-        DiaryPageRequest diaryPageRequest = new DiaryPageRequest(pageNumber, pageSize);
-        List<DiarySavedResponse> responses = diaryService.readDiariesByMember(diaryPageRequest, memberId);
+            @RequestParam(defaultValue = "0") @Min(0) @Max(200) final int pageNumber,
+            @RequestParam(defaultValue = "10") @Min(1) @Max(10) final int pageSize) {
+        List<DiarySavedResponse> responses = diaryService.readDiariesByMember(memberId, pageNumber, pageSize);
         if (responses.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

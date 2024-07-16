@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.hashtag.exception.common;
+package com.startingblue.fourtooncookie.hashtag.exception;
 
 import java.util.NoSuchElementException;
 

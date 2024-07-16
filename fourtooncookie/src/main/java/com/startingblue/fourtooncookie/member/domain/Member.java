@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Entity
 @Slf4j
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Member {
 
     @Id
@@ -28,4 +28,6 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
 }

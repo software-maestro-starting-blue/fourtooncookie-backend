@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.hashtag.exception.common;
+package com.startingblue.fourtooncookie.hashtag.exception;
 
 public class HashtagTypeNotFoundException extends RuntimeException {
 

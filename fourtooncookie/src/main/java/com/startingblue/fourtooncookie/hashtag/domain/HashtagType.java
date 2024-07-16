@@ -1,11 +1,12 @@
 package com.startingblue.fourtooncookie.hashtag.domain;
 
-import com.startingblue.fourtooncookie.hashtag.exception.common.HashtagNoSuchElementException;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Getter
+@AllArgsConstructor
 public enum HashtagType {
 
     WEATHER(1L, "날씨"),
@@ -16,18 +17,4 @@ public enum HashtagType {
 
     private final String name;
 
-    HashtagType(final Long id, final String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public static HashtagType from(String text) {
-        for (HashtagType hashtagType : HashtagType.values()) {
-            if (text.equalsIgnoreCase(hashtagType.name())) {
-                return hashtagType;
-            }
-        }
-
-        throw new HashtagNoSuchElementException();
-    }
 }

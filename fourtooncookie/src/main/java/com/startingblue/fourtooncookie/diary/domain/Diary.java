@@ -1,7 +1,7 @@
 package com.startingblue.fourtooncookie.diary.domain;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
-import com.startingblue.fourtooncookie.DiaryHashtag;
+import com.startingblue.fourtooncookie.converter.LongListToStringConverter;
 import com.startingblue.fourtooncookie.hashtag.domain.Hashtag;
 import com.startingblue.fourtooncookie.image.paintingimage.domain.PaintingImage;
 import com.startingblue.fourtooncookie.member.domain.Member;
@@ -10,7 +10,9 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Slf4j
@@ -38,8 +40,10 @@ public class Diary {
     @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<PaintingImage> paintingImages;
 
-    @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<DiaryHashtag> hashtags;
+//    private String hashtagIds;
+
+    @Convert(converter = LongListToStringConverter.class)
+    private List<Long> hashtags = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Character character;
@@ -80,37 +84,11 @@ public class Diary {
     }
 
     public void updateHashtags(List<Hashtag> hashtags) {
-        if (hasHashtags()) {
-            removeHashtags(hashtags);
-        }
-        addHashtags(hashtags);
+        this.hashtags = hashtags.stream()
+                .map(Hashtag::getId)
+                .collect(Collectors.toList());
+//        this.hashtags = hashtags;
     }
 
-    private boolean hasHashtags() {
-        return hashtags != null && !hashtags.isEmpty();
-    }
-
-    private void removeHashtags(List<Hashtag> hashtags) {
-        for (Hashtag hashtag : hashtags) {
-            removeHashtag(hashtag);
-        }
-    }
-
-    private void removeHashtag(Hashtag hashtag) {
-        DiaryHashtag diaryHashtag = new DiaryHashtag(this, hashtag);
-        hashtags.remove(diaryHashtag);
-        diaryHashtag.assignDiary(null);
-    }
-
-    private void addHashtags(List<Hashtag> hashtags) {
-        for (Hashtag hashtag : hashtags) {
-            addHashtag(hashtag);
-        }
-    }
-
-    private void addHashtag(Hashtag hashtag) {
-        DiaryHashtag diaryHashtag = new DiaryHashtag(this, hashtag);
-        hashtags.add(diaryHashtag);
-    }
 
 }
