@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Diary {
+public final class Diary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,10 +40,8 @@ public class Diary {
     @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<PaintingImage> paintingImages;
 
-//    private String hashtagIds;
-
     @Convert(converter = LongListToStringConverter.class)
-    private List<Long> hashtags = new ArrayList<>();
+    private List<Long> hashtagsIds= new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Character character;
@@ -84,7 +82,7 @@ public class Diary {
     }
 
     public void updateHashtags(List<Hashtag> hashtags) {
-        this.hashtags = hashtags.stream()
+        this.hashtagsIds = hashtags.stream()
                 .map(Hashtag::getId)
                 .collect(Collectors.toList());
 //        this.hashtags = hashtags;

@@ -27,7 +27,7 @@ public record DiarySavedResponse(
                         .stream()
                         .map(PaintingImage::getPath)
                         .toList())
-                .hashtagIds(diary.getHashtags())
+                .hashtagIds(diary.getHashtagsIds())
                 .characterId(1L) // todo: 임시 데이터
                 .build();
     }

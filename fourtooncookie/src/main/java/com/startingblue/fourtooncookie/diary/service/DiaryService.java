@@ -48,7 +48,7 @@ public class DiaryService {
                 .diaryDate(request.diaryDate())
                 .createdAt(LocalDateTime.now())
                 .modifiedAt(LocalDateTime.now())
-                .hashtags(new ArrayList<>())
+                .hashtagsIds(new ArrayList<>())
                 .paintingImages(new ArrayList<>())
                 .character(null)
                 .member(member)
