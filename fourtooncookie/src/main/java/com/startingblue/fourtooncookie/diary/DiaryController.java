@@ -26,7 +26,7 @@ public class DiaryController {
 
     @PostMapping
     public ResponseEntity<Void> createDiary(@RequestBody final DiarySaveRequest request) {
-        memberService.save(new Member());
+        memberService.save(new Member()); // TODO : 삭제 해야함.
         diaryService.createDiary(request, 1L); // TODO : 우선 디폴트 값 넣어 놓음.
         return ResponseEntity.ok().build();
     }
