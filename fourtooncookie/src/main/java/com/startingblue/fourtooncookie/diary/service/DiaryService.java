@@ -12,6 +12,7 @@ import com.startingblue.fourtooncookie.member.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,13 +38,15 @@ public class DiaryService {
 
     public void createDiary(final DiarySaveRequest request, final Long memberId) {
         // TODO
-//        Character character = characterRepository.findById(request.characterId())
-//                .orElseThrow(() -> new RuntimeException("Character with ID " + diarySaveRequest.characterId() + " not found"));
-        Member member = memberService.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member with ID " + memberId + " not found"));
+//        Character character = characterService.findById(request.characterId())
+        Member member = memberService.findById(memberId);
+        Diary diary = buildDiary(request, member);
+        diary.updateHashtags(Hashtag.findHashtagsByIds(request.hashtagIds()));
+        diaryRepository.save(diary);
+    }
 
-        log.info(request.hashtagIds().toString());
-        Diary diary = Diary.builder()
+    private static Diary buildDiary(DiarySaveRequest request, Member member) {
+        return Diary.builder()
                 .content(request.content())
                 .isFavorite(false)
                 .diaryDate(request.diaryDate())
@@ -53,23 +57,12 @@ public class DiaryService {
                 .character(null)
                 .member(member)
                 .build();
-        List<Hashtag> foundHashtags = Hashtag.findHashtagsByIds(request.hashtagIds());
-        diary.updateHashtags(foundHashtags);
-        diaryRepository.save(diary);
-        log.info("Create diary: {}", diary);
     }
 
     public List<DiarySavedResponse> readDiariesByMember(final Long memberId, final int pageNumber, final int pageSize) {
-        return diaryRepository.findAllByMemberId(memberId,
-                        PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "diaryDate")))
-                .stream()
-                .map(DiarySavedResponse::of)
-                .toList();
-    }
-
-    public List<DiarySavedResponse> readAllDiaries() {
-        return diaryRepository.findAll()
-                .stream()
+        Member foundMember = memberService.findById(memberId);
+        Page<Diary> diaries = diaryRepository.findAllByMember(foundMember, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "diaryDate")));
+        return diaries.stream()
                 .map(DiarySavedResponse::of)
                 .toList();
     }
@@ -78,10 +71,9 @@ public class DiaryService {
         Diary existedDiary = diaryRepository.findById(diaryId)
                         .orElseThrow(DiaryNoSuchElementException::new);
 
-        List<Hashtag> foundHashtags = Hashtag.findHashtagsByIds(request.hashtagIds());
         LocalDateTime modifiedAt = LocalDateTime.now();
-//        Character character = characterServer.findById(request.characterId());
-        //TODO
+        List<Hashtag> foundHashtags = Hashtag.findHashtagsByIds(request.hashtagIds());
+//        Character character = characterServer.findById(request.characterId()); //TODO
         existedDiary.update(request.content(), modifiedAt, foundHashtags, null);
         diaryRepository.save(existedDiary);
     }
