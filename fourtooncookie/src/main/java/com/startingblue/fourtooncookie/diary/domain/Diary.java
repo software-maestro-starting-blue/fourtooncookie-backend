@@ -5,13 +5,18 @@ import com.startingblue.fourtooncookie.converter.LongListToStringConverter;
 import com.startingblue.fourtooncookie.hashtag.domain.Hashtag;
 import com.startingblue.fourtooncookie.image.paintingimage.domain.PaintingImage;
 import com.startingblue.fourtooncookie.member.domain.Member;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Entity
@@ -27,6 +32,8 @@ public final class Diary {
     @Column(name = "diary_id")
     private Long id;
 
+    @Size(min = 1, max = 1000)
+    @NotBlank
     private String content;
 
     private Boolean isFavorite;
@@ -38,15 +45,19 @@ public final class Diary {
     private LocalDateTime modifiedAt;
 
     @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Nullable
     private List<PaintingImage> paintingImages;
 
     @Convert(converter = LongListToStringConverter.class)
+    @Builder.Default
     private List<Long> hashtagsIds= new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
+//    @NotNull TODO
     private Character character;
 
     @ManyToOne(fetch = FetchType.LAZY)
+//    @NotNull TODO
     private Member member;
 
     public void update(String content, LocalDateTime modifiedAt, List<Hashtag> hashtags, Character character) {
@@ -70,7 +81,7 @@ public final class Diary {
     }
 
     private void removePaintingImages() {
-        for (PaintingImage paintingImage : paintingImages) {
+        for (PaintingImage paintingImage : Objects.requireNonNull(paintingImages)) {
             paintingImage.assignDiary(null);
         }
         paintingImages.clear();
@@ -85,8 +96,6 @@ public final class Diary {
         this.hashtagsIds = hashtags.stream()
                 .map(Hashtag::getId)
                 .collect(Collectors.toList());
-//        this.hashtags = hashtags;
     }
-
 
 }

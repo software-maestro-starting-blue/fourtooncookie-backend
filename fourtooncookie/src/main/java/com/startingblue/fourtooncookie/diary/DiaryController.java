@@ -6,6 +6,7 @@ import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
 import com.startingblue.fourtooncookie.diary.service.DiaryService;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -32,15 +33,11 @@ public class DiaryController {
     }
 
     @GetMapping("/timeline")
-    public ResponseEntity<List<DiarySavedResponse>> readAllDiaries() {
-        return ResponseEntity.ok(diaryService.readAllDiaries());
-    }
-
-    @GetMapping("/timeline/{memberId}")
     public ResponseEntity<List<DiarySavedResponse>> readDiariesByMember (
-            @PathVariable final Long memberId,
+            HttpServletRequest httpRequest,
             @RequestParam(defaultValue = "0") @Min(0) @Max(200) final int pageNumber,
             @RequestParam(defaultValue = "10") @Min(1) @Max(10) final int pageSize) {
+        Long memberId = Long.parseLong(httpRequest.getHeader("memberId")); // TODO 현재는 헤더에 넣고, jwt 를 이용코드로 변경 예정
         List<DiarySavedResponse> responses = diaryService.readDiariesByMember(memberId, pageNumber, pageSize);
         if (responses.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -49,7 +46,8 @@ public class DiaryController {
     }
 
     @PatchMapping("/{diaryId}")
-    public ResponseEntity<Void> updateDiary(@PathVariable final Long diaryId, @RequestBody final DiaryUpdateRequest request) {
+    public ResponseEntity<Void> updateDiary(@PathVariable final Long diaryId,
+                                            @RequestBody final DiaryUpdateRequest request) {
         diaryService.updateDiary(diaryId, request);
         return ResponseEntity.ok().build();
     }
