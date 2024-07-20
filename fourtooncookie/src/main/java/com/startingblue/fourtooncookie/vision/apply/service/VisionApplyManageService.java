@@ -18,6 +18,8 @@ public class VisionApplyManageService {
     @Value("${ai.split.prompt}")
     private String CONTENT_SPLIT_SYSTEM_PROMPT;
 
+    private final static String RESULT_SPLIT_REGEX = "\\.";
+
     private final List<VisionApplyService> visionApplyServices;
 
     private final LLMService llmService;
@@ -27,26 +29,21 @@ public class VisionApplyManageService {
     public void createImageByDiary(Long diaryId, String content, Character character) {
         VisionApplyService visionApplyService = findVisionApplyServiceByModelType(character.getModelType());
 
-        List<String> contents = splitContentBy4(content);
+        List<String> contents = seperateContentBy4contents(content);
 
         visionApplyService.processVisionApply(diaryId, contents, character);
     }
 
     private VisionApplyService findVisionApplyServiceByModelType(ModelType modelType) {
-        Optional<VisionApplyService> foundVisionApplyService = visionApplyServices.stream()
+        return visionApplyServices.stream()
                 .filter(visionApplyService -> visionApplyService.getModelType().equals(modelType))
-                .findFirst();
-
-        if (foundVisionApplyService.isEmpty()) {
-            throw new IllegalStateException("No Vision Service Found");
-        }
-
-        return foundVisionApplyService.get();
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No Vision Service Found"));
     }
 
-    private List<String> splitContentBy4(String content) {
+    private List<String> seperateContentBy4contents(String content) {
         String result = llmService.getLLMResult(CONTENT_SPLIT_SYSTEM_PROMPT, content);
-        return List.of(result.split("\\."));
+        return List.of(result.split(RESULT_SPLIT_REGEX));
     }
 
 }
