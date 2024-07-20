@@ -25,23 +25,23 @@ public class VisionApplyManageService {
 
     @Async
     public void createImageByDiary(Long diaryId, String content, Character character) {
-        VisionApplyService visionApplyService = findVisionRequestServiceByModelType(character.getModelType());
+        VisionApplyService visionApplyService = findVisionApplyServiceByModelType(character.getModelType());
 
         List<String> contents = splitContentBy4(content);
 
         visionApplyService.processVisionApply(diaryId, contents, character);
     }
 
-    private VisionApplyService findVisionRequestServiceByModelType(ModelType modelType) {
-        Optional<VisionApplyService> visionApplyService = visionApplyServices.stream()
-                .filter(nowVisionService -> nowVisionService.getModelType().equals(modelType))
+    private VisionApplyService findVisionApplyServiceByModelType(ModelType modelType) {
+        Optional<VisionApplyService> foundVisionApplyService = visionApplyServices.stream()
+                .filter(visionApplyService -> visionApplyService.getModelType().equals(modelType))
                 .findFirst();
 
-        if (visionApplyService.isEmpty()) {
+        if (foundVisionApplyService.isEmpty()) {
             throw new IllegalStateException("No Vision Service Found");
         }
 
-        return visionApplyService.get();
+        return foundVisionApplyService.get();
     }
 
     private List<String> splitContentBy4(String content) {
