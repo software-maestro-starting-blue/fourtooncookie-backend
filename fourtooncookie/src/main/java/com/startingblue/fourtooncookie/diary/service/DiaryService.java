@@ -40,23 +40,18 @@ public class DiaryService {
         // TODO
 //        Character character = characterService.findById(request.characterId())
         Member member = memberService.findById(memberId);
-        Diary diary = buildDiary(request, member);
-        diary.updateHashtags(Hashtag.findHashtagsByIds(request.hashtagIds()));
-        diaryRepository.save(diary);
-    }
-
-    private static Diary buildDiary(DiarySaveRequest request, Member member) {
-        return Diary.builder()
+        Diary diary = Diary.builder()
                 .content(request.content())
                 .isFavorite(false)
                 .diaryDate(request.diaryDate())
                 .createdAt(LocalDateTime.now())
                 .modifiedAt(LocalDateTime.now())
-                .hashtagsIds(new ArrayList<>())
-                .paintingImages(new ArrayList<>())
-                .character(null)
+                .hashtagsIds(request.hashtagIds())
+                .paintingImageUrls(new ArrayList<>())
+                .character(null) // todo : character 로 변경
                 .member(member)
                 .build();
+        diaryRepository.save(diary);
     }
 
     public List<DiarySavedResponse> readDiariesByMember(final Long memberId, final int pageNumber, final int pageSize) {
@@ -68,19 +63,16 @@ public class DiaryService {
     }
 
     public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
-        Diary existedDiary = diaryRepository.findById(diaryId)
-                        .orElseThrow(DiaryNoSuchElementException::new);
+        Diary existedDiary = findById(diaryId);
 
         LocalDateTime modifiedAt = LocalDateTime.now();
-        List<Hashtag> foundHashtags = Hashtag.findHashtagsByIds(request.hashtagIds());
-//        Character character = characterServer.findById(request.characterId()); //TODO
-        existedDiary.update(request.content(), modifiedAt, foundHashtags, null);
+//        Character character = characterServer.findById(request.characterId()); //TODO 주석 제거
+        existedDiary.update(request.content(), modifiedAt, request.paintingImageUrls() ,request.hashtagIds(), null); // todo: null 을 character 로 변경
         diaryRepository.save(existedDiary);
     }
 
     public void deleteDiary(Long diaryId) {
-        Diary foundDiary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new DiaryNoSuchElementException("diary not found: " + diaryId));
+        Diary foundDiary = findById(diaryId);
         diaryRepository.delete(foundDiary);
     }
 }

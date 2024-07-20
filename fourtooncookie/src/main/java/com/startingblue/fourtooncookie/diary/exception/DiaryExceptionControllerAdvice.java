@@ -11,16 +11,11 @@ public class DiaryExceptionControllerAdvice {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<?> handleEntityNotFoundException(EntityNotFoundException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Diary not found: " + e.getMessage());
     }
 
     @ExceptionHandler(DiaryNoSuchElementException.class)
-    public ResponseEntity<?> handleDiaryNoSuchElementException(DiaryNoSuchElementException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<String> handleDiaryNoSuchElementException(DiaryNoSuchElementException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Diary not found: " + e.getMessage());
     }
 }

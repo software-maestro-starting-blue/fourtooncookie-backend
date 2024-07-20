@@ -1,7 +1,6 @@
 package com.startingblue.fourtooncookie.diary.dto.response;
 
 import com.startingblue.fourtooncookie.diary.domain.Diary;
-import com.startingblue.fourtooncookie.image.paintingimage.domain.PaintingImage;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -23,12 +22,12 @@ public record DiarySavedResponse(
                 .content(diary.getContent())
                 .isFavorite(diary.isFavorite())
                 .diaryDate(diary.getDiaryDate())
-                .paintingImageUrls(diary.getPaintingImages()
+                .paintingImageUrls(diary.getPaintingImageUrls()
                         .stream()
-                        .map(PaintingImage::getPath)
+                        .map(String::valueOf)
                         .toList())
                 .hashtagIds(diary.getHashtagsIds())
-                .characterId(1L) // todo: 임시 데이터
+                .characterId(diary.getCharacter().getId())
                 .build();
     }
 }
