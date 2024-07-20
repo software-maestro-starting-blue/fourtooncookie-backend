@@ -75,7 +75,6 @@ public class DiaryService {
     public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
         Diary existedDiary = findById(diaryId);
 
-        LocalDateTime modifiedAt = LocalDateTime.now();
 //        Character character = characterServer.findById(request.characterId()); //TODO 주석 제거
         existedDiary.update(request.content(), DIARY_DEFAULT_IMAGE_URLS,request.hashtagIds(), null); // todo: null 을 character 로 변경
         diaryRepository.save(existedDiary);
