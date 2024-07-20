@@ -24,7 +24,7 @@ public class VisionApplyManageService {
 
 
     @Async
-    public void createAIImageByDiary(Long diaryId, String content, Character character) {
+    public void createImageByDiary(Long diaryId, String content, Character character) {
         VisionApplyService visionApplyService = findVisionRequestServiceByModelType(character.getModelType());
 
         List<String> contents = splitContentBy4(content);
