@@ -31,7 +31,7 @@ public record DiarySavedResponse(
                 .hashtagIds(diary.getHashtagsIds())
                 .characterId(Optional.ofNullable(diary.getCharacter())
                         .map(Character::getId)
-                        .orElse(null))
+                        .orElse(null)) // todo: 나중에는 필요 없는 코드, 테스트용
                 .build();
     }
 }
