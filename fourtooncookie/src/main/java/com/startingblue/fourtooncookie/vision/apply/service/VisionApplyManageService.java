@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class VisionApplyMainService {
+public class VisionApplyManageService {
 
     @Value("${ai.split.prompt}")
     private String CONTENT_SPLIT_SYSTEM_PROMPT;
