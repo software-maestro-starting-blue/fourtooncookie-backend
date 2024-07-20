@@ -55,12 +55,10 @@ public final class Diary extends BaseEntity {
     private Member member;
 
     public void update(String content,
-                       List<URL> paintingImageUrls,
                        List<Long> hashtagIds,
                        Character character) {
         this.content = content;
         this.character = character;
-        updatePaintingImageUrls(paintingImageUrls);
         updateHashtags(hashtagIds);
     }
 
@@ -84,12 +82,14 @@ public final class Diary extends BaseEntity {
                 Objects.equals(paintingImageUrls, diary.paintingImageUrls) &&
                 Objects.equals(hashtagsIds, diary.hashtagsIds) &&
                 Objects.equals(character, diary.character) &&
-                Objects.equals(member, diary.member);
+                Objects.equals(member, diary.member) &&
+                Objects.equals(getCreatedDateTime(), diary.getCreatedDateTime()) &&
+                Objects.equals(getModifiedDateTime(), diary.getModifiedDateTime());
     }
 
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, content, isFavorite, diaryDate, paintingImageUrls, hashtagsIds, character, member);
+        return Objects.hash(id, content, isFavorite, diaryDate, paintingImageUrls, hashtagsIds, character, member, getCreatedDateTime(), getModifiedDateTime());
     }
 }

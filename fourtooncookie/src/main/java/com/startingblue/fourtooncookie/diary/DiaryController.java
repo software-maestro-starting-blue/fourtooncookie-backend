@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.diary;
 
+import com.startingblue.fourtooncookie.diary.dto.request.DiaryPaintingImagesUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
@@ -48,6 +49,13 @@ public class DiaryController {
     @PatchMapping("/{diaryId}")
     public ResponseEntity<Void> updateDiary(@PathVariable final Long diaryId,
                                             @RequestBody final DiaryUpdateRequest request) {
+        diaryService.updateDiary(diaryId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{diaryId}/painting-images")
+    public ResponseEntity<Void> updateDiary(@PathVariable final Long diaryId,
+                                            @RequestBody final DiaryPaintingImagesUpdateRequest request) {
         diaryService.updateDiary(diaryId, request);
         return ResponseEntity.ok().build();
     }

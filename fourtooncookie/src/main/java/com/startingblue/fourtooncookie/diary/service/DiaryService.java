@@ -2,6 +2,7 @@ package com.startingblue.fourtooncookie.diary.service;
 
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
+import com.startingblue.fourtooncookie.diary.dto.request.DiaryPaintingImagesUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -56,7 +56,7 @@ public class DiaryService {
                 .isFavorite(false)
                 .diaryDate(request.diaryDate())
                 .hashtagsIds(request.hashtagIds())
-                .paintingImageUrls(new ArrayList<>())
+                .paintingImageUrls(DIARY_DEFAULT_IMAGE_URLS)
                 .character(null) // todo : character 로 변경
                 .member(member)
                 .build();
@@ -73,9 +73,14 @@ public class DiaryService {
 
     public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
         Diary existedDiary = findById(diaryId);
-
 //        Character character = characterServer.findById(request.characterId()); //TODO 주석 제거
-        existedDiary.update(request.content(), DIARY_DEFAULT_IMAGE_URLS,request.hashtagIds(), null); // todo: null 을 character 로 변경
+        existedDiary.update(request.content(), request.hashtagIds(), null); // todo: null 을 character 로 변경
+        diaryRepository.save(existedDiary);
+    }
+
+    public void updateDiary(Long diaryId, DiaryPaintingImagesUpdateRequest request) {
+        Diary existedDiary = findById(diaryId);
+        existedDiary.updatePaintingImageUrls(request.paintingImageUrls());
         diaryRepository.save(existedDiary);
     }
 
