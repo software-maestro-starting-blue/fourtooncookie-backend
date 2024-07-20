@@ -61,6 +61,7 @@ public class DiaryService {
                 .member(member)
                 .build();
         diaryRepository.save(diary);
+        // todo vision
     }
 
     public List<DiarySavedResponse> readDiariesByMember(final Long memberId, final int pageNumber, final int pageSize) {
@@ -76,8 +77,10 @@ public class DiaryService {
 //        Character character = characterServer.findById(request.characterId()); //TODO 주석 제거
         existedDiary.update(request.content(), request.hashtagIds(), null); // todo: null 을 character 로 변경
         diaryRepository.save(existedDiary);
+        // todo vision
     }
 
+    // TODO listener 로 코드 이동 예정
     public void updateDiary(Long diaryId, DiaryPaintingImagesUpdateRequest request) {
         Diary existedDiary = findById(diaryId);
         existedDiary.updatePaintingImageUrls(request.paintingImageUrls());
