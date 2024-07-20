@@ -18,4 +18,10 @@ public class DiaryExceptionControllerAdvice {
     public ResponseEntity<String> handleDiaryNoSuchElementException(DiaryNoSuchElementException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Diary not found: " + e.getMessage());
     }
+
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleDiaryNoSuchElementException(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Diary default image path not found:  " + e.getMessage());
+    }
 }

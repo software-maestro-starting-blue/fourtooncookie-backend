@@ -16,6 +16,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,18 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class DiaryService {
+
+    private static final URL DIARY_DEFAULT_IMAGE_URL; // TODO s3 기본 이미지로 수정
+    private static final List<URL> DIARY_DEFAULT_IMAGE_URLS;
+
+    static {
+        try {
+            DIARY_DEFAULT_IMAGE_URL = new URL("http://s3/defaultImage.png");
+            DIARY_DEFAULT_IMAGE_URLS = List.of(DIARY_DEFAULT_IMAGE_URL, DIARY_DEFAULT_IMAGE_URL, DIARY_DEFAULT_IMAGE_URL, DIARY_DEFAULT_IMAGE_URL);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Invalid URL");
+        }
+    }
 
     private final DiaryRepository diaryRepository;
     private final MemberService memberService;
@@ -65,7 +79,7 @@ public class DiaryService {
 
         LocalDateTime modifiedAt = LocalDateTime.now();
 //        Character character = characterServer.findById(request.characterId()); //TODO 주석 제거
-        existedDiary.update(request.content(), modifiedAt, request.paintingImageUrls() ,request.hashtagIds(), null); // todo: null 을 character 로 변경
+        existedDiary.update(request.content(), modifiedAt, DIARY_DEFAULT_IMAGE_URLS,request.hashtagIds(), null); // todo: null 을 character 로 변경
         diaryRepository.save(existedDiary);
     }
 
