@@ -56,8 +56,6 @@ public class DiaryService {
                 .content(request.content())
                 .isFavorite(false)
                 .diaryDate(request.diaryDate())
-                .createdAt(LocalDateTime.now())
-                .modifiedAt(LocalDateTime.now())
                 .hashtagsIds(request.hashtagIds())
                 .paintingImageUrls(new ArrayList<>())
                 .character(null) // todo : character 로 변경
@@ -79,7 +77,7 @@ public class DiaryService {
 
         LocalDateTime modifiedAt = LocalDateTime.now();
 //        Character character = characterServer.findById(request.characterId()); //TODO 주석 제거
-        existedDiary.update(request.content(), modifiedAt, DIARY_DEFAULT_IMAGE_URLS,request.hashtagIds(), null); // todo: null 을 character 로 변경
+        existedDiary.update(request.content(), DIARY_DEFAULT_IMAGE_URLS,request.hashtagIds(), null); // todo: null 을 character 로 변경
         diaryRepository.save(existedDiary);
     }
 

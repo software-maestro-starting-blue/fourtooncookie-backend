@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.diary.domain;
 
+import com.startingblue.fourtooncookie.BaseEntity;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.converter.LongListToStringConverter;
 import com.startingblue.fourtooncookie.converter.UrlListToStringConverter;
@@ -12,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -23,7 +23,7 @@ import java.util.Objects;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public final class Diary {
+public final class Diary extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,10 +37,6 @@ public final class Diary {
     private boolean isFavorite;
 
     private LocalDate diaryDate;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime modifiedAt;
 
     @Convert(converter = UrlListToStringConverter.class)
     @Builder.Default
@@ -58,10 +54,11 @@ public final class Diary {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    public void update(String content, LocalDateTime modifiedAt,
-                       List<URL> paintingImageUrls, List<Long> hashtagIds, Character character) {
+    public void update(String content,
+                       List<URL> paintingImageUrls,
+                       List<Long> hashtagIds,
+                       Character character) {
         this.content = content;
-        this.modifiedAt = modifiedAt;
         this.character = character;
         updatePaintingImageUrls(paintingImageUrls);
         updateHashtags(hashtagIds);
@@ -84,8 +81,6 @@ public final class Diary {
                 Objects.equals(id, diary.id) &&
                 Objects.equals(content, diary.content) &&
                 Objects.equals(diaryDate, diary.diaryDate) &&
-                Objects.equals(createdAt, diary.createdAt) &&
-                Objects.equals(modifiedAt, diary.modifiedAt) &&
                 Objects.equals(paintingImageUrls, diary.paintingImageUrls) &&
                 Objects.equals(hashtagsIds, diary.hashtagsIds) &&
                 Objects.equals(character, diary.character) &&
@@ -95,6 +90,6 @@ public final class Diary {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, content, isFavorite, diaryDate, createdAt, modifiedAt, paintingImageUrls, hashtagsIds, character, member);
+        return Objects.hash(id, content, isFavorite, diaryDate, paintingImageUrls, hashtagsIds, character, member);
     }
 }

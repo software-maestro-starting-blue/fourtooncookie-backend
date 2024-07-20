@@ -1,10 +1,12 @@
 package com.startingblue.fourtooncookie.diary.dto.response;
 
+import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import lombok.Builder;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Builder
 public record DiarySavedResponse(
@@ -27,7 +29,9 @@ public record DiarySavedResponse(
                         .map(String::valueOf)
                         .toList())
                 .hashtagIds(diary.getHashtagsIds())
-                .characterId(diary.getCharacter().getId())
+                .characterId(Optional.ofNullable(diary.getCharacter())
+                        .map(Character::getId)
+                        .orElse(null))
                 .build();
     }
 }
