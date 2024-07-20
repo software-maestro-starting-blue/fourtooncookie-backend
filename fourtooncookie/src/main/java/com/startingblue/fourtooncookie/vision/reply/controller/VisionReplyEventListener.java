@@ -14,7 +14,7 @@ public class VisionReplyEventListener {
 
     @EventListener
     public void handleVisionReplyEvent(VisionReplyEvent event) {
-        visionReplyService.processVisionReply(event.getDiaryId(), event.getImages());
+        visionReplyService.processVisionReply(event.diaryId(), event.images());
     }
 
 }
