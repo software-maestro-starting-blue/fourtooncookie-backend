@@ -8,11 +8,11 @@ import com.startingblue.fourtooncookie.member.domain.Member;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +36,9 @@ public final class Diary {
     @NotBlank
     private String content;
 
-    private Boolean isFavorite;
+    private boolean isFavorite;
 
-    private LocalDateTime diaryDate;
+    private LocalDate diaryDate;
 
     private LocalDateTime createdAt;
 
@@ -60,9 +60,27 @@ public final class Diary {
 //    @NotNull TODO
     private Member member;
 
-    public void update(String content, LocalDateTime modifiedAt, List<Hashtag> hashtags, Character character) {
+    @Builder
+    public Diary(String content, boolean isFavorite,
+                 LocalDate diaryDate, LocalDateTime createdAt, LocalDateTime modifiedAt,
+                 @Nullable List<PaintingImage> paintingImages, List<Long> hashtagsIds,
+                 Character character, Member member) {
+        this.content = content;
+        this.isFavorite = isFavorite;
+        this.diaryDate = diaryDate;
+        this.createdAt = createdAt;
+        this.modifiedAt = modifiedAt;
+        this.paintingImages = paintingImages;
+        this.hashtagsIds = hashtagsIds;
+        this.character = character;
+        this.member = member;
+    }
+
+    public void update(String content, LocalDateTime modifiedAt,
+                       List<Hashtag> hashtags, Character character) {
         this.content = content;
         this.modifiedAt = modifiedAt;
+        this.paintingImages = new ArrayList<>();
         this.character = character;
         updateHashtags(hashtags);
     }
@@ -98,4 +116,16 @@ public final class Diary {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Diary diary = (Diary) o;
+        return isFavorite == diary.isFavorite && Objects.equals(id, diary.id) && Objects.equals(content, diary.content) && Objects.equals(diaryDate, diary.diaryDate) && Objects.equals(createdAt, diary.createdAt) && Objects.equals(modifiedAt, diary.modifiedAt) && Objects.equals(paintingImages, diary.paintingImages) && Objects.equals(hashtagsIds, diary.hashtagsIds) && Objects.equals(character, diary.character) && Objects.equals(member, diary.member);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, content, isFavorite, diaryDate, createdAt, modifiedAt, paintingImages, hashtagsIds, character, member);
+    }
 }
