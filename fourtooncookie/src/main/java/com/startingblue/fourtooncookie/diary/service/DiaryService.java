@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -61,7 +60,7 @@ public class DiaryService {
 
     public List<DiarySavedResponse> readDiariesByMember(final Long memberId, final int pageNumber, final int pageSize) {
         Member foundMember = memberService.findById(memberId);
-        Page<Diary> diaries = diaryRepository.findAllByMember(foundMember, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "diaryDate")));
+        Page<Diary> diaries = diaryRepository.findAllByMemberOrderByDiaryDateDesc(foundMember, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "diaryDate")));
         return diaries.stream()
                 .map(DiarySavedResponse::of)
                 .toList();
