@@ -1,4 +1,6 @@
 package com.startingblue.fourtooncookie.character.dto.request;
 
-public record AddCharacterRequest(String modelType, String name, String selectionThumbnailUrl, String calendarThumbnailUrl) {
+import java.net.URL;
+
+public record AddCharacterRequest(String modelType, String name, URL selectionThumbnailUrl) {
 }

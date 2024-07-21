@@ -7,13 +7,7 @@ import com.startingblue.fourtooncookie.character.service.CharacterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -22,8 +16,8 @@ public final class CharacterController {
     private final CharacterService characterService;
 
     @GetMapping("/character")
-    public ResponseEntity<CharacterResponses> showCharacters() {
-        final CharacterResponses characterResponses = characterService.showCharacters();
+    public ResponseEntity<CharacterResponses> showCharactersByModelType(@RequestParam(defaultValue = "dall_e_3") String modelType) {
+        final CharacterResponses characterResponses = characterService.showCharactersByModelType(modelType);
 
         return ResponseEntity.ok(characterResponses);
     }

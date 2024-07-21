@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.URL;
+
 @Entity
 @Slf4j
 @Getter
@@ -21,20 +23,12 @@ public class Character {
 
     private String name;
 
-    private String selectionThumbnailUrl;
+    private URL selectionThumbnailUrl;
 
-    private String calendarThumbnailUrl;
-
-    public Character(final ModelType modelType, final String name, final String selectionThumbnailUrl, final String calendarThumbnailUrl) {
-        this(null, modelType, name, selectionThumbnailUrl, calendarThumbnailUrl);
-    }
-
-    public Character(final Long id, final ModelType modelType, final String name, final String selectionThumbnailUrl, final String calendarThumbnailUrl) {
-        this.id = id;
+    public Character(final ModelType modelType, final String name, final URL selectionThumbnailUrl) {
         this.modelType = modelType;
         this.name = name;
         this.selectionThumbnailUrl = selectionThumbnailUrl;
-        this.calendarThumbnailUrl = calendarThumbnailUrl;
     }
 
     public void changeModelType(final ModelType modelType) {
@@ -45,11 +39,7 @@ public class Character {
         this.name = name;
     }
 
-    public void changeSelectionThumbnailUrl(final String selectionThumbnailUrl) {
+    public void changeSelectionThumbnailUrl(final URL selectionThumbnailUrl) {
         this.selectionThumbnailUrl = selectionThumbnailUrl;
-    }
-
-    public void changeCalendarThumbnailUrl(final String calendarThumbnailUrl) {
-        this.calendarThumbnailUrl = calendarThumbnailUrl;
     }
 }

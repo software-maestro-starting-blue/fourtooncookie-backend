@@ -8,11 +8,13 @@ import com.startingblue.fourtooncookie.character.dto.request.ModifyCharacterRequ
 import com.startingblue.fourtooncookie.character.dto.response.CharacterResponse;
 import com.startingblue.fourtooncookie.character.dto.response.CharacterResponses;
 import com.startingblue.fourtooncookie.character.exception.CharacterNoSuchElementException;
+import com.startingblue.fourtooncookie.diary.exception.DiaryNoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Transactional
@@ -26,8 +28,8 @@ public class CharacterService {
         final Character character = new Character(
                 modelType,
                 request.name(),
-                request.selectionThumbnailUrl(),
-                request.calendarThumbnailUrl());
+                request.selectionThumbnailUrl()
+        );
 
         characterRepository.save(character);
     }
@@ -40,7 +42,6 @@ public class CharacterService {
         character.changeModelType(ModelType.from(request.modelType()));
         character.changeName(request.name());
         character.changeSelectionThumbnailUrl(request.selectionThumbnailUrl());
-        character.changeCalendarThumbnailUrl(request.calendarThumbnailUrl());
         characterRepository.save(character);
     }
 
@@ -49,17 +50,22 @@ public class CharacterService {
     }
 
     @Transactional(readOnly = true)
-    public CharacterResponses showCharacters() {
-        final List<Character> characters = characterRepository.findAll();
-        final CharacterResponses characterResponses = new CharacterResponses(characters.stream()
+    public CharacterResponses showCharactersByModelType(String modelType) {
+        ModelType matchModelType = ModelType.from(modelType);
+        final List<Character> characters = characterRepository.findAllByModelType(matchModelType);
+
+        return new CharacterResponses(characters.stream()
+                .filter(character -> character.getModelType().equals(matchModelType))
                 .map(character -> new CharacterResponse(
                         character.getId(),
                         character.getModelType().name(),
                         character.getName(),
-                        character.getSelectionThumbnailUrl(),
-                        character.getCalendarThumbnailUrl()))
+                        character.getSelectionThumbnailUrl()))
                 .toList());
+    }
 
-        return characterResponses;
+    public Character findById(Long characterId) {
+        return characterRepository.findById(characterId)
+                        .orElseThrow(CharacterNoSuchElementException::new);
     }
 }

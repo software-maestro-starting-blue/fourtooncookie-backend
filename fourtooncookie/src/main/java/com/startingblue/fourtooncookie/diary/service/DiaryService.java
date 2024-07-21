@@ -1,5 +1,7 @@
 package com.startingblue.fourtooncookie.diary.service;
 
+import com.startingblue.fourtooncookie.character.domain.Character;
+import com.startingblue.fourtooncookie.character.service.CharacterService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryPaintingImagesUpdateRequest;
@@ -41,6 +43,7 @@ public class DiaryService {
 
     private final DiaryRepository diaryRepository;
     private final MemberService memberService;
+    private final CharacterService characterService;
 
     public Diary findById(final Long id) {
         return diaryRepository.findById(id)
@@ -48,8 +51,7 @@ public class DiaryService {
     }
 
     public void createDiary(final DiarySaveRequest request, final Long memberId) {
-        // TODO
-//        Character character = characterService.findById(request.characterId())
+        Character character = characterService.findById(request.characterId());
         Member member = memberService.findById(memberId);
         Diary diary = Diary.builder()
                 .content(request.content())
@@ -57,7 +59,7 @@ public class DiaryService {
                 .diaryDate(request.diaryDate())
                 .hashtagsIds(request.hashtagIds())
                 .paintingImageUrls(DIARY_DEFAULT_IMAGE_URLS)
-                .character(null) // todo : character 로 변경
+                .character(character)
                 .member(member)
                 .build();
         diaryRepository.save(diary);
