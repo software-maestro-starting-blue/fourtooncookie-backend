@@ -9,7 +9,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -18,7 +17,6 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Slf4j
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

@@ -32,7 +32,7 @@ public class DiaryService {
 
     static {
         try {
-            DIARY_DEFAULT_IMAGE_URL = new URL("http://s3/defaultImage.png");
+            DIARY_DEFAULT_IMAGE_URL = new URL("http://s3/defaultImage.png"); // todo, URL 수정
             DIARY_DEFAULT_IMAGE_URLS = List.of(DIARY_DEFAULT_IMAGE_URL, DIARY_DEFAULT_IMAGE_URL, DIARY_DEFAULT_IMAGE_URL, DIARY_DEFAULT_IMAGE_URL);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Invalid URL");
