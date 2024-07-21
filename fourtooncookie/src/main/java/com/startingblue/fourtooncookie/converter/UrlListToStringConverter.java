@@ -16,7 +16,7 @@ public class UrlListToStringConverter implements AttributeConverter<List<URL>, S
 
     @Override
     public String convertToDatabaseColumn(List<URL> attribute) {
-        if (attribute == null || attribute.isEmpty()) {
+        if (isAttributeEmpty(attribute)) {
             return "";
         }
         return attribute.stream()
@@ -26,7 +26,7 @@ public class UrlListToStringConverter implements AttributeConverter<List<URL>, S
 
     @Override
     public List<URL> convertToEntityAttribute(String dbData) {
-        if (dbData == null || dbData.isEmpty()) {
+        if (isDBColumnEmpty(dbData)) {
             return List.of();
         }
         return Arrays.stream(dbData.split(","))
@@ -38,5 +38,13 @@ public class UrlListToStringConverter implements AttributeConverter<List<URL>, S
                     }
                 })
                 .toList();
+    }
+
+    private static boolean isAttributeEmpty(List<URL> attribute) {
+        return attribute == null || attribute.isEmpty();
+    }
+
+    private static boolean isDBColumnEmpty(String dbData) {
+        return dbData == null || dbData.isEmpty();
     }
 }

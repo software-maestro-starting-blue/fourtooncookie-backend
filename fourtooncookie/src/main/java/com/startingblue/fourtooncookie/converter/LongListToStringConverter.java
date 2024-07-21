@@ -12,11 +12,14 @@ import java.util.stream.Collectors;
 @Service
 public class LongListToStringConverter implements AttributeConverter<List<Long>, String> {
 
+    private static final String EMPTY_LIST = "";
+
     @Override
     public String convertToDatabaseColumn(List<Long> attribute) {
-        if (attribute == null || attribute.isEmpty()) {
-            return "";
+        if (isAttributeEmpty(attribute)) {
+            return EMPTY_LIST;
         }
+
         return attribute.stream()
                 .map(String::valueOf)
                 .collect(Collectors.joining(","));
@@ -24,11 +27,19 @@ public class LongListToStringConverter implements AttributeConverter<List<Long>,
 
     @Override
     public List<Long> convertToEntityAttribute(String dbData) {
-        if (dbData == null || dbData.isEmpty()) {
+        if (isDBColumnEmpty(dbData)) {
             return List.of();
         }
         return Arrays.stream(dbData.split(","))
                 .map(Long::valueOf)
                 .collect(Collectors.toList());
+    }
+
+    private static boolean isAttributeEmpty(List<Long> attribute) {
+        return attribute == null || attribute.isEmpty();
+    }
+
+    private static boolean isDBColumnEmpty(String dbData) {
+        return dbData == null || dbData.isEmpty();
     }
 }
