@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie;
+package com.startingblue.fourtooncookie.config;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

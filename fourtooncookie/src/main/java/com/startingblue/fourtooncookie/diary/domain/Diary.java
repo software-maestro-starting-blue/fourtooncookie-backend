@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.diary.domain;
 
-import com.startingblue.fourtooncookie.BaseEntity;
+import com.startingblue.fourtooncookie.config.BaseEntity;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.converter.LongListToStringConverter;
 import com.startingblue.fourtooncookie.converter.UrlListToStringConverter;
