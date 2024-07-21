@@ -4,38 +4,43 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import org.springframework.stereotype.Service;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Converter
 @Service
-public class LongListToStringConverter implements AttributeConverter<List<Long>, String> {
-
-    private static final String EMPTY_LIST = "";
+public class UrlListToStringConverter implements AttributeConverter<List<URL>, String> {
 
     @Override
-    public String convertToDatabaseColumn(List<Long> attribute) {
+    public String convertToDatabaseColumn(List<URL> attribute) {
         if (isAttributeEmpty(attribute)) {
-            return EMPTY_LIST;
+            return "";
         }
-
         return attribute.stream()
                 .map(String::valueOf)
                 .collect(Collectors.joining(","));
     }
 
     @Override
-    public List<Long> convertToEntityAttribute(String dbData) {
+    public List<URL> convertToEntityAttribute(String dbData) {
         if (isDBColumnEmpty(dbData)) {
             return List.of();
         }
         return Arrays.stream(dbData.split(","))
-                .map(Long::valueOf)
-                .collect(Collectors.toList());
+                .map(urlString -> {
+                    try {
+                        return new URL(urlString);
+                    } catch (MalformedURLException e) {
+                        throw new RuntimeException("Malformed URL: " + urlString, e);
+                    }
+                })
+                .toList();
     }
 
-    private static boolean isAttributeEmpty(List<Long> attribute) {
+    private static boolean isAttributeEmpty(List<URL> attribute) {
         return attribute == null || attribute.isEmpty();
     }
 

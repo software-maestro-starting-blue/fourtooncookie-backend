@@ -11,16 +11,17 @@ public class DiaryExceptionControllerAdvice {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<?> handleEntityNotFoundException(EntityNotFoundException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Diary not found: " + e.getMessage());
     }
 
     @ExceptionHandler(DiaryNoSuchElementException.class)
-    public ResponseEntity<?> handleDiaryNoSuchElementException(DiaryNoSuchElementException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> handleDiaryNoSuchElementException(DiaryNoSuchElementException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Diary not found: " + e.getMessage());
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleDiaryNoSuchElementException(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Diary default image path not found:  " + e.getMessage());
     }
 }

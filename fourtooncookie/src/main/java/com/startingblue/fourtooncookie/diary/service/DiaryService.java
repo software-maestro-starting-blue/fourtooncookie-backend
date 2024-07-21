@@ -2,11 +2,11 @@ package com.startingblue.fourtooncookie.diary.service;
 
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
+import com.startingblue.fourtooncookie.diary.dto.request.DiaryPaintingImagesUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNoSuchElementException;
-import com.startingblue.fourtooncookie.hashtag.domain.Hashtag;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.service.MemberService;
 import jakarta.transaction.Transactional;
@@ -17,16 +17,27 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
 public class DiaryService {
+
+    private static final URL DIARY_DEFAULT_IMAGE_URL; // TODO s3 기본 이미지로 수정
+    private static final List<URL> DIARY_DEFAULT_IMAGE_URLS;
+
+    static {
+        try {
+            DIARY_DEFAULT_IMAGE_URL = new URL("http://s3/defaultImage.png"); // todo, URL 수정
+            DIARY_DEFAULT_IMAGE_URLS = List.of(DIARY_DEFAULT_IMAGE_URL, DIARY_DEFAULT_IMAGE_URL, DIARY_DEFAULT_IMAGE_URL, DIARY_DEFAULT_IMAGE_URL);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Invalid URL");
+        }
+    }
 
     private final DiaryRepository diaryRepository;
     private final MemberService memberService;
@@ -40,23 +51,17 @@ public class DiaryService {
         // TODO
 //        Character character = characterService.findById(request.characterId())
         Member member = memberService.findById(memberId);
-        Diary diary = buildDiary(request, member);
-        diary.updateHashtags(Hashtag.findHashtagsByIds(request.hashtagIds()));
-        diaryRepository.save(diary);
-    }
-
-    private static Diary buildDiary(DiarySaveRequest request, Member member) {
-        return Diary.builder()
+        Diary diary = Diary.builder()
                 .content(request.content())
                 .isFavorite(false)
                 .diaryDate(request.diaryDate())
-                .createdAt(LocalDateTime.now())
-                .modifiedAt(LocalDateTime.now())
-                .hashtagsIds(new ArrayList<>())
-                .paintingImages(new ArrayList<>())
-                .character(null)
+                .hashtagsIds(request.hashtagIds())
+                .paintingImageUrls(DIARY_DEFAULT_IMAGE_URLS)
+                .character(null) // todo : character 로 변경
                 .member(member)
                 .build();
+        diaryRepository.save(diary);
+        // todo vision
     }
 
     public List<DiarySavedResponse> readDiariesByMember(final Long memberId, final int pageNumber, final int pageSize) {
@@ -68,19 +73,22 @@ public class DiaryService {
     }
 
     public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
-        Diary existedDiary = diaryRepository.findById(diaryId)
-                        .orElseThrow(DiaryNoSuchElementException::new);
+        Diary existedDiary = findById(diaryId);
+//        Character character = characterServer.findById(request.characterId()); //TODO 주석 제거
+        existedDiary.update(request.content(), request.hashtagIds(), null); // todo: null 을 character 로 변경
+        diaryRepository.save(existedDiary);
+        // todo vision
+    }
 
-        LocalDateTime modifiedAt = LocalDateTime.now();
-        List<Hashtag> foundHashtags = Hashtag.findHashtagsByIds(request.hashtagIds());
-//        Character character = characterServer.findById(request.characterId()); //TODO
-        existedDiary.update(request.content(), modifiedAt, foundHashtags, null);
+    // TODO listener 로 코드 이동 예정
+    public void updateDiary(Long diaryId, DiaryPaintingImagesUpdateRequest request) {
+        Diary existedDiary = findById(diaryId);
+        existedDiary.updatePaintingImageUrls(request.paintingImageUrls());
         diaryRepository.save(existedDiary);
     }
 
     public void deleteDiary(Long diaryId) {
-        Diary foundDiary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new DiaryNoSuchElementException("diary not found: " + diaryId));
+        Diary foundDiary = findById(diaryId);
         diaryRepository.delete(foundDiary);
     }
 }

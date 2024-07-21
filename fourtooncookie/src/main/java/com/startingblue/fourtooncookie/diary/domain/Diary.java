@@ -1,31 +1,27 @@
 package com.startingblue.fourtooncookie.diary.domain;
 
+import com.startingblue.fourtooncookie.config.BaseEntity;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.converter.LongListToStringConverter;
-import com.startingblue.fourtooncookie.hashtag.domain.Hashtag;
-import com.startingblue.fourtooncookie.image.paintingimage.domain.PaintingImage;
+import com.startingblue.fourtooncookie.converter.UrlListToStringConverter;
 import com.startingblue.fourtooncookie.member.domain.Member;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
+import java.net.URL;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Entity
-@Slf4j
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public final class Diary {
+public final class Diary extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,66 +32,62 @@ public final class Diary {
     @NotBlank
     private String content;
 
-    private Boolean isFavorite;
+    private boolean isFavorite;
 
-    private LocalDateTime diaryDate;
+    private LocalDate diaryDate;
 
-    private LocalDateTime createdAt;
-
-    private LocalDateTime modifiedAt;
-
-    @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @Nullable
-    private List<PaintingImage> paintingImages;
+    @Convert(converter = UrlListToStringConverter.class)
+    @Builder.Default
+    private List<URL> paintingImageUrls = new ArrayList<>();
 
     @Convert(converter = LongListToStringConverter.class)
     @Builder.Default
     private List<Long> hashtagsIds= new ArrayList<>();
 
+    //    @NotNull TODO
     @ManyToOne(fetch = FetchType.LAZY)
-//    @NotNull TODO
     private Character character;
 
+    //    @NotNull TODO
     @ManyToOne(fetch = FetchType.LAZY)
-//    @NotNull TODO
     private Member member;
 
-    public void update(String content, LocalDateTime modifiedAt, List<Hashtag> hashtags, Character character) {
+    public void update(String content,
+                       List<Long> hashtagIds,
+                       Character character) {
         this.content = content;
-        this.modifiedAt = modifiedAt;
         this.character = character;
-        updateHashtags(hashtags);
+        updateHashtags(hashtagIds);
     }
 
-    public void updatePaintingImages(List<PaintingImage> paintingImages) {
-        if (hasPaintingImages()) {
-            removePaintingImages();
-        }
-        for (PaintingImage paintingImage : paintingImages) {
-            addPaintingImage(paintingImage);
-        }
+    public void updatePaintingImageUrls(List<URL> paintingImageUrls) {
+        this.paintingImageUrls = new ArrayList<>(paintingImageUrls);
     }
 
-    private boolean hasPaintingImages() {
-        return paintingImages != null && !paintingImages.isEmpty();
+    public void updateHashtags(List<Long> hashtagIds) {
+        this.hashtagsIds = new ArrayList<>(hashtagIds);
     }
 
-    private void removePaintingImages() {
-        for (PaintingImage paintingImage : Objects.requireNonNull(paintingImages)) {
-            paintingImage.assignDiary(null);
-        }
-        paintingImages.clear();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Diary diary = (Diary) o;
+        return isFavorite == diary.isFavorite &&
+                Objects.equals(id, diary.id) &&
+                Objects.equals(content, diary.content) &&
+                Objects.equals(diaryDate, diary.diaryDate) &&
+                Objects.equals(paintingImageUrls, diary.paintingImageUrls) &&
+                Objects.equals(hashtagsIds, diary.hashtagsIds) &&
+                Objects.equals(character, diary.character) &&
+                Objects.equals(member, diary.member) &&
+                Objects.equals(getCreatedDateTime(), diary.getCreatedDateTime()) &&
+                Objects.equals(getModifiedDateTime(), diary.getModifiedDateTime());
     }
 
-    private void addPaintingImage(PaintingImage paintingImage) {
-        paintingImages.add(paintingImage);
-        paintingImage.assignDiary(this);
-    }
 
-    public void updateHashtags(List<Hashtag> hashtags) {
-        this.hashtagsIds = hashtags.stream()
-                .map(Hashtag::getId)
-                .collect(Collectors.toList());
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, content, isFavorite, diaryDate, paintingImageUrls, hashtagsIds, character, member, getCreatedDateTime(), getModifiedDateTime());
     }
-
 }

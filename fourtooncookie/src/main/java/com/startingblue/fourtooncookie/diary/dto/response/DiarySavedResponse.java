@@ -1,18 +1,19 @@
 package com.startingblue.fourtooncookie.diary.dto.response;
 
+import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
-import com.startingblue.fourtooncookie.image.paintingimage.domain.PaintingImage;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Builder
 public record DiarySavedResponse(
         Long diaryId,
         String content,
-        Boolean isFavorite,
-        LocalDateTime diaryDate,
+        boolean isFavorite,
+        LocalDate diaryDate,
         List<String> paintingImageUrls,
         List<Long> hashtagIds,
         Long characterId
@@ -21,14 +22,16 @@ public record DiarySavedResponse(
         return DiarySavedResponse.builder()
                 .diaryId(diary.getId())
                 .content(diary.getContent())
-                .isFavorite(diary.getIsFavorite())
+                .isFavorite(diary.isFavorite())
                 .diaryDate(diary.getDiaryDate())
-                .paintingImageUrls(diary.getPaintingImages()
+                .paintingImageUrls(diary.getPaintingImageUrls()
                         .stream()
-                        .map(PaintingImage::getPath)
+                        .map(String::valueOf)
                         .toList())
                 .hashtagIds(diary.getHashtagsIds())
-                .characterId(1L) // todo: 임시 데이터
+                .characterId(Optional.ofNullable(diary.getCharacter())
+                        .map(Character::getId)
+                        .orElse(null)) // todo: 나중에는 필요 없는 코드, 테스트용
                 .build();
     }
 }
