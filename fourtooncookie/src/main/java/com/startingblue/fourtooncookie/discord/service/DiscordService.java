@@ -1,6 +1,7 @@
 package com.startingblue.fourtooncookie.discord.service;
 
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -10,6 +11,9 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+@RequiredArgsConstructor
 @Service
 public class DiscordService {
 
@@ -18,12 +22,15 @@ public class DiscordService {
     @Value("${discord.token}")
     private String DISCORD_API_KEY;
 
+    private final List<ListenerAdapter> listeners;
+
     @PostConstruct
     private void init() throws InterruptedException {
         jda = JDABuilder.createDefault(DISCORD_API_KEY)
                 .enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.DIRECT_MESSAGES)
                 .build();
         jda.awaitReady();
+        listeners.forEach(this::addListener);
     }
 
     public void sendMessage(Integer guildId, Integer channelId, String message) {
