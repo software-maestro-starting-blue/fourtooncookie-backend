@@ -5,8 +5,6 @@ import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
 import com.startingblue.fourtooncookie.diary.service.DiaryService;
-import com.startingblue.fourtooncookie.member.domain.Member;
-import com.startingblue.fourtooncookie.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -24,11 +22,9 @@ import java.util.List;
 public class DiaryController {
 
     private final DiaryService diaryService;
-    private final MemberService memberService;
 
     @PostMapping
     public ResponseEntity<Void> createDiary(@RequestBody final DiarySaveRequest request) {
-        memberService.save(new Member()); // TODO : 삭제 해야함.
         diaryService.createDiary(request, 1L); // TODO : 우선 디폴트 값 넣어 놓음.
         return ResponseEntity.ok().build();
     }
