@@ -55,7 +55,7 @@ public class DallE3VisionApplyService implements VisionApplyService {
         return response.getResult().getOutput().getB64Json();
     }
 
-    private List<byte[]> convertImageUrlToFourImages(String imageB64Json) {
+    private List<byte[]> convertImageB64JsonToFourImagesOfByteArray(String imageB64Json) {
         return null;
     }
 
