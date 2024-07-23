@@ -37,9 +37,7 @@ public class CharacterService {
                 .findById(characterId)
                 .orElseThrow(CharacterNoSuchElementException::new);
 
-        character.changeModelType(CharacterType.from(request.modelType()));
-        character.changeName(request.name());
-        character.changeSelectionThumbnailUrl(request.selectionThumbnailUrl());
+        character.update(CharacterType.valueOf(request.modelType()), request.name(), request.selectionThumbnailUrl());
         characterRepository.save(character);
     }
 

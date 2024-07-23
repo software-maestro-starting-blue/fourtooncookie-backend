@@ -99,8 +99,12 @@ class CharacterRepositoryTest {
         Character character = new Character(CharacterType.DALL_E_3, "멍멍이", new URL("https://멍멍이-dalle3.png"));
         Character savedCharacter = characterRepository.save(character);
 
+        CharacterType newCharacterType = CharacterType.STABLE_DIFFUSION;
+        String newName = "바뀐멍멍이";
+        URL newURL = new URL("https://바뀐멍멍이-stable-diffusion.png");
+
         // when
-        savedCharacter.changeName("바뀐멍멍이");
+        savedCharacter.update(newCharacterType, newName, newURL);
         Character updatedCharacter = characterRepository.save(savedCharacter);
 
         // then

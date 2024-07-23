@@ -31,15 +31,9 @@ public class Character {
         this.selectionThumbnailUrl = selectionThumbnailUrl;
     }
 
-    public void changeModelType(final CharacterType characterType) {
+    public void update(final  CharacterType characterType, final String name, final URL selectionThumbnailUrl) {
         this.characterType = characterType;
-    }
-
-    public void changeName(final String name) {
         this.name = name;
-    }
-
-    public void changeSelectionThumbnailUrl(final URL selectionThumbnailUrl) {
         this.selectionThumbnailUrl = selectionThumbnailUrl;
     }
 }
