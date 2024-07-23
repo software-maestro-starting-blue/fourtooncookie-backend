@@ -1,9 +1,7 @@
 package com.startingblue.fourtooncookie.member.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
@@ -11,7 +9,9 @@ import java.time.LocalDate;
 @Entity
 @Slf4j
 @Getter
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
 
     @Id

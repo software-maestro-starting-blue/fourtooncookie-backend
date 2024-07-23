@@ -26,8 +26,8 @@ public class CharacterService {
         final Character character = new Character(
                 modelType,
                 request.name(),
-                request.selectionThumbnailUrl(),
-                request.calendarThumbnailUrl());
+                request.selectionThumbnailUrl()
+        );
 
         characterRepository.save(character);
     }
@@ -40,7 +40,6 @@ public class CharacterService {
         character.changeModelType(ModelType.from(request.modelType()));
         character.changeName(request.name());
         character.changeSelectionThumbnailUrl(request.selectionThumbnailUrl());
-        character.changeCalendarThumbnailUrl(request.calendarThumbnailUrl());
         characterRepository.save(character);
     }
 
@@ -51,15 +50,18 @@ public class CharacterService {
     @Transactional(readOnly = true)
     public CharacterResponses showCharacters() {
         final List<Character> characters = characterRepository.findAll();
-        final CharacterResponses characterResponses = new CharacterResponses(characters.stream()
+
+        return new CharacterResponses(characters.stream()
                 .map(character -> new CharacterResponse(
                         character.getId(),
                         character.getModelType().name(),
                         character.getName(),
-                        character.getSelectionThumbnailUrl(),
-                        character.getCalendarThumbnailUrl()))
+                        character.getSelectionThumbnailUrl()))
                 .toList());
+    }
 
-        return characterResponses;
+    public Character findById(Long characterId) {
+        return characterRepository.findById(characterId)
+                        .orElseThrow(CharacterNoSuchElementException::new);
     }
 }
