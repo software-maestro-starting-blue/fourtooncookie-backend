@@ -2,7 +2,7 @@ package com.startingblue.fourtooncookie.character.service;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
-import com.startingblue.fourtooncookie.character.domain.ModelType;
+import com.startingblue.fourtooncookie.character.domain.CharacterType;
 import com.startingblue.fourtooncookie.character.dto.request.AddCharacterRequest;
 import com.startingblue.fourtooncookie.character.dto.request.ModifyCharacterRequest;
 import com.startingblue.fourtooncookie.character.dto.response.CharacterResponse;
@@ -22,9 +22,9 @@ public class CharacterService {
     private final CharacterRepository characterRepository;
 
     public void addCharacter(final AddCharacterRequest request) {
-        final ModelType modelType = ModelType.valueOf(request.modelType());
+        final CharacterType characterType = CharacterType.valueOf(request.modelType());
         final Character character = new Character(
-                modelType,
+                characterType,
                 request.name(),
                 request.selectionThumbnailUrl()
         );
@@ -37,7 +37,7 @@ public class CharacterService {
                 .findById(characterId)
                 .orElseThrow(CharacterNoSuchElementException::new);
 
-        character.changeModelType(ModelType.from(request.modelType()));
+        character.changeModelType(CharacterType.from(request.modelType()));
         character.changeName(request.name());
         character.changeSelectionThumbnailUrl(request.selectionThumbnailUrl());
         characterRepository.save(character);
@@ -54,7 +54,7 @@ public class CharacterService {
         return new CharacterResponses(characters.stream()
                 .map(character -> new CharacterResponse(
                         character.getId(),
-                        character.getModelType().name(),
+                        character.getCharacterType().name(),
                         character.getName(),
                         character.getSelectionThumbnailUrl()))
                 .toList());

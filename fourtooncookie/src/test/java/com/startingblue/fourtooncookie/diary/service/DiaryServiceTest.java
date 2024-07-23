@@ -2,7 +2,7 @@ package com.startingblue.fourtooncookie.diary.service;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
-import com.startingblue.fourtooncookie.character.domain.ModelType;
+import com.startingblue.fourtooncookie.character.domain.CharacterType;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryPaintingImagesUpdateRequest;
@@ -55,7 +55,7 @@ class DiaryServiceTest {
         memberRepository.deleteAllInBatch();
         characterRepository.deleteAllInBatch();
 
-        character = new Character(ModelType.DALL_E_3, "멍멍이", new URL("http://멍멍이.png"));
+        character = new Character(CharacterType.DALL_E_3, "멍멍이", new URL("http://멍멍이.png"));
         characterRepository.save(character);
 
         member = createMember("민서", LocalDate.of(2000, 5, 31), Gender.MALE);
@@ -169,7 +169,7 @@ class DiaryServiceTest {
         Diary diary = createDiary(LocalDate.of(2024, 7, 21), character, member);
         diaryRepository.save(diary);
 
-        Character newCharacter = new Character(ModelType.STABLE_DIFFUSION, "오동이", new URL("http://오동이.png"));
+        Character newCharacter = new Character(CharacterType.STABLE_DIFFUSION, "오동이", new URL("http://오동이.png"));
         characterRepository.save(newCharacter);
 
         DiaryUpdateRequest request = new DiaryUpdateRequest("새로운 일기 내용", List.of(1L), newCharacter.getId());

@@ -2,7 +2,7 @@ package com.startingblue.fourtooncookie.diary.domain;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
-import com.startingblue.fourtooncookie.character.domain.ModelType;
+import com.startingblue.fourtooncookie.character.domain.CharacterType;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
@@ -172,7 +172,7 @@ class DiaryTest {
     @Test
     void update() throws MalformedURLException {
         // given
-        Character character = new Character(ModelType.DALL_E_3, "멍멍이", new URL("http://멍멍이.png"));
+        Character character = new Character(CharacterType.DALL_E_3, "멍멍이", new URL("http://멍멍이.png"));
         characterRepository.save(character);
 
         Member member = createMember("민서", LocalDate.of(2000, 5, 31), Gender.MALE);
@@ -183,7 +183,7 @@ class DiaryTest {
 
         Diary savedDiary = diaryRepository.findById(saveDiary.getId()).get();
 
-        Character newCharacter = new Character(ModelType.STABLE_DIFFUSION, "오동이", new URL("http://오동이.png"));
+        Character newCharacter = new Character(CharacterType.STABLE_DIFFUSION, "오동이", new URL("http://오동이.png"));
         characterRepository.save(newCharacter);
 
         // when
@@ -199,7 +199,7 @@ class DiaryTest {
     @Test
     void updatePaintingImageUrls() throws MalformedURLException {
         // given
-        Character character = new Character(ModelType.DALL_E_3, "멍멍이", new URL("http://멍멍이.png"));
+        Character character = new Character(CharacterType.DALL_E_3, "멍멍이", new URL("http://멍멍이.png"));
         characterRepository.save(character);
 
         Member member = createMember("민서", LocalDate.of(2000, 5, 31), Gender.MALE);

@@ -2,16 +2,16 @@ package com.startingblue.fourtooncookie.character.domain;
 
 import com.startingblue.fourtooncookie.character.exception.ModelTypeNoSuchElementException;
 
-public enum ModelType {
+public enum CharacterType {
 
     DALL_E_3,
     STABLE_DIFFUSION,
     MIDJOURNEY;
 
-    public static ModelType from(final String value){
-        for (final ModelType modelType : ModelType.values()) {
-            if (modelType.name().equalsIgnoreCase(value)) {
-                return modelType;
+    public static CharacterType from(final String value){
+        for (final CharacterType characterType : CharacterType.values()) {
+            if (characterType.name().equalsIgnoreCase(value)) {
+                return characterType;
             }
         }
         throw new ModelTypeNoSuchElementException();

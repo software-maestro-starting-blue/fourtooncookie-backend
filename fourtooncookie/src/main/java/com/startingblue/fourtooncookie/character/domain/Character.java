@@ -19,20 +19,20 @@ public class Character {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private ModelType modelType;
+    private CharacterType characterType;
 
     private String name;
 
     private URL selectionThumbnailUrl;
 
-    public Character(final ModelType modelType, final String name, final URL selectionThumbnailUrl) {
-        this.modelType = modelType;
+    public Character(final CharacterType characterType, final String name, final URL selectionThumbnailUrl) {
+        this.characterType = characterType;
         this.name = name;
         this.selectionThumbnailUrl = selectionThumbnailUrl;
     }
 
-    public void changeModelType(final ModelType modelType) {
-        this.modelType = modelType;
+    public void changeModelType(final CharacterType characterType) {
+        this.characterType = characterType;
     }
 
     public void changeName(final String name) {
