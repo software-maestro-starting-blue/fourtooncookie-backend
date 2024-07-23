@@ -35,7 +35,7 @@ public class DallE3VisionApplyService implements VisionApplyService {
 
         String imageB64Json = getImageFromDallE3(prompt);
 
-        List<byte[]> imageByteArrays = convertImageUrlToFourImages(imageB64Json);
+        List<byte[]> imageByteArrays = convertImageB64JsonToFourImagesOfByteArray(imageB64Json);
 
         applicationEventPublisher.publishEvent(new VisionReplyEvent(diaryId, imageByteArrays));
     }
