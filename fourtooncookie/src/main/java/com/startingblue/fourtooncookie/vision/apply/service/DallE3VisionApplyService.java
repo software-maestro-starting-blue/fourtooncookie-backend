@@ -11,6 +11,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -51,8 +58,31 @@ public class DallE3VisionApplyService implements VisionApplyService {
         return response.getResult().getOutput().getB64Json();
     }
 
-    private List<byte[]> convertImageB64JsonToFourImagesOfByteArray(String imageB64Json) {
-        return null;
+    private List<byte[]> convertImageB64JsonToFourImagesOfByteArray(String imageB64Json) throws IOException {
+        byte[] decodedBytes = Base64.getDecoder().decode(imageB64Json);
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(decodedBytes);
+        BufferedImage originalImage = ImageIO.read(bais);
+
+
+        int width = originalImage.getWidth();
+        int height = originalImage.getHeight();
+        BufferedImage[] subImages = new BufferedImage[4];
+
+        subImages[0] = originalImage.getSubimage(0, 0, width / 2, height / 2); // top-left
+        subImages[1] = originalImage.getSubimage(width / 2, 0, width / 2, height / 2); // top-right
+        subImages[2] = originalImage.getSubimage(0, height / 2, width / 2, height / 2); // bottom-left
+        subImages[3] = originalImage.getSubimage(width / 2, height / 2, width / 2, height / 2); // bottom-right
+
+
+        List<byte[]> subImageBytes = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(subImages[i], "png", baos);
+            subImageBytes.add(baos.toByteArray());
+        }
+
+        return subImageBytes;
     }
 
     @Override
