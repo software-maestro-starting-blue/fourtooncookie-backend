@@ -7,6 +7,7 @@ import com.startingblue.fourtooncookie.converter.UrlListToStringConverter;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -34,6 +35,7 @@ public final class Diary extends BaseEntity {
 
     private boolean isFavorite;
 
+    @NotNull
     private LocalDate diaryDate;
 
     @Convert(converter = UrlListToStringConverter.class)
@@ -44,11 +46,11 @@ public final class Diary extends BaseEntity {
     @Builder.Default
     private List<Long> hashtagsIds= new ArrayList<>();
 
-    //    @NotNull TODO
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     private Character character;
 
-    //    @NotNull TODO
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
@@ -66,6 +68,10 @@ public final class Diary extends BaseEntity {
 
     public void updateHashtags(List<Long> hashtagIds) {
         this.hashtagsIds = new ArrayList<>(hashtagIds);
+    }
+
+    public boolean isOwner(Long memberId) {
+        return this.member.getId().equals(memberId);
     }
 
     @Override
