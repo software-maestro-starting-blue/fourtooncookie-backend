@@ -3,17 +3,13 @@ package com.startingblue.fourtooncookie.vision.apply.service;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.ModelType;
 import com.startingblue.fourtooncookie.vision.reply.dto.VisionReplyEvent;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.image.*;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
 import java.util.List;
 
