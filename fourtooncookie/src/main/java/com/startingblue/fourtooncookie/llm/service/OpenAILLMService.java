@@ -18,9 +18,7 @@ abstract public class OpenAILLMService implements LLMService {
 
     @Override
     public String getLLMResult(String systemPrompt, String userPrompt) {
-        OpenAiChatOptions option = OpenAiChatOptions.builder()
-                .withModel(OpenAiApi.ChatModel.GPT_4_O)
-                .build();
+        OpenAiChatOptions option = getOpenAiChatOptions();
 
         ChatResponse response = openAiChatModel.call(new Prompt(List.of(new SystemMessage(systemPrompt), new UserMessage(userPrompt)), option));
 
