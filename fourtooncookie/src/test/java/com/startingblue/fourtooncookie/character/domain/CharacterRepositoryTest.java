@@ -1,5 +1,7 @@
 package com.startingblue.fourtooncookie.character.domain;
 
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +16,20 @@ import static org.assertj.core.api.Assertions.*;
 
 @ActiveProfiles("test")
 @SpringBootTest
+@Transactional
 class CharacterRepositoryTest {
 
     @Autowired
     CharacterRepository characterRepository;
 
-    @DisplayName("특정 모델 타입의 모든 캐릭터를 가져온다.")
+    @BeforeEach
+    public void setUp() throws MalformedURLException {
+        characterRepository.deleteAllInBatch();
+    }
+
+    @DisplayName("모든 캐릭터를 저장한다.")
     @Test
-    void findAllByModelType() throws MalformedURLException {
+    void save() throws MalformedURLException {
         // given
         Character dogDalle3Character = new Character(ModelType.DALL_E_3, "멍멍이", new URL("https://멍멍이-dalle3.png"));
         Character catDalle3Character = new Character(ModelType.DALL_E_3, "나비", new URL("https://나비-dalle3.png"));
@@ -29,19 +37,20 @@ class CharacterRepositoryTest {
         characterRepository.saveAll(List.of(dogDalle3Character, catDalle3Character, catStableDiffusionCharacter));
 
         // when
-        List<Character> savedDalle3Characters = characterRepository.findAllByModelType(ModelType.DALL_E_3);
+        List<Character> savedCharacters = characterRepository.findAll();
 
         // then
-        assertThat(savedDalle3Characters).hasSize(2);
-        assertThat(savedDalle3Characters)
+        assertThat(savedCharacters).hasSize(3);
+        assertThat(savedCharacters)
                 .extracting(Character::getName)
-                .containsExactlyInAnyOrder("멍멍이", "나비");
+                .containsExactlyInAnyOrder("멍멍이", "나비", "개");
 
-        assertThat(savedDalle3Characters)
+        assertThat(savedCharacters)
                 .extracting(Character::getSelectionThumbnailUrl)
                 .containsExactlyInAnyOrder(
                         new URL("https://멍멍이-dalle3.png"),
-                        new URL("https://나비-dalle3.png")
+                        new URL("https://나비-dalle3.png"),
+                        new URL("http://개-stable-diffusion.png")
                 );
     }
 }

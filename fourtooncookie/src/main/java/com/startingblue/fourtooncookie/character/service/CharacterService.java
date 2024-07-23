@@ -48,12 +48,10 @@ public class CharacterService {
     }
 
     @Transactional(readOnly = true)
-    public CharacterResponses showCharactersByModelType(String modelType) {
-        ModelType matchModelType = ModelType.from(modelType);
-        final List<Character> characters = characterRepository.findAllByModelType(matchModelType);
+    public CharacterResponses showCharacters() {
+        final List<Character> characters = characterRepository.findAll();
 
         return new CharacterResponses(characters.stream()
-                .filter(character -> character.getModelType().equals(matchModelType))
                 .map(character -> new CharacterResponse(
                         character.getId(),
                         character.getModelType().name(),

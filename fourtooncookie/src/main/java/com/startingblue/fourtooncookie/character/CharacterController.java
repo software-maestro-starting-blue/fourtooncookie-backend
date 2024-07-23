@@ -16,8 +16,8 @@ public final class CharacterController {
     private final CharacterService characterService;
 
     @GetMapping("/character")
-    public ResponseEntity<CharacterResponses> showCharactersByModelType(@RequestParam(defaultValue = "dall_e_3") String modelType) {
-        final CharacterResponses characterResponses = characterService.showCharactersByModelType(modelType);
+    public ResponseEntity<CharacterResponses> showCharacters() {
+        final CharacterResponses characterResponses = characterService.showCharacters();
 
         return ResponseEntity.ok(characterResponses);
     }
