@@ -66,7 +66,7 @@ public class DiaryService {
 
     public List<DiarySavedResponse> readDiariesByMember(final Long memberId, final int pageNumber, final int pageSize) {
         Member foundMember = memberService.findById(memberId);
-        Page<Diary> diaries = diaryRepository.findAllByMember(foundMember, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "diaryDate")));
+        Page<Diary> diaries = diaryRepository.findAllByMemberOrderByDiaryDateDesc(foundMember, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "diaryDate")));
         return diaries.stream()
                 .map(DiarySavedResponse::of)
                 .toList();
