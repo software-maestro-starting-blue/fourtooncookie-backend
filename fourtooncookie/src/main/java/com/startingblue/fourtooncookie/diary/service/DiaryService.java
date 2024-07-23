@@ -46,11 +46,20 @@ public class DiaryController {
         return ResponseEntity.ok(responses);
     }
 
+
     @PatchMapping("/{diaryId}")
     public ResponseEntity<Void> updateDiary(@PathVariable final Long diaryId,
                                             @RequestBody final DiaryUpdateRequest request) {
         diaryService.updateDiary(diaryId, request);
         return ResponseEntity.ok().build();
+
+    public List<DiarySavedResponse> readDiariesByMember(final Long memberId, final int pageNumber, final int pageSize) {
+        Member foundMember = memberService.findById(memberId);
+        Page<Diary> diaries = diaryRepository.findAllByMemberOrderByDiaryDateDesc(foundMember, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "diaryDate")));
+        return diaries.stream()
+                .map(DiarySavedResponse::of)
+                .toList();
+
     }
 
     @PatchMapping("/{diaryId}/painting-images")
