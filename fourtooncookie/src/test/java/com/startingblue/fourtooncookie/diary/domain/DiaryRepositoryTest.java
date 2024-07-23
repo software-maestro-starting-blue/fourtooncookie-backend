@@ -1,7 +1,13 @@
 package com.startingblue.fourtooncookie.diary.domain;
 
+import com.startingblue.fourtooncookie.character.domain.Character;
+import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
+import com.startingblue.fourtooncookie.character.domain.ModelType;
+import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
+import com.startingblue.fourtooncookie.member.domain.Role;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,14 +15,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDateTime;
+import jakarta.transaction.Transactional;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles("test")
 @SpringBootTest
+@Transactional
 class DiaryRepositoryTest {
 
     @Autowired
@@ -25,49 +36,114 @@ class DiaryRepositoryTest {
     @Autowired
     MemberRepository memberRepository;
 
-    @DisplayName("특정 멤버의 페이징된 일기를 작성날짜 내림차순으로 가져온다.")
-    @Test
-    void findAllByMemberOrderByDiaryDateDesc() {
-        // given
-        Member member1 = new Member();
-        memberRepository.save(member1);
+    @Autowired
+    CharacterRepository characterRepository;
 
-        Diary diary1 = createDiary(member1, "첫번째 일기", false, LocalDateTime.of(2024, 7, 20, 14, 30));
-        Diary diary2 = createDiary(member1, "두번째 일기", false, LocalDateTime.of(2024, 7, 20, 15, 0));
-        Diary diary3 = createDiary(member1, "마지막 일기", true, LocalDateTime.of(2024, 7, 20, 15, 30));
-        diaryRepository.saveAll(List.of(diary1, diary2, diary3));
-
-        int pageNumber = 0;
-        int pageSize = 10;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "diaryDate"));
-
-        // when
-        Page<Diary> diaries = diaryRepository.findAllByMemberOrderByDiaryDateDesc(member1, pageable);
-
-        // then
-        assertThat(diaries).isNotNull();
-        assertThat(diaries.getContent()).hasSize(3);
-        assertThat(diaries.getContent().get(0).getContent()).isEqualTo("마지막 일기"); // 최신 일기 내용 확인
-        assertThat(diaries.getContent().get(2).getContent()).isEqualTo("첫번째 일기"); // 오래된 일기 내용 확인
-
-        // 페이지 관련 정보 검증
-        assertThat(diaries.getNumber()).isEqualTo(pageNumber);
-        assertThat(diaries.getSize()).isEqualTo(pageSize);
-        assertThat(diaries.getSort().getOrderFor("diaryDate").getDirection()).isEqualTo(Sort.Direction.DESC);
-
-        // 일기 날짜가 내림차순으로 정렬되었는지 검증
-        assertThat(diaries.getContent().get(0).getDiaryDate()).isAfter(diaries.getContent().get(2).getDiaryDate());
+    @BeforeEach
+    void setUp() throws MalformedURLException {
+        diaryRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
+        characterRepository.deleteAllInBatch();
     }
 
-    private Diary createDiary(Member member, String content, boolean isFavorite, LocalDateTime current) {
-        return Diary.builder()
-                .content(content)
-                .isFavorite(isFavorite)
-                .member(member)
-                .character(null)
-                .diaryDate(current)
-                .createdAt(current)
-                .modifiedAt(current)
+    @DisplayName("일기를 저장한다.")
+    @Test
+    void saveDiary() throws MalformedURLException {
+        // given
+        Member member = Member.builder()
+                .name("testUser")
+                .email("test@email.com")
+                .birth(LocalDate.of(2024, 7, 23))
+                .gender(Gender.OTHER)
+                .role(Role.MEMBER)
                 .build();
+        memberRepository.save(member);
+
+        Character character = new Character(ModelType.DALL_E_3, "Test Character", new URL("https://testImagePng.com"));
+        characterRepository.save(character);
+
+        Diary diary = Diary.builder()
+                .content("Test Content")
+                .isFavorite(false)
+                .diaryDate(LocalDate.now())
+                .paintingImageUrls(List.of(new URL("https://example.com/image.png")))
+                .hashtagsIds(List.of(1L, 2L, 3L))
+                .character(character)
+                .member(member)
+                .build();
+
+        // when
+        Diary savedDiary = diaryRepository.save(diary);
+
+        // then
+        assertThat(savedDiary.getId()).isNotNull();
+        assertThat(savedDiary.getContent()).isEqualTo("Test Content");
+        assertThat(savedDiary.isFavorite()).isFalse();
+        assertThat(savedDiary.getDiaryDate()).isEqualTo(LocalDate.now());
+        assertThat(savedDiary.getPaintingImageUrls()).containsExactly(new URL("https://example.com/image.png"));
+        assertThat(savedDiary.getHashtagsIds()).containsExactly(1L, 2L, 3L);
+        assertThat(savedDiary.getCharacter()).isEqualTo(character);
+        assertThat(savedDiary.getMember()).isEqualTo(member);
+    }
+
+    @DisplayName("멤버 별 일기를 일기 날짜 내림차순으로 조회한다.")
+    @Test
+    void findAllByMemberWithPagination() throws MalformedURLException {
+        // given
+        Member member = Member.builder()
+                .name("testUser")
+                .email("test@email.com")
+                .birth(LocalDate.of(2024, 7, 23))
+                .gender(Gender.OTHER)
+                .role(Role.MEMBER)
+                .build();
+        memberRepository.save(member);
+
+        Character character = new Character(ModelType.DALL_E_3, "Test Character", new URL("https://testImagePng.com"));
+        characterRepository.save(character);
+
+        Diary diary1 = Diary.builder()
+                .content("Test Content 1")
+                .isFavorite(false)
+                .diaryDate(LocalDate.of(2024, 7, 23))
+                .paintingImageUrls(List.of(new URL("https://example.com/image1.png")))
+                .hashtagsIds(List.of(1L))
+                .character(character)
+                .member(member)
+                .build();
+
+        Diary diary2 = Diary.builder()
+                .content("Test Content 2")
+                .isFavorite(false)
+                .diaryDate(LocalDate.of(2024, 7, 24))
+                .paintingImageUrls(List.of(new URL("https://example.com/image2.png")))
+                .hashtagsIds(List.of(2L))
+                .character(character)
+                .member(member)
+                .build();
+
+        Diary diary3 = Diary.builder()
+                .content("Test Content 3")
+                .isFavorite(false)
+                .diaryDate(LocalDate.of(2024, 7, 25))
+                .paintingImageUrls(List.of(new URL("https://example.com/image3.png")))
+                .hashtagsIds(List.of(2L))
+                .character(character)
+                .member(member)
+                .build();
+
+        diaryRepository.saveAll(List.of(diary1, diary2, diary3));
+
+        Pageable pageable = PageRequest.of(0, 2);
+
+        // when
+        Page<Diary> diaryPage = diaryRepository.findAllByMemberOrderByDiaryDateDesc(member, pageable);
+
+        // then
+        assertThat(diaryPage.getTotalElements()).isEqualTo(3);
+        assertThat(diaryPage.getContent()).hasSize(2);
+        assertThat(diaryPage.getContent())
+                .extracting(Diary::getContent)
+                .containsExactlyInAnyOrder("Test Content 3", "Test Content 2");
     }
 }
