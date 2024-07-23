@@ -1,96 +1,74 @@
-package com.startingblue.fourtooncookie.diary.service;
+package com.startingblue.fourtooncookie.diary;
 
-import com.startingblue.fourtooncookie.character.domain.Character;
-import com.startingblue.fourtooncookie.character.service.CharacterService;
-import com.startingblue.fourtooncookie.diary.domain.Diary;
-import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryPaintingImagesUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
-import com.startingblue.fourtooncookie.diary.exception.DiaryNoSuchElementException;
+import com.startingblue.fourtooncookie.diary.service.DiaryService;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.service.MemberService;
-import jakarta.transaction.Transactional;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
-@Service
+@RestController
+@RequestMapping("/diary")
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
-public class DiaryService {
+public class DiaryController {
 
-    private static final URL DIARY_DEFAULT_IMAGE_URL; // TODO s3 기본 이미지로 수정
-    private static final List<URL> DIARY_DEFAULT_IMAGE_URLS;
-
-    static {
-        try {
-            DIARY_DEFAULT_IMAGE_URL = new URL("http://s3/defaultImage.png"); // todo, URL 수정
-            DIARY_DEFAULT_IMAGE_URLS = List.of(DIARY_DEFAULT_IMAGE_URL, DIARY_DEFAULT_IMAGE_URL, DIARY_DEFAULT_IMAGE_URL, DIARY_DEFAULT_IMAGE_URL);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Invalid URL");
-        }
-    }
-
-    private final DiaryRepository diaryRepository;
+    private final DiaryService diaryService;
     private final MemberService memberService;
-    private final CharacterService characterService;
 
-    public Diary findById(final Long id) {
-        return diaryRepository.findById(id)
-                .orElseThrow(DiaryNoSuchElementException::new);
+    @PostMapping
+    public ResponseEntity<Void> createDiary(@RequestBody final DiarySaveRequest request) {
+//        memberService.save(new Member()); // TODO : 삭제 해야함.
+        diaryService.createDiary(request, 1L); // TODO : 우선 디폴트 값 넣어 놓음.
+        return ResponseEntity.ok().build();
     }
 
-    public void createDiary(final DiarySaveRequest request, final Long memberId) {
-        Character character = characterService.findById(request.characterId());
-        Member member = memberService.findById(memberId);
-        Diary diary = Diary.builder()
-                .content(request.content())
-                .isFavorite(false)
-                .diaryDate(request.diaryDate())
-                .hashtagsIds(request.hashtagIds())
-                .paintingImageUrls(DIARY_DEFAULT_IMAGE_URLS)
-                .character(character)
-                .member(member)
-                .build();
-        diaryRepository.save(diary);
-        // todo vision
+    @GetMapping("/timeline")
+    public ResponseEntity<List<DiarySavedResponse>> readDiariesByMember (
+            HttpServletRequest httpRequest,
+            @RequestParam(defaultValue = "0") @Min(0) @Max(200) final int pageNumber,
+            @RequestParam(defaultValue = "10") @Min(1) @Max(10) final int pageSize) {
+        Long memberId = Long.parseLong(httpRequest.getHeader("memberId")); // TODO 현재는 헤더에 넣고, jwt 를 이용코드로 변경 예정
+        List<DiarySavedResponse> responses = diaryService.readDiariesByMember(memberId, pageNumber, pageSize);
+        if (responses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(responses);
     }
 
-    public List<DiarySavedResponse> readDiariesByMember(final Long memberId, final int pageNumber, final int pageSize) {
-        Member foundMember = memberService.findById(memberId);
-        Page<Diary> diaries = diaryRepository.findAllByMember(foundMember, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "diaryDate")));
-        return diaries.stream()
-                .map(DiarySavedResponse::of)
-                .toList();
+    @PatchMapping("/{diaryId}")
+    public ResponseEntity<Void> updateDiary(@PathVariable final Long diaryId,
+                                            @RequestBody final DiaryUpdateRequest request) {
+        diaryService.updateDiary(diaryId, request);
+        return ResponseEntity.ok().build();
     }
 
-    public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
-        Diary existedDiary = findById(diaryId);
-//        Character character = characterServer.findById(request.characterId()); //TODO 주석 제거
-        existedDiary.update(request.content(), request.hashtagIds(), null); // todo: null 을 character 로 변경
-        diaryRepository.save(existedDiary);
-        // todo vision
+    @PatchMapping("/{diaryId}/painting-images")
+    public ResponseEntity<Void> updateDiary(@PathVariable final Long diaryId,
+                                            @RequestBody final DiaryPaintingImagesUpdateRequest request) {
+        diaryService.updateDiary(diaryId, request);
+        return ResponseEntity.ok().build();
     }
 
-    // TODO listener 로 코드 이동 예정
-    public void updateDiary(Long diaryId, DiaryPaintingImagesUpdateRequest request) {
-        Diary existedDiary = findById(diaryId);
-        existedDiary.updatePaintingImageUrls(request.paintingImageUrls());
-        diaryRepository.save(existedDiary);
+    @DeleteMapping("/{diaryId}")
+    public ResponseEntity<Void> deleteDiary(@PathVariable final Long diaryId) {
+        diaryService.deleteDiary(diaryId);
+        return ResponseEntity.noContent().build();
     }
 
-    public void deleteDiary(Long diaryId) {
-        Diary foundDiary = findById(diaryId);
-        diaryRepository.delete(foundDiary);
+    @PatchMapping("/favorite/{diaryId}")
+    public ResponseEntity<Void> favoriteDiary(@PathVariable final Long diaryId, @RequestBody final boolean isFavorite) {
+        log.info("favorite: {} diary {}", isFavorite, diaryId);
+        return ResponseEntity.ok().build();
     }
 }
