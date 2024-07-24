@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,9 @@ import java.util.LinkedList;
 @RequiredArgsConstructor
 @Service
 public class MidjourneyDiscordService extends ListenerAdapter {
+
+    @Value("${discord.midjourney.guildid}")
+    private Long guildId;
 
     private final DiscordService discordService;
 
@@ -53,6 +57,14 @@ public class MidjourneyDiscordService extends ListenerAdapter {
 
     @Scheduled(fixedDelay = 1000)
     private void processReadyQueue() {
-        // TODO processingEntities에 존재하지 않는 channel에 대한 readyQueue가 존재할 경우 이를 실행
+        readyQueue.keySet().stream()
+                .filter(channelId -> ! processingEntities.containsKey(channelId))
+                .forEach(channelId -> {
+                    MidjourneyDiscordQueueEntity entity = readyQueue.get(channelId).pop();
+
+                    discordService.sendMessage(guildId, channelId, entity.message());
+
+                    processingEntities.put(channelId, entity);
+                });
     }
 }
