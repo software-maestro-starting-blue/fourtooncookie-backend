@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ArtworkExceptionControllerAdvice {
 
     @ExceptionHandler(ArtworkNoSuchElementException.class)
-    public ResponseEntity<?> handleArtworkNoSuchElementException(ArtworkNoSuchElementException e) {
+    public ResponseEntity<String> handleArtworkNoSuchElementException(ArtworkNoSuchElementException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
