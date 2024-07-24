@@ -21,9 +21,9 @@ public class MidjourneyVisionApplyService implements VisionApplyService {
 
             String contentPrompt = generateContentPrompt(content);
 
-            String prompt = getCharacterPrompt(character) + ", " + contentPrompt;
+            String finalPrompt = generateFinalPrompt(contentPrompt, character);
 
-            midjourneyDiscordService.pushReadyQueue(diaryId, prompt, i, character);
+            midjourneyDiscordService.pushReadyQueue(diaryId, finalPrompt, i, character);
         }
 
     }
@@ -32,7 +32,7 @@ public class MidjourneyVisionApplyService implements VisionApplyService {
         return null; // TODO: LLMService를 활용하여서 Content를 Midjourney에서 활용할 수 있도록 재가공하기
     }
 
-    private String getCharacterPrompt(Character character) {
+    private String generateFinalPrompt(String contentPrompt, Character character) {
         return null; // TODO: 캐릭터에 맞는 프롬프트를 가지고 오기
     }
 
