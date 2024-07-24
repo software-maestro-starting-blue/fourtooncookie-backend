@@ -29,7 +29,7 @@ public class DiscordService {
         jda.awaitReady();
     }
 
-    public void sendMessage(Integer guildId, Integer channelId, String message) {
+    public void sendMessage(Long guildId, Long channelId, String message) {
         Guild guild = jda.getGuildById(guildId);
         if (guild == null) {
             throw new IllegalStateException("Guild not found");
@@ -48,7 +48,7 @@ public class DiscordService {
         jda.addEventListener(listener);
     }
 
-    public TextChannel getChannelByName(Integer guildId, String channelName) {
+    public TextChannel getChannelByName(Long guildId, String channelName) {
         Guild guild = jda.getGuildById(guildId);
         if (guild == null) {
             throw new IllegalStateException("Guild not found");
