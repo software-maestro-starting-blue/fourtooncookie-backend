@@ -36,8 +36,19 @@ public class MidjourneyDiscordService extends ListenerAdapter {
     }
 
     public void pushReadyQueue(Long diaryId, String prompt, Integer gridPosition, Character character) {
-        // TODO character에 맞는 channelId 확인하기
-        // TODO Entity를 구성하여 readyQueue에 해당 엔티티 넣기
+        Long channelId = getChannelIdByCharacter(character);
+        String message = "/imagine " + prompt;
+        MidjourneyDiscordQueueEntity entity = new MidjourneyDiscordQueueEntity(diaryId, message, gridPosition, false);
+
+        if (! readyQueue.containsKey(channelId)) {
+            readyQueue.put(channelId, new LinkedList<>());
+        }
+
+        readyQueue.get(channelId).add(entity);
+    }
+
+    private Long getChannelIdByCharacter(Character character) {
+        return null; // TODO: 테이블의 정보를 활용하여 알아내거나, 채널 이름을 통해서 알아내기
     }
 
     @Scheduled(fixedDelay = 1000)
