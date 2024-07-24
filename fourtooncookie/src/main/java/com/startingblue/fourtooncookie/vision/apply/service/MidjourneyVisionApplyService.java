@@ -15,8 +15,25 @@ public class MidjourneyVisionApplyService implements VisionApplyService {
 
     @Override
     public void processVisionApply(Long diaryId, List<String> contents, Character character) {
-        // TODO: 각 컨텐츠에 대한 프롬프트 재가공
-        // TODO: MidjourneyDiscordService의 pushReadyQueue를 실행하여 정보 전달
+
+        for (int i = 0; i < 4; i++) {
+            String content = contents.get(i);
+
+            String contentPrompt = generateContentPrompt(content);
+
+            String prompt = getCharacterPrompt(character) + ", " + contentPrompt;
+
+            midjourneyDiscordService.pushReadyQueue(diaryId, prompt, i, character);
+        }
+
+    }
+
+    private String generateContentPrompt(String content) {
+        return null; // TODO: LLMService를 활용하여서 Content를 Midjourney에서 활용할 수 있도록 재가공하기
+    }
+
+    private String getCharacterPrompt(Character character) {
+        return null; // TODO: 캐릭터에 맞는 프롬프트를 가지고 오기
     }
 
     @Override
