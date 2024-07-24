@@ -2,7 +2,7 @@ package com.startingblue.fourtooncookie.diary.domain;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
-import com.startingblue.fourtooncookie.character.domain.CharacterType;
+import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
@@ -59,7 +59,7 @@ class DiaryRepositoryTest {
                 .build();
         memberRepository.save(member);
 
-        Character character = new Character(CharacterType.DALL_E_3, "Test Character", new URL("https://testImagePng.com"));
+        Character character = new Character(CharacterVisionType.DALL_E_3, "Test Character", new URL("https://testImagePng.com"));
         characterRepository.save(character);
 
         Diary diary = Diary.builder()
@@ -99,7 +99,7 @@ class DiaryRepositoryTest {
                 .build();
         memberRepository.save(member);
 
-        Character character = new Character(CharacterType.DALL_E_3, "Test Character", new URL("https://testImagePng.com"));
+        Character character = new Character(CharacterVisionType.DALL_E_3, "Test Character", new URL("https://testImagePng.com"));
         characterRepository.save(character);
 
         Diary diary1 = Diary.builder()
