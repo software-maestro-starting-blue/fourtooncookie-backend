@@ -2,6 +2,9 @@ package com.startingblue.fourtooncookie.discord.service.midjourney;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.discord.model.midjourney.MidjourneyDiscordQueueEntity;
+import com.startingblue.fourtooncookie.discord.service.DiscordService;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -10,12 +13,20 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+@RequiredArgsConstructor
 @Service
 public class MidjourneyDiscordService extends ListenerAdapter {
+
+    private final DiscordService discordService;
 
     private HashMap<Long, LinkedList<MidjourneyDiscordQueueEntity>> readyQueue = new HashMap<>();
 
     private HashMap<Long, MidjourneyDiscordQueueEntity> processingEntities = new HashMap<>();
+
+    @PostConstruct
+    public void init() {
+        discordService.addListener(this);
+    }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {

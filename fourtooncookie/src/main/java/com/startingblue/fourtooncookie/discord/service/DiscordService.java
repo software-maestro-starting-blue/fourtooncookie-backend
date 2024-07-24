@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
 public class DiscordService {
 
@@ -22,15 +21,12 @@ public class DiscordService {
     @Value("${discord.token}")
     private String DISCORD_API_KEY;
 
-    private final List<ListenerAdapter> listeners;
-
     @PostConstruct
     private void init() throws InterruptedException {
         jda = JDABuilder.createDefault(DISCORD_API_KEY)
                 .enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.DIRECT_MESSAGES)
                 .build();
         jda.awaitReady();
-        listeners.forEach(this::addListener);
     }
 
     public void sendMessage(Integer guildId, Integer channelId, String message) {
