@@ -24,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DallE3VisionApplyService implements VisionApplyService {
 
-    @Value("${vision.prompt.dalle3}")
+    @Value("${prompt.vision.dalle3}")
     private String SYSTEM_PROMPT;
 
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -58,31 +58,34 @@ public class DallE3VisionApplyService implements VisionApplyService {
         return response.getResult().getOutput().getB64Json();
     }
 
-    private List<byte[]> convertImageB64JsonToFourImagesOfByteArray(String imageB64Json) throws IOException {
-        byte[] decodedBytes = Base64.getDecoder().decode(imageB64Json);
+    private List<byte[]> convertImageB64JsonToFourImagesOfByteArray(String imageB64Json) {
+        try {
+            byte[] decodedBytes = Base64.getDecoder().decode(imageB64Json);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(decodedBytes);
-        BufferedImage originalImage = ImageIO.read(bais);
+            ByteArrayInputStream bais = new ByteArrayInputStream(decodedBytes);
+            BufferedImage originalImage = ImageIO.read(bais);
+
+            int width = originalImage.getWidth();
+            int height = originalImage.getHeight();
+            BufferedImage[] subImages = new BufferedImage[4];
+
+            subImages[0] = originalImage.getSubimage(0, 0, width / 2, height / 2); // top-left
+            subImages[1] = originalImage.getSubimage(width / 2, 0, width / 2, height / 2); // top-right
+            subImages[2] = originalImage.getSubimage(0, height / 2, width / 2, height / 2); // bottom-left
+            subImages[3] = originalImage.getSubimage(width / 2, height / 2, width / 2, height / 2); // bottom-right
 
 
-        int width = originalImage.getWidth();
-        int height = originalImage.getHeight();
-        BufferedImage[] subImages = new BufferedImage[4];
+            List<byte[]> subImageBytes = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(subImages[i], "png", baos);
+                subImageBytes.add(baos.toByteArray());
+            }
 
-        subImages[0] = originalImage.getSubimage(0, 0, width / 2, height / 2); // top-left
-        subImages[1] = originalImage.getSubimage(width / 2, 0, width / 2, height / 2); // top-right
-        subImages[2] = originalImage.getSubimage(0, height / 2, width / 2, height / 2); // bottom-left
-        subImages[3] = originalImage.getSubimage(width / 2, height / 2, width / 2, height / 2); // bottom-right
-
-
-        List<byte[]> subImageBytes = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(subImages[i], "png", baos);
-            subImageBytes.add(baos.toByteArray());
+            return subImageBytes;
+        } catch (IOException exception) {
+            throw new IllegalStateException("이미지를 4장으로 나누는 과정에서 오류가 나타남", exception);
         }
-
-        return subImageBytes;
     }
 
     @Override
