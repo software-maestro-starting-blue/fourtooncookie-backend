@@ -56,14 +56,16 @@ class ArtworkRepositoryTest {
 
     @DisplayName("저장된 작품을 삭제한다.")
     @Test
-    public void testDelete() throws MalformedURLException {
+    public void deleteById() throws MalformedURLException {
         // Given
         Artwork artwork = new Artwork("Test Title", new URL("http://test.com/image.jpg"));
         Artwork savedArtwork = artworkRepository.save(artwork);
 
+        Long deletedId = savedArtwork.getId();
+
         // When
         artworkRepository.delete(savedArtwork);
-        Optional<Artwork> foundArtwork = artworkRepository.findById(savedArtwork.getId());
+        Optional<Artwork> foundArtwork = artworkRepository.findById(deletedId);
 
         // Then
         assertThat(foundArtwork).isNotPresent();

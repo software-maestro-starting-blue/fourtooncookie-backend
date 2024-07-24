@@ -35,8 +35,12 @@ class ArtworkServiceTest {
     @Test
     public void getSavedArtworkResponses() throws MalformedURLException {
         // Given
-        Artwork artwork1 = new Artwork("Title 1", new URL("http://test.com/image1.jpg"));
-        Artwork artwork2 = new Artwork("Title 2", new URL("http://test.com/image2.jpg"));
+        String title1 = "Title 1";
+        URL url1 = new URL("http://test.com/image1.jpg");
+        String title2 = "Title 2";
+        URL url2 = new URL("http://test.com/image2.jpg");
+        Artwork artwork1 = new Artwork(title1, url1);
+        Artwork artwork2 = new Artwork(title2, url2);
         artworkRepository.save(artwork1);
         artworkRepository.save(artwork2);
 
@@ -45,34 +49,45 @@ class ArtworkServiceTest {
 
         // Then
         assertThat(responses.artworks()).hasSize(2);
+        assertThat(responses.artworks().get(0).title()).isEqualTo(title1);
+        assertThat(responses.artworks().get(0).thumnailUrl()).isEqualTo(url1);
+        assertThat(responses.artworks().get(1).title()).isEqualTo(title2);
+        assertThat(responses.artworks().get(1).thumnailUrl()).isEqualTo(url2);
     }
 
     @DisplayName("새로운 작품을 저장한다.")
     @Test
     public void saveArtwork() throws MalformedURLException {
         // Given
-        ArtworkSaveRequest request = new ArtworkSaveRequest("New Artwork", new URL("http://test.com/newimage.jpg"));
+        String newTitle = "New Artwork";
+        URL newUrl = new URL("http://test.com/newimage.jpg");
+        ArtworkSaveRequest request = new ArtworkSaveRequest(newTitle, newUrl);
 
         // When
         artworkService.saveArtwork(request);
 
         // Then
         Optional<Artwork> savedArtwork = artworkRepository.findAll().stream()
-                .filter(artwork -> artwork.getTitle().equals("New Artwork"))
+                .filter(artwork -> artwork.getTitle().equals(newTitle))
                 .findFirst();
 
         assertThat(savedArtwork).isPresent();
-        assertThat(savedArtwork.get().getTitle()).isEqualTo("New Artwork");
-        assertThat(savedArtwork.get().getThumbnailUrl().toString()).isEqualTo("http://test.com/newimage.jpg");
+        assertThat(savedArtwork.get().getTitle()).isEqualTo(newTitle);
+        assertThat(savedArtwork.get().getThumbnailUrl()).isEqualTo(newUrl);
     }
 
     @DisplayName("저장된 작품을 업데이트한다.")
     @Test
     public void updateArtwork() throws MalformedURLException {
         // Given
-        Artwork artwork = new Artwork("Old Title", new URL("http://test.com/oldimage.jpg"));
+        String oldTitle = "Old Title";
+        URL oldUrl = new URL("http://test.com/oldimage.jpg");
+        Artwork artwork = new Artwork(oldTitle, oldUrl);
         Artwork savedArtwork = artworkRepository.save(artwork);
-        ArtworkUpdateRequest request = new ArtworkUpdateRequest("Updated Title", new URL("http://test.com/updatedimage.jpg"));
+
+        String updateTitle = "update Title";
+        URL updateUrl = new URL("http://test.com/updateimage.jpg");
+        ArtworkUpdateRequest request = new ArtworkUpdateRequest(updateTitle, updateUrl);
 
         // When
         artworkService.updateArtwork(savedArtwork.getId(), request);
@@ -80,22 +95,27 @@ class ArtworkServiceTest {
         // Then
         Optional<Artwork> updatedArtwork = artworkRepository.findById(savedArtwork.getId());
         assertThat(updatedArtwork).isPresent();
-        assertThat(updatedArtwork.get().getTitle()).isEqualTo("Updated Title");
-        assertThat(updatedArtwork.get().getThumbnailUrl().toString()).isEqualTo("http://test.com/updatedimage.jpg");
+        assertThat(updatedArtwork.get().getTitle()).isEqualTo(updateTitle);
+        assertThat(updatedArtwork.get().getThumbnailUrl()).isEqualTo(updateUrl);
     }
 
     @DisplayName("저장된 작품을 삭제한다.")
     @Test
     public void deleteArtwork() throws MalformedURLException {
         // Given
-        Artwork artwork = new Artwork("Test Title", new URL("http://test.com/image.jpg"));
+        String title = "Title";
+        URL url = new URL("http://test.com/image.jpg");
+
+        Artwork artwork = new Artwork(title, url);
         Artwork savedArtwork = artworkRepository.save(artwork);
 
+        Long deleteId = savedArtwork.getId();
+
         // When
-        artworkService.deleteArtwork(savedArtwork.getId());
+        artworkService.deleteArtwork(deleteId);
 
         // Then
-        Optional<Artwork> foundArtwork = artworkRepository.findById(savedArtwork.getId());
+        Optional<Artwork> foundArtwork = artworkRepository.findById(deleteId);
         assertThat(foundArtwork).isNotPresent();
     }
 
@@ -104,7 +124,9 @@ class ArtworkServiceTest {
     public void updateArtworkWithInvalidId() throws MalformedURLException {
         // Given
         Long notFoundArtworkId = -1L;
-        ArtworkUpdateRequest request = new ArtworkUpdateRequest("Updated Title", new URL("http://test.com/updatedimage.jpg"));
+        String updateTitle = "Update Title";
+        URL updateUrl = new URL("http://test.com/updateimage.jpg");
+        ArtworkUpdateRequest request = new ArtworkUpdateRequest(updateTitle, updateUrl);
 
         // When & Then
         assertThatThrownBy(() -> artworkService.updateArtwork(notFoundArtworkId, request))
