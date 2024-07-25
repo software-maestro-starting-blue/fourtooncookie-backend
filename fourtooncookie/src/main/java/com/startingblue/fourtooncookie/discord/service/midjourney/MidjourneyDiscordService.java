@@ -57,7 +57,7 @@ public class MidjourneyDiscordService extends ListenerAdapter {
 
     }
 
-    public void pusPendingQueue(Long diaryId, String prompt, Integer gridPosition, Character character) {
+    public void pushPendingQueue(Long diaryId, String prompt, Integer gridPosition, Character character) {
         Long channelId = getChannelIdByCharacter(character);
         String message = "/imagine " + prompt;
         MidjourneyDiscordQueueEntity entity = new MidjourneyDiscordQueueEntity(diaryId, message, gridPosition, false);
