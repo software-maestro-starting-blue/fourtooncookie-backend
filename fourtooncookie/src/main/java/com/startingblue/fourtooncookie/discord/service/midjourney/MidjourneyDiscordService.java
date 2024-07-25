@@ -1,25 +1,18 @@
 package com.startingblue.fourtooncookie.discord.service.midjourney;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
-import com.startingblue.fourtooncookie.discord.model.midjourney.MidjourneyDiscordQueueEntity;
+import com.startingblue.fourtooncookie.discord.model.midjourney.MidjourneyDiscordPendingEntity;
 import com.startingblue.fourtooncookie.discord.service.DiscordService;
-import com.startingblue.fourtooncookie.vision.reply.dto.VisionReplyEvent;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -33,7 +26,7 @@ public class MidjourneyDiscordService extends ListenerAdapter {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    private HashMap<Long, HashMap<Long, MidjourneyDiscordQueueEntity>> pendingQueue = new HashMap<>();
+    private HashMap<Long, HashMap<Long, MidjourneyDiscordPendingEntity>> pendingEntities = new HashMap<>();
 
     @PostConstruct
     public void init() {
@@ -46,7 +39,7 @@ public class MidjourneyDiscordService extends ListenerAdapter {
             return;
         }
 
-        if (! pendingQueue.containsKey(event.getChannel().getIdLong())) {
+        if (! pendingEntities.containsKey(event.getChannel().getIdLong())) {
             return;
         }
 
@@ -54,11 +47,11 @@ public class MidjourneyDiscordService extends ListenerAdapter {
         Message receivedMessage = event.getMessage();
         Message referencedMessage = receivedMessage.getReferencedMessage();
 
-        if (referencedMessage == null || ! pendingQueue.get(channelId).containsKey(referencedMessage.getIdLong())) {
+        if (referencedMessage == null || ! pendingEntities.get(channelId).containsKey(referencedMessage.getIdLong())) {
             return;
         }
 
-        MidjourneyDiscordQueueEntity entity = pendingQueue.get(channelId).get(referencedMessage.getIdLong());
+        MidjourneyDiscordPendingEntity entity = pendingEntities.get(channelId).get(referencedMessage.getIdLong());
 
         Optional<Attachment> imageAttachment = receivedMessage.getAttachments().stream()
                 .filter(Attachment::isImage)
@@ -85,18 +78,18 @@ public class MidjourneyDiscordService extends ListenerAdapter {
         return 0; // TODO: 이미지를 llmService로 분석하여 가장 적합한 이미지를 선택하기
     }
 
-    public void pushPendingQueue(Long diaryId, String prompt, Integer gridPosition, Character character) {
+    public void pushPendingEntities(Long diaryId, String prompt, Integer gridPosition, Character character) {
         Long channelId = getChannelIdByCharacter(character);
         String message = "/imagine " + prompt;
-        MidjourneyDiscordQueueEntity entity = new MidjourneyDiscordQueueEntity(diaryId, message, gridPosition);
+        MidjourneyDiscordPendingEntity entity = new MidjourneyDiscordPendingEntity(diaryId, message, gridPosition);
 
-        if (! pendingQueue.containsKey(channelId)) {
-            pendingQueue.put(channelId, new HashMap<>());
+        if (! pendingEntities.containsKey(channelId)) {
+            pendingEntities.put(channelId, new HashMap<>());
         }
 
         Message sentMessage = discordService.sendMessage(guildId, channelId, entity.message()).join();
 
-        pendingQueue.get(channelId).put(sentMessage.getIdLong(), entity);
+        pendingEntities.get(channelId).put(sentMessage.getIdLong(), entity);
     }
 
     private Long getChannelIdByCharacter(Character character) {
