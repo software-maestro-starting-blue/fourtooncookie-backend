@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class DiscordService {
@@ -29,7 +31,7 @@ public class DiscordService {
         jda.awaitReady();
     }
 
-    public void sendMessage(Long guildId, Long channelId, String message) {
+    public CompletableFuture<Message> sendMessage(Long guildId, Long channelId, String message) {
         Guild guild = jda.getGuildById(guildId);
         if (guild == null) {
             throw new IllegalStateException("Guild not found");
@@ -41,7 +43,7 @@ public class DiscordService {
             throw new IllegalStateException("Channel not found");
         }
 
-        textChannel.sendMessage(message).queue();
+        return textChannel.sendMessage(message).submit();
     }
 
     public void addListener(ListenerAdapter listener) {
