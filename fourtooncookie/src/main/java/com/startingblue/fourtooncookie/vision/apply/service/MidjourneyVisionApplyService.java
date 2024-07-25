@@ -23,7 +23,7 @@ public class MidjourneyVisionApplyService implements VisionApplyService {
 
             String finalPrompt = generateFinalPrompt(contentPrompt, character);
 
-            midjourneyDiscordService.pusPendingQueue(diaryId, finalPrompt, i, character);
+            midjourneyDiscordService.pushPendingQueue(diaryId, finalPrompt, i, character);
         }
 
     }
