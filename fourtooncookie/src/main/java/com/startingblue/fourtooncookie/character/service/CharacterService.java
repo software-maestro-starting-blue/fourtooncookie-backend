@@ -4,7 +4,7 @@ import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.artwork.service.ArtworkService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
-import com.startingblue.fourtooncookie.character.domain.ModelType;
+import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.character.dto.request.AddCharacterRequest;
 import com.startingblue.fourtooncookie.character.dto.request.ModifyCharacterRequest;
 import com.startingblue.fourtooncookie.character.dto.response.CharacterResponse;
@@ -25,11 +25,9 @@ public class CharacterService {
     private final ArtworkService artworkService;
 
     public void addCharacter(final AddCharacterRequest request) {
-        final ModelType modelType = ModelType.valueOf(request.modelType());
-        final Artwork artwork = artworkService.findById(request.artworkId());
+        final CharacterVisionType characterVisionType = CharacterVisionType.valueOf(request.modelType());
         final Character character = new Character(
-                modelType,
-                artwork,
+                characterVisionType,
                 request.name(),
                 request.selectionThumbnailUrl(),
                 request.basePrompt()
@@ -65,7 +63,7 @@ public class CharacterService {
         return new CharacterResponses(characters.stream()
                 .map(character -> new CharacterResponse(
                         character.getId(),
-                        character.getModelType().name(),
+                        character.getCharacterVisionType().name(),
                         character.getName(),
                         character.getSelectionThumbnailUrl()))
                 .toList());

@@ -124,6 +124,10 @@ class CharacterRepositoryTest {
         Character character = new Character(ModelType.DALL_E_3, artwork, "멍멍이", new URL("https://멍멍이-dalle3.png"), basePrompt);
         Character savedCharacter = characterRepository.save(character);
 
+        CharacterVisionType newCharacterVisionType = CharacterVisionType.STABLE_DIFFUSION;
+        String newName = "바뀐멍멍이";
+        URL newURL = new URL("https://바뀐멍멍이-stable-diffusion.png");
+
         // when
         String updatedBasePrompt = "Updated base prompt.";
         savedCharacter.update(character.getModelType(), character.getArtwork(), "바뀐멍멍이", character.getSelectionThumbnailUrl(), updatedBasePrompt);

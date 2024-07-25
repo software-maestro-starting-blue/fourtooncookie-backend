@@ -22,7 +22,8 @@ public class Character {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private ModelType modelType;
+    private CharacterVisionType characterVisionType;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artwork_id")
@@ -36,18 +37,16 @@ public class Character {
 
     @NotBlank
     private String basePrompt;
-
-    public Character(final ModelType modelType, final Artwork artwork, final String name, final URL selectionThumbnailUrl, final String basePrompt) {
-        this.modelType = modelType;
-        this.artwork = artwork;
+  
+    public Character(final CharacterVisionType characterVisionType, final String name, final URL selectionThumbnailUrl, final String basePrompt) {
+        this.characterVisionType = characterVisionType;
         this.name = name;
         this.selectionThumbnailUrl = selectionThumbnailUrl;
         this.basePrompt = basePrompt;
     }
 
-    public void update(final ModelType modelType, final Artwork artwork, final String name, final URL selectionThumbnailUrl, final String basePrompt) {
-        this.modelType = modelType;
-        this.artwork = artwork;
+    public void update(final CharacterVisionType characterVisionType, final String name, final URL selectionThumbnailUrl, final String basePrompt) {
+        this.characterVisionType = characterVisionType;
         this.name = name;
         this.selectionThumbnailUrl = selectionThumbnailUrl;
         this.basePrompt = basePrompt;

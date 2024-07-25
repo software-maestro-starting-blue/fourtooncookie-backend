@@ -4,7 +4,7 @@ import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.artwork.service.ArtworkService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
-import com.startingblue.fourtooncookie.character.domain.ModelType;
+import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.character.dto.request.AddCharacterRequest;
 import com.startingblue.fourtooncookie.character.dto.request.ModifyCharacterRequest;
 import com.startingblue.fourtooncookie.character.dto.response.CharacterResponse;
@@ -106,6 +106,7 @@ class CharacterServiceTest {
         String basePrompt = "This is a base prompt";
         Character character1 = new Character(ModelType.DALL_E_3, new Artwork("Test Artwork", new URL("https://test.png")), "멍멍이", new URL("https://멍멍이-dalle3.png"), basePrompt);
         Character character2 = new Character(ModelType.DALL_E_3, new Artwork("Test Artwork", new URL("https://test.png")), "나비", new URL("https://나비-dalle3.png"), basePrompt);
+
         when(characterRepository.findAll()).thenReturn(List.of(character1, character2));
 
         // when
@@ -138,7 +139,7 @@ class CharacterServiceTest {
         characterService.modifyCharacter(characterId, request);
 
         // then
-        assertThat(character.getModelType()).isEqualTo(ModelType.STABLE_DIFFUSION);
+        assertThat(character.getCharacterVisionType()).isEqualTo(CharacterVisionType.STABLE_DIFFUSION);
         assertThat(character.getName()).isEqualTo("바뀐멍멍이");
         assertThat(character.getSelectionThumbnailUrl()).isEqualTo(new URL("https://바뀐멍멍이.png"));
         assertThat(character.getBasePrompt()).isEqualTo("Updated prompt");
