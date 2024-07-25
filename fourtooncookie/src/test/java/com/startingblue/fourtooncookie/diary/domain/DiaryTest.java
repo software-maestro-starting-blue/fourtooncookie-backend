@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.diary.domain;
 
+import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.ModelType;
@@ -46,6 +47,7 @@ class DiaryTest {
     CharacterRepository characterRepository;
 
     private Validator validator;
+    private Artwork artwork;
     private Character character;
     private Member member;
 
@@ -53,7 +55,7 @@ class DiaryTest {
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-
+        artwork = mock(Artwork.class);
         character = mock(Character.class);
         member = mock(Member.class);
         when(member.getId()).thenReturn(1L);
@@ -172,7 +174,7 @@ class DiaryTest {
     @Test
     void update() throws MalformedURLException {
         // given
-        Character character = new Character(ModelType.DALL_E_3, "멍멍이", new URL("http://멍멍이.png"));
+        Character character = new Character(ModelType.DALL_E_3, artwork, "멍멍이", new URL("http://멍멍이.png"), "base Prompt");
         characterRepository.save(character);
 
         Member member = createMember("민서", LocalDate.of(2000, 5, 31), Gender.MALE);
@@ -183,7 +185,10 @@ class DiaryTest {
 
         Diary savedDiary = diaryRepository.findById(saveDiary.getId()).get();
 
-        Character newCharacter = new Character(ModelType.STABLE_DIFFUSION, "오동이", new URL("http://오동이.png"));
+        String newCharacterName = "오동이";
+        URL newCharacterUrl = new URL("http://오동이.png");
+        String newBasePrompt = "new Base Prompt";
+        Character newCharacter = new Character(ModelType.STABLE_DIFFUSION, artwork, newCharacterName, newCharacterUrl, newBasePrompt);
         characterRepository.save(newCharacter);
 
         // when
@@ -193,13 +198,16 @@ class DiaryTest {
         assertThat(savedDiary.getContent()).isEqualTo("새로운 일기 내용");
         assertThat(savedDiary.getHashtagsIds()).isEqualTo(List.of(1L));
         assertThat(savedDiary.getCharacter()).isEqualTo(newCharacter);
+        assertThat(savedDiary.getCharacter().getName()).isEqualTo(newCharacterName);
+        assertThat(savedDiary.getCharacter().getSelectionThumbnailUrl()).isEqualTo(newCharacterUrl);
+        assertThat(savedDiary.getCharacter().getBasePrompt()).isEqualTo(newBasePrompt);
     }
 
     @DisplayName("일기 그림 이미지 URL 업데이트")
     @Test
     void updatePaintingImageUrls() throws MalformedURLException {
         // given
-        Character character = new Character(ModelType.DALL_E_3, "멍멍이", new URL("http://멍멍이.png"));
+        Character character = new Character(ModelType.DALL_E_3, artwork, "멍멍이", new URL("http://멍멍이.png"), "base Prompt");
         characterRepository.save(character);
 
         Member member = createMember("민서", LocalDate.of(2000, 5, 31), Gender.MALE);
@@ -208,18 +216,23 @@ class DiaryTest {
         Diary saveDiary = createDiary(LocalDate.of(2024, 7, 21), character, member);
         diaryRepository.save(saveDiary);
 
+        String url1 = "http://new1.png";
+        String url2 = "http://new2.png";
+        String url3 = "http://new3.png";
+        String url4 = "http://new4.png";
+        List<URL> updatePaintingImageUrls = List.of(new URL(url1), new URL(url2), new URL(url3), new URL(url4));
+
         // when
-        saveDiary.updatePaintingImageUrls(List.of(new URL("http://new1.png"), new URL("http://new2.png"),
-                new URL("http://new3.png"), new URL("http://new4.png")));
+        saveDiary.updatePaintingImageUrls(updatePaintingImageUrls);
 
         // then
         assertThat(saveDiary.getPaintingImageUrls())
                 .extracting(URL::toString)
                 .containsExactlyInAnyOrder(
-                        "http://new1.png",
-                        "http://new2.png",
-                        "http://new3.png",
-                        "http://new4.png"
+                        url1,
+                        url2,
+                        url3,
+                        url4
                 );
     }
 

@@ -1,5 +1,7 @@
 package com.startingblue.fourtooncookie.diary.domain;
 
+import com.startingblue.fourtooncookie.artwork.domain.Artwork;
+import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.ModelType;
@@ -39,11 +41,20 @@ class DiaryRepositoryTest {
     @Autowired
     CharacterRepository characterRepository;
 
+    @Autowired
+    ArtworkRepository artworkRepository;
+
+    private Artwork artwork;
+
     @BeforeEach
     void setUp() throws MalformedURLException {
         diaryRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
         characterRepository.deleteAllInBatch();
+        artworkRepository.deleteAllInBatch();
+
+        artwork = new Artwork("Test Artwork", new URL("https://test.com/artwork.png"));
+        artwork = artworkRepository.save(artwork);
     }
 
     @DisplayName("일기를 저장한다.")
@@ -59,7 +70,7 @@ class DiaryRepositoryTest {
                 .build();
         memberRepository.save(member);
 
-        Character character = new Character(ModelType.DALL_E_3, "Test Character", new URL("https://testImagePng.com"));
+        Character character = new Character(ModelType.DALL_E_3, artwork, "Test Character", new URL("https://testImagePng.com"), "Test base prompt");
         characterRepository.save(character);
 
         Diary diary = Diary.builder()
@@ -99,7 +110,7 @@ class DiaryRepositoryTest {
                 .build();
         memberRepository.save(member);
 
-        Character character = new Character(ModelType.DALL_E_3, "Test Character", new URL("https://testImagePng.com"));
+        Character character = new Character(ModelType.DALL_E_3, artwork, "Test Character", new URL("https://testImagePng.com"), "Test base prompt");
         characterRepository.save(character);
 
         Diary diary1 = Diary.builder()
@@ -127,7 +138,7 @@ class DiaryRepositoryTest {
                 .isFavorite(false)
                 .diaryDate(LocalDate.of(2024, 7, 25))
                 .paintingImageUrls(List.of(new URL("https://example.com/image3.png")))
-                .hashtagsIds(List.of(2L))
+                .hashtagsIds(List.of(3L))
                 .character(character)
                 .member(member)
                 .build();
@@ -144,6 +155,6 @@ class DiaryRepositoryTest {
         assertThat(diaryPage.getContent()).hasSize(2);
         assertThat(diaryPage.getContent())
                 .extracting(Diary::getContent)
-                .containsExactlyInAnyOrder("Test Content 3", "Test Content 2");
+                .containsExactly("Test Content 3", "Test Content 2");
     }
 }
