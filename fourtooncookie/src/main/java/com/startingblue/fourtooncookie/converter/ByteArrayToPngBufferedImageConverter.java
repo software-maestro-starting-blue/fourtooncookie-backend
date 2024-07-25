@@ -11,7 +11,7 @@ import java.io.ByteArrayOutputStream;
 
 @Converter
 @Service
-public class ByteArrayToBufferedImageConverter implements AttributeConverter<byte[], BufferedImage> {
+public class ByteArrayToPngBufferedImageConverter implements AttributeConverter<byte[], BufferedImage> {
 
 
     @Override
