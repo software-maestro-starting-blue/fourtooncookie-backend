@@ -1,7 +1,7 @@
 package com.startingblue.fourtooncookie.vision.apply.service;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
-import com.startingblue.fourtooncookie.character.domain.ModelType;
+import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.llm.service.LLMService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -27,14 +26,14 @@ public class VisionApplyManageService {
 
     @Async
     public void createImageByDiary(Long diaryId, String content, Character character) {
-        VisionApplyService visionApplyService = findVisionApplyServiceByModelType(character.getModelType());
+        VisionApplyService visionApplyService = findVisionApplyServiceByModelType(character.getCharacterVisionType());
 
         List<String> contents = seperateContentBy4contents(content);
 
         visionApplyService.processVisionApply(diaryId, contents, character);
     }
 
-    private VisionApplyService findVisionApplyServiceByModelType(ModelType modelType) {
+    private VisionApplyService findVisionApplyServiceByModelType(CharacterVisionType modelType) {
         return visionApplyServices.stream()
                 .filter(visionApplyService -> visionApplyService.getModelType().equals(modelType))
                 .findFirst()
