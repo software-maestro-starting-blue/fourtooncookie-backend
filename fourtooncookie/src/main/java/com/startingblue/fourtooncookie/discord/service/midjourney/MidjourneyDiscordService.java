@@ -31,9 +31,30 @@ public class MidjourneyDiscordService extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        // TODO processingEntities에 존재하는 entity에 대한 답장일 경우 이에 대해 handling
-        // 1. 만약 isImageSelectionProcessed가 false일 경우 이에 대해 선택을 시킨 후, true로 바꾸기
-        // 2. 그렇지 않을 경우, processingEntities에서 해당 부분을 지우고 event publish하기
+        if (event.getGuild().getIdLong() != guildId) {
+            return;
+        }
+
+        if (! pendingQueue.containsKey(event.getChannel().getIdLong())) {
+            return;
+        }
+
+        Long channelId = event.getChannel().getIdLong();
+        Message receivedMessage = event.getMessage();
+        Message referencedMessage = receivedMessage.getReferencedMessage();
+
+        if (referencedMessage == null || ! pendingQueue.get(channelId).containsKey(referencedMessage.getIdLong())) {
+            return;
+        }
+
+        MidjourneyDiscordQueueEntity entity = pendingQueue.get(channelId).get(referencedMessage.getIdLong());
+
+        if (!entity.isImageSelectionProcessed()) {
+            // 1. 만약 isImageSelectionProcessed가 false일 경우 이에 대해 선택을 시킨 후, true로 바꾸기
+        } else {
+            // 2. 그렇지 않을 경우, processingEntities에서 해당 부분을 지우고 event publish하기
+        }
+
     }
 
     public void pusPendingQueue(Long diaryId, String prompt, Integer gridPosition, Character character) {
