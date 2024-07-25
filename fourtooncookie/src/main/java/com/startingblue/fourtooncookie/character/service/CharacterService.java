@@ -39,23 +39,23 @@ public class CharacterService {
     }
 
     public void modifyCharacter(final Long characterId, final ModifyCharacterRequest request) {
-        final Character character = characterRepository
-                .findById(characterId)
-                .orElseThrow(CharacterNoSuchElementException::new);
-        final ModelType modelType = ModelType.valueOf(request.modelType());
-        final Artwork artwork = artworkService.findById(request.artworkId());
+        Character foundCharacter = findById(characterId);
+        ModelType fooundModelType = ModelType.valueOf(request.modelType());
+        Artwork foundArtwork = artworkService.findById(request.artworkId());
 
-        character.update(modelType,
-                artwork,
+        foundCharacter.update(
+                fooundModelType,
+                foundArtwork,
                 request.name(),
                 request.selectionThumbnailUrl(),
                 request.basePrompt());
 
-        characterRepository.save(character);
+        characterRepository.save(foundCharacter);
     }
 
     public void deleteCharacter(final Long characterId) {
-        characterRepository.deleteById(characterId);
+       Character foundCharacter = findById(characterId);
+        characterRepository.delete(foundCharacter);
     }
 
     @Transactional(readOnly = true)
@@ -66,6 +66,8 @@ public class CharacterService {
                 .map(character -> new CharacterResponse(
                         character.getId(),
                         character.getModelType().name(),
+                        character.getArtwork().getTitle(),
+                        character.getArtwork().getThumbnailUrl(),
                         character.getName(),
                         character.getSelectionThumbnailUrl()))
                 .toList());
