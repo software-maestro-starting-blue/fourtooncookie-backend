@@ -189,6 +189,24 @@ class CharacterServiceTest {
         verify(characterRepository, times(1)).save(character);
     }
 
+    @DisplayName("존재하지 않는 캐릭터는 수정하지 못한다.")
+    @Test
+    void throwExceptionWhenUpdateNotFoundCharacter() throws MalformedURLException {
+        // given
+        Long notFoundCharacterId = -1L;
+        String updateCharacterVisionType = "STABLE_DIFFUSION";
+        Long updateArtworkId = 2L;
+        String updateCharacterName = "바뀐멍멍이";
+        URL updateUrl = new URL("https://test.png");
+        String updatedBasePrompt = "This is a base prompt";
+        ModifyCharacterRequest request = new ModifyCharacterRequest(updateCharacterVisionType, updateArtworkId, updateCharacterName, updateUrl, updatedBasePrompt);
+
+
+        // when & then
+        when(characterRepository.findById(notFoundCharacterId)).thenReturn(Optional.empty());
+        assertThrows(CharacterNoSuchElementException.class, () -> characterService.modifyCharacter(notFoundCharacterId, request));
+        verify(characterRepository, times(1)).findById(notFoundCharacterId);
+    }
 
     @DisplayName("캐릭터를 삭제한다.")
     @Test
@@ -209,25 +227,6 @@ class CharacterServiceTest {
 
         Optional<Character> deletedCharacter = characterRepository.findById(characterId);
         assertTrue(deletedCharacter.isEmpty());
-    }
-
-    @DisplayName("존재하지 않는 캐릭터는 수정하지 못한다.")
-    @Test
-    void throwExceptionWhenUpdateNotFoundCharacter() throws MalformedURLException {
-        // given
-        Long notFoundCharacterId = -1L;
-        String updateCharacterVisionType = "STABLE_DIFFUSION";
-        Long updateArtworkId = 2L;
-        String updateCharacterName = "바뀐멍멍이";
-        URL updateUrl = new URL("https://test.png");
-        String updatedBasePrompt = "This is a base prompt";
-        ModifyCharacterRequest request = new ModifyCharacterRequest(updateCharacterVisionType, updateArtworkId, updateCharacterName, updateUrl, updatedBasePrompt);
-
-
-        // when & then
-        when(characterRepository.findById(notFoundCharacterId)).thenReturn(Optional.empty());
-        assertThrows(CharacterNoSuchElementException.class, () -> characterService.modifyCharacter(notFoundCharacterId, request));
-        verify(characterRepository, times(1)).findById(notFoundCharacterId);
     }
 
     @DisplayName("존재하지 않는 캐릭터는 삭제하지 못한다.")

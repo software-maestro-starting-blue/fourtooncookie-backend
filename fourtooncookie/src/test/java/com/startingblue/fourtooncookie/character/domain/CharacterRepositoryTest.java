@@ -149,20 +149,19 @@ class CharacterRepositoryTest {
         Character character = new Character(CharacterVisionType.DALL_E_3, defaultArtwork, "멍멍이", new URL("https://멍멍이-dalle3.png"), basePrompt);
         Character savedCharacter = characterRepository.save(character);
 
-        CharacterVisionType newCharacterVisionType = CharacterVisionType.STABLE_DIFFUSION;
-        String newName = "바뀐멍멍이";
-        URL newURL = new URL("https://바뀐멍멍이-stable-diffusion.png");
-
-        // when
+        CharacterVisionType updateCharacterVisionType = CharacterVisionType.STABLE_DIFFUSION;
+        Artwork updateArtwork = new Artwork("update Artwork", new URL("https://updateArtwork.png"));
         String updateCharacterName = "바뀐멍멍이";
         URL updateUrl = new URL("https://test.png");
         String updateBasePrompt = "Updated base prompt.";
-        savedCharacter.update(character.getCharacterVisionType(), character.getArtwork(), updateCharacterName, updateUrl, updateBasePrompt);
+
+        // when
+        savedCharacter.update(updateCharacterVisionType, updateArtwork, updateCharacterName, updateUrl, updateBasePrompt);
         Character updatedCharacter = characterRepository.save(savedCharacter);
 
         // then
-        assertThat(updatedCharacter.getCharacterVisionType()).isEqualTo(CharacterVisionType.DALL_E_3);
-        assertThat(updatedCharacter.getArtwork()).isEqualTo(defaultArtwork);
+        assertThat(updatedCharacter.getCharacterVisionType()).isEqualTo(updateCharacterVisionType);
+        assertThat(updatedCharacter.getArtwork()).isEqualTo(updateArtwork);
         assertThat(updatedCharacter.getName()).isEqualTo(updateCharacterName);
         assertThat(updatedCharacter.getSelectionThumbnailUrl()).isEqualTo(updateUrl);
         assertThat(updatedCharacter.getBasePrompt()).isEqualTo(updateBasePrompt);
