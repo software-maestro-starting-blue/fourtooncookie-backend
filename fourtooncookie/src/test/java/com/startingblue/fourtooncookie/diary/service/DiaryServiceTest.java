@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -175,6 +176,7 @@ class DiaryServiceTest {
     @Test
     void updateDiaryTest() throws MalformedURLException {
         // given
+
         Diary diary = createDiary(LocalDate.of(2024, 7, 21), character, member);
         diaryRepository.save(diary);
 
@@ -200,9 +202,11 @@ class DiaryServiceTest {
         Diary diary = createDiary(LocalDate.of(2024, 7, 21), character, member);
         diaryRepository.save(diary);
 
-        DiaryPaintingImagesUpdateRequest request = new DiaryPaintingImagesUpdateRequest(
-                List.of(new URL("http://new1.png"), new URL("http://new2.png"), new URL("http://new3.png"), new URL("http://new4.png"))
-        );
+        List<URL> updateUrls = new ArrayList<>();
+        for (int i = 1; i <= 4; i++) {
+            updateUrls.add(new URL("https://new" + i + ".png"));
+        }
+        DiaryPaintingImagesUpdateRequest request = new DiaryPaintingImagesUpdateRequest(updateUrls);
 
         // when
         diaryService.updateDiary(diary.getId(), request);
@@ -211,11 +215,11 @@ class DiaryServiceTest {
         Diary updatedDiary = diaryRepository.findById(diary.getId()).get();
         assertThat(updatedDiary.getPaintingImageUrls())
                 .extracting(URL::toString)
-                .containsExactlyInAnyOrder(
-                        "http://new1.png",
-                        "http://new2.png",
-                        "http://new3.png",
-                        "http://new4.png"
+                .containsExactly(
+                        updateUrls.get(0).toString(),
+                        updateUrls.get(1).toString(),
+                        updateUrls.get(2).toString(),
+                        updateUrls.get(3).toString()
                 );
     }
 

@@ -3,7 +3,6 @@ package com.startingblue.fourtooncookie.character.domain;
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,25 +27,16 @@ class CharacterRepositoryTest {
     @Autowired
     private ArtworkRepository artworkRepository;
 
-    private Artwork defaultArtwork = new Artwork("Test Artwork", new URL("https://test.png"));
-
-    CharacterRepositoryTest() throws MalformedURLException {
-    }
-
-    @BeforeEach
-    public void setUp() throws MalformedURLException {
-        defaultArtwork = new Artwork("Test Artwork", new URL("https://test.png"));
-        artworkRepository.save(defaultArtwork);
-    }
 
     @DisplayName("캐릭터를 저장한다.")
     @Test
     void save() throws MalformedURLException {
         // given
         String characterName = "멍멍이";
+        Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
         URL characterUrl = new URL("https://멍멍이-dalle3.png");
         String basePrompt = "This is a base prompt.";
-        Character character = new Character(CharacterVisionType.DALL_E_3, defaultArtwork, characterName, characterUrl, basePrompt);
+        Character character = new Character(CharacterVisionType.DALL_E_3, artwork, characterName, characterUrl, basePrompt);
 
         // when
         Character savedCharacter = characterRepository.save(character);
@@ -56,7 +46,7 @@ class CharacterRepositoryTest {
         assertThat(savedCharacter.getName()).isEqualTo(characterName);
         assertThat(savedCharacter.getCharacterVisionType()).isEqualTo(CharacterVisionType.DALL_E_3);
         assertThat(savedCharacter.getSelectionThumbnailUrl()).isEqualTo(characterUrl);
-        assertThat(savedCharacter.getArtwork()).isEqualTo(defaultArtwork);
+        assertThat(savedCharacter.getArtwork()).isEqualTo(artwork);
         assertThat(savedCharacter.getBasePrompt()).isEqualTo(basePrompt);
     }
 
@@ -64,10 +54,11 @@ class CharacterRepositoryTest {
     @Test
     void findById() throws MalformedURLException {
         // given
+        Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
         String characterName = "멍멍이";
         URL characterUrl = new URL("https://test.png");
         String basePrompt = "This is a base prompt.";
-        Character character = new Character(CharacterVisionType.DALL_E_3, defaultArtwork, characterName, characterUrl, basePrompt);
+        Character character = new Character(CharacterVisionType.DALL_E_3, artwork, characterName, characterUrl, basePrompt);
         Character savedCharacter = characterRepository.save(character);
 
         // when
@@ -85,25 +76,28 @@ class CharacterRepositoryTest {
     @Test
     void findAll() throws MalformedURLException {
         // given
+        Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
+        artworkRepository.save(artwork);
+
         String dogDalle3CharacterName = "멍멍이";
         URL dogDalle3Url = new URL("https://멍멍이-dalle3.png");
         String dogDalle3CharacterBasePrompt = "This is a base prompt dog.";
-        Character dogDalle3Character = new Character(CharacterVisionType.DALL_E_3, defaultArtwork, dogDalle3CharacterName, dogDalle3Url, dogDalle3CharacterBasePrompt);
+        Character dogDalle3Character = new Character(CharacterVisionType.DALL_E_3, artwork, dogDalle3CharacterName, dogDalle3Url, dogDalle3CharacterBasePrompt);
 
         String catDalle3CharacterName = "나비";
         URL catDalle3Url = new URL("https://나비-dalle3.png");
         String catDalle3CharacterBasePrompt = "This is a base prompt cat.";
-        Character catDalle3Character = new Character(CharacterVisionType.DALL_E_3, defaultArtwork, catDalle3CharacterName, catDalle3Url, catDalle3CharacterBasePrompt);
+        Character catDalle3Character = new Character(CharacterVisionType.DALL_E_3, artwork, catDalle3CharacterName, catDalle3Url, catDalle3CharacterBasePrompt);
 
         String midjourneyCharacterName = "미드나비";
         URL midjourneyCharacterUrl = new URL("https://midjourney.png");
         String midjourneyCharacterNameCharacterBasePrompt = "This is a base prompt mid cat.";
-        Character dogMidjourney = new Character(CharacterVisionType.MIDJOURNEY, defaultArtwork, midjourneyCharacterName, midjourneyCharacterUrl, midjourneyCharacterNameCharacterBasePrompt);
+        Character dogMidjourney = new Character(CharacterVisionType.MIDJOURNEY, artwork, midjourneyCharacterName, midjourneyCharacterUrl, midjourneyCharacterNameCharacterBasePrompt);
 
         String stableDiffusionCharacterName = "스테이블디퓨전";
         URL stableDiffusionCharacterUrl = new URL("https://stable-diffusion.png");
         String stableDiffusionCharacterNameCharacterBasePrompt = "This is a base prompt stable diffusion.";
-        Character catStableDiffusionCharacter = new Character(CharacterVisionType.STABLE_DIFFUSION, defaultArtwork, stableDiffusionCharacterName, stableDiffusionCharacterUrl, stableDiffusionCharacterNameCharacterBasePrompt);
+        Character catStableDiffusionCharacter = new Character(CharacterVisionType.STABLE_DIFFUSION, artwork, stableDiffusionCharacterName, stableDiffusionCharacterUrl, stableDiffusionCharacterNameCharacterBasePrompt);
         characterRepository.saveAll(List.of(dogDalle3Character, catDalle3Character, dogMidjourney, catStableDiffusionCharacter));
 
         // when
@@ -111,11 +105,9 @@ class CharacterRepositoryTest {
 
         // then
         assertThat(savedCharacters).hasSize(4);
-
         assertThat(savedCharacters)
                 .extracting(Character::getCharacterVisionType)
                 .containsExactly(CharacterVisionType.DALL_E_3, CharacterVisionType.DALL_E_3, CharacterVisionType.MIDJOURNEY, CharacterVisionType.STABLE_DIFFUSION);
-
         assertThat(savedCharacters)
                 .extracting(Character::getName)
                 .containsExactly(
@@ -139,14 +131,19 @@ class CharacterRepositoryTest {
                         midjourneyCharacterNameCharacterBasePrompt,
                         stableDiffusionCharacterNameCharacterBasePrompt
                 );
+        Character savedStableDiffusionCharacter = savedCharacters.get(3);
+        assertThat(savedStableDiffusionCharacter.getCharacterVisionType()).isEqualTo(CharacterVisionType.STABLE_DIFFUSION);
+        assertThat(savedStableDiffusionCharacter.getName()).isEqualTo(stableDiffusionCharacterName);
+        assertThat(savedStableDiffusionCharacter.getArtwork()).isEqualTo(savedStableDiffusionCharacter.getArtwork());
+        assertThat(savedStableDiffusionCharacter.getSelectionThumbnailUrl()).isEqualTo(stableDiffusionCharacterUrl);
+        assertThat(savedStableDiffusionCharacter.getBasePrompt()).isEqualTo(stableDiffusionCharacterNameCharacterBasePrompt);
     }
 
     @DisplayName("특정 캐릭터를 수정한다.")
     @Test
     void update() throws MalformedURLException {
         // given
-        String basePrompt = "This is a base prompt.";
-        Character character = new Character(CharacterVisionType.DALL_E_3, defaultArtwork, "멍멍이", new URL("https://멍멍이-dalle3.png"), basePrompt);
+        Character character = new Character(CharacterVisionType.DALL_E_3, new Artwork("Test Artwork", new URL("https://test.png")), "멍멍이", new URL("https://멍멍이-dalle3.png"), "This is a base prompt");
         Character savedCharacter = characterRepository.save(character);
 
         CharacterVisionType updateCharacterVisionType = CharacterVisionType.STABLE_DIFFUSION;
@@ -171,8 +168,9 @@ class CharacterRepositoryTest {
     @Test
     void delete() throws MalformedURLException {
         // given
+        Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
         String basePrompt = "This is a base prompt.";
-        Character character = new Character(CharacterVisionType.DALL_E_3, defaultArtwork, "멍멍이", new URL("https://멍멍이-dalle3.png"), basePrompt);
+        Character character = new Character(CharacterVisionType.DALL_E_3, artwork, "멍멍이", new URL("https://멍멍이-dalle3.png"), basePrompt);
         Character savedCharacter = characterRepository.save(character);
 
         // when
