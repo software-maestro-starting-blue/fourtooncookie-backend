@@ -231,7 +231,7 @@ class CharacterServiceTest {
 
     @DisplayName("존재하지 않는 캐릭터는 삭제하지 못한다.")
     @Test
-    void throwExceptionWhenDeleteNotFoundCharacter() throws MalformedURLException {
+    void throwExceptionWhenDeleteNotFoundCharacter() {
         // given
         Long notFoundCharacterId = -1L;
         when(characterRepository.findById(notFoundCharacterId)).thenReturn(Optional.empty());
