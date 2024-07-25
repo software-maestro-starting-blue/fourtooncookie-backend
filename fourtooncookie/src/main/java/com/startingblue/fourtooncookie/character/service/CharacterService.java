@@ -1,5 +1,7 @@
 package com.startingblue.fourtooncookie.character.service;
 
+import com.startingblue.fourtooncookie.artwork.domain.Artwork;
+import com.startingblue.fourtooncookie.artwork.service.ArtworkService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
@@ -20,13 +22,17 @@ import java.util.List;
 public class CharacterService {
 
     private final CharacterRepository characterRepository;
+    private final ArtworkService artworkService;
 
     public void addCharacter(final AddCharacterRequest request) {
-        final CharacterVisionType characterVisionType = CharacterVisionType.valueOf(request.modelType());
+        final CharacterVisionType modelType = CharacterVisionType.valueOf(request.characterVisionType());
+        final Artwork artwork = artworkService.findById(request.artworkId());
         final Character character = new Character(
-                characterVisionType,
+                modelType,
+                artwork,
                 request.name(),
-                request.selectionThumbnailUrl()
+                request.selectionThumbnailUrl(),
+                request.basePrompt()
         );
 
         characterRepository.save(character);
@@ -36,13 +42,21 @@ public class CharacterService {
         final Character character = characterRepository
                 .findById(characterId)
                 .orElseThrow(CharacterNoSuchElementException::new);
+        final CharacterVisionType modelType = CharacterVisionType.valueOf(request.modelType());
+        final Artwork artwork = artworkService.findById(request.artworkId());
 
-        character.update(CharacterVisionType.valueOf(request.modelType()), request.name(), request.selectionThumbnailUrl());
+        character.update(modelType,
+                artwork,
+                request.name(),
+                request.selectionThumbnailUrl(),
+                request.basePrompt());
+
         characterRepository.save(character);
     }
 
     public void deleteCharacter(final Long characterId) {
-        characterRepository.deleteById(characterId);
+        Character foundCharacter = findById(characterId);
+        characterRepository.delete(foundCharacter);
     }
 
     @Transactional(readOnly = true)
@@ -53,6 +67,8 @@ public class CharacterService {
                 .map(character -> new CharacterResponse(
                         character.getId(),
                         character.getCharacterVisionType().name(),
+                        character.getArtwork().getTitle(),
+                        character.getArtwork().getThumbnailUrl(),
                         character.getName(),
                         character.getSelectionThumbnailUrl()))
                 .toList());
