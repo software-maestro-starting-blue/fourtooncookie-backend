@@ -4,7 +4,7 @@ import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.artwork.service.ArtworkService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
-import com.startingblue.fourtooncookie.character.domain.ModelType;
+import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.character.dto.request.AddCharacterRequest;
 import com.startingblue.fourtooncookie.character.dto.request.ModifyCharacterRequest;
 import com.startingblue.fourtooncookie.character.dto.response.CharacterResponse;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Transactional
@@ -25,7 +26,7 @@ public class CharacterService {
     private final ArtworkService artworkService;
 
     public void addCharacter(final AddCharacterRequest request) {
-        final ModelType modelType = ModelType.valueOf(request.modelType());
+        final CharacterVisionType modelType = CharacterVisionType.valueOf(request.characterVisionType());
         final Artwork artwork = artworkService.findById(request.artworkId());
         final Character character = new Character(
                 modelType,
@@ -39,22 +40,23 @@ public class CharacterService {
     }
 
     public void modifyCharacter(final Long characterId, final ModifyCharacterRequest request) {
-        Character foundCharacter = findById(characterId);
-        ModelType fooundModelType = ModelType.valueOf(request.modelType());
-        Artwork foundArtwork = artworkService.findById(request.artworkId());
+        final Character character = characterRepository
+                .findById(characterId)
+                .orElseThrow(CharacterNoSuchElementException::new);
+        final CharacterVisionType modelType = CharacterVisionType.valueOf(request.modelType());
+        final Artwork artwork = artworkService.findById(request.artworkId());
 
-        foundCharacter.update(
-                fooundModelType,
-                foundArtwork,
+        character.update(modelType,
+                artwork,
                 request.name(),
                 request.selectionThumbnailUrl(),
                 request.basePrompt());
 
-        characterRepository.save(foundCharacter);
+        characterRepository.save(character);
     }
 
     public void deleteCharacter(final Long characterId) {
-       Character foundCharacter = findById(characterId);
+        Character foundCharacter = findById(characterId);
         characterRepository.delete(foundCharacter);
     }
 
@@ -65,7 +67,7 @@ public class CharacterService {
         return new CharacterResponses(characters.stream()
                 .map(character -> new CharacterResponse(
                         character.getId(),
-                        character.getModelType().name(),
+                        character.getCharacterVisionType().name(),
                         character.getArtwork().getTitle(),
                         character.getArtwork().getThumbnailUrl(),
                         character.getName(),

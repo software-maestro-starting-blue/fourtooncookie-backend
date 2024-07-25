@@ -3,7 +3,7 @@ package com.startingblue.fourtooncookie.diary.domain;
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
-import com.startingblue.fourtooncookie.character.domain.ModelType;
+import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
@@ -174,7 +174,7 @@ class DiaryTest {
     @Test
     void update() throws MalformedURLException {
         // given
-        Character character = new Character(ModelType.DALL_E_3, artwork, "멍멍이", new URL("http://멍멍이.png"), "base Prompt");
+        Character character = new Character(CharacterVisionType.DALL_E_3, artwork, "멍멍이", new URL("http://멍멍이.png"), "base Prompt");
         characterRepository.save(character);
 
         Member member = createMember("민서", LocalDate.of(2000, 5, 31), Gender.MALE);
@@ -188,7 +188,7 @@ class DiaryTest {
         String newCharacterName = "오동이";
         URL newCharacterUrl = new URL("http://오동이.png");
         String newBasePrompt = "new Base Prompt";
-        Character newCharacter = new Character(ModelType.STABLE_DIFFUSION, artwork, newCharacterName, newCharacterUrl, newBasePrompt);
+        Character newCharacter = new Character(CharacterVisionType.STABLE_DIFFUSION, artwork, newCharacterName, newCharacterUrl, newBasePrompt);
         characterRepository.save(newCharacter);
 
         // when
@@ -207,7 +207,7 @@ class DiaryTest {
     @Test
     void updatePaintingImageUrls() throws MalformedURLException {
         // given
-        Character character = new Character(ModelType.DALL_E_3, artwork, "멍멍이", new URL("http://멍멍이.png"), "base Prompt");
+        Character character = new Character(CharacterVisionType.DALL_E_3, artwork, "멍멍이", new URL("http://멍멍이.png"), "base Prompt");
         characterRepository.save(character);
 
         Member member = createMember("민서", LocalDate.of(2000, 5, 31), Gender.MALE);

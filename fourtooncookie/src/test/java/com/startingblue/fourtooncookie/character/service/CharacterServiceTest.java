@@ -4,7 +4,7 @@ import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.artwork.service.ArtworkService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
-import com.startingblue.fourtooncookie.character.domain.ModelType;
+import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.character.dto.request.AddCharacterRequest;
 import com.startingblue.fourtooncookie.character.dto.request.ModifyCharacterRequest;
 import com.startingblue.fourtooncookie.character.dto.response.CharacterResponse;
@@ -50,9 +50,9 @@ class CharacterServiceTest {
         // given
         AddCharacterRequest request = new AddCharacterRequest("DALL_E_3", 1L, "멍멍이", new URL("https://멍멍이-dalle3.png"), "This is a base prompt");
 
-        ModelType modelType = ModelType.valueOf(request.modelType());
+        CharacterVisionType characterVisionType = CharacterVisionType.valueOf(request.characterVisionType());
         Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
-        Character character = new Character(modelType, artwork, request.name(), request.selectionThumbnailUrl(), request.basePrompt());
+        Character character = new Character(characterVisionType, artwork, request.name(), request.selectionThumbnailUrl(), request.basePrompt());
 
         // when
         when(artworkService.findById(request.artworkId())).thenReturn(artwork);
@@ -60,7 +60,7 @@ class CharacterServiceTest {
         characterService.addCharacter(request);
 
         // then
-        assertThat(character.getModelType()).isEqualTo(modelType);
+        assertThat(character.getCharacterVisionType()).isEqualTo(characterVisionType);
         assertThat(character.getArtwork()).isEqualTo(artwork);
         assertThat(character.getName()).isEqualTo(request.name());
         assertThat(character.getSelectionThumbnailUrl()).isEqualTo(request.selectionThumbnailUrl());
@@ -74,7 +74,7 @@ class CharacterServiceTest {
         // given
         Long characterId = 1L;
         String basePrompt = "This is a base prompt";
-        Character character = new Character(ModelType.DALL_E_3, new Artwork("Test Artwork", new URL("https://test.png")), "멍멍이", new URL("https://멍멍이-dalle3.png"), basePrompt);
+        Character character = new Character(CharacterVisionType.DALL_E_3, new Artwork("Test Artwork", new URL("https://test.png")), "멍멍이", new URL("https://멍멍이-dalle3.png"), basePrompt);
         when(characterRepository.findById(characterId)).thenReturn(Optional.of(character));
 
         // when
@@ -103,7 +103,7 @@ class CharacterServiceTest {
     @Test
     void showAllCharacters() throws MalformedURLException {
         // given
-        ModelType character1VisionType = ModelType.DALL_E_3;
+        CharacterVisionType character1VisionType = CharacterVisionType.DALL_E_3;
         Artwork charcter1Artwork = new Artwork("Test Artwork", new URL("https://test.png"));
         URL character1Url = new URL("https://test.png");
         String character1Name = "멍멍이";
@@ -111,7 +111,7 @@ class CharacterServiceTest {
         Character character1 = new Character(character1VisionType, charcter1Artwork, character1Name, character1Url, character1BasePrompt);
 
 
-        ModelType character2VisionType = ModelType.STABLE_DIFFUSION;
+        CharacterVisionType character2VisionType = CharacterVisionType.STABLE_DIFFUSION;
         Artwork charcter2Artwork = new Artwork("Test2 Artwork", new URL("https://test.png"));
         URL character2Url = new URL("https://test2.png");
         String character2Name = "멍멍이2";
@@ -163,16 +163,16 @@ class CharacterServiceTest {
     void modifyCharacterSuccessfully() throws MalformedURLException {
         // given
         Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
-        Character character = new Character(ModelType.DALL_E_3, artwork, "멍멍이", new URL("https://멍멍이-dalle3.png"), "This is a base prompt");
+        Character character = new Character(CharacterVisionType.DALL_E_3, artwork, "멍멍이", new URL("https://멍멍이-dalle3.png"), "This is a base prompt");
         Long characterId = 1L;
 
-        String updateModelType = "STABLE_DIFFUSION";
+        String updateCharacterVisionType = "STABLE_DIFFUSION";
         Long updateArtworkId = 2L;
         Artwork updateArtwork = new Artwork("update Artwork", new URL("https://updateTest.png"));
         String updateCharacterName = "바뀐멍멍이";
         URL updateUrl = new URL("https://test.png");
         String updatedBasePrompt = "This is a base prompt";
-        ModifyCharacterRequest request = new ModifyCharacterRequest(updateModelType, updateArtworkId, updateCharacterName, updateUrl, updatedBasePrompt);
+        ModifyCharacterRequest request = new ModifyCharacterRequest(updateCharacterVisionType, updateArtworkId, updateCharacterName, updateUrl, updatedBasePrompt);
 
         // when
         when(characterRepository.findById(characterId)).thenReturn(Optional.of(character));
@@ -181,7 +181,7 @@ class CharacterServiceTest {
         Character updatedCharacter = characterService.findById(characterId);
 
         // then
-        assertThat(updatedCharacter.getModelType()).isEqualTo(ModelType.valueOf(updateModelType));
+        assertThat(updatedCharacter.getCharacterVisionType()).isEqualTo(CharacterVisionType.valueOf(updateCharacterVisionType));
         assertThat(updatedCharacter.getName()).isEqualTo(updateCharacterName);
         assertThat(updatedCharacter.getSelectionThumbnailUrl()).isEqualTo(updateUrl);
         assertThat(updatedCharacter.getBasePrompt()).isEqualTo(updatedBasePrompt);
@@ -196,7 +196,7 @@ class CharacterServiceTest {
         // given
         Long characterId = 1L;
         String basePrompt = "This is a base prompt";
-        Character character = new Character(ModelType.DALL_E_3, new Artwork("Test Artwork", new URL("https://test.png")), "멍멍이", new URL("https://멍멍이-dalle3.png"), basePrompt);
+        Character character = new Character(CharacterVisionType.DALL_E_3, new Artwork("Test Artwork", new URL("https://test.png")), "멍멍이", new URL("https://멍멍이-dalle3.png"), basePrompt);
 
         when(characterRepository.findById(characterId)).thenReturn(Optional.of(character));
 
@@ -216,12 +216,12 @@ class CharacterServiceTest {
     void throwExceptionWhenUpdateNotFoundCharacter() throws MalformedURLException {
         // given
         Long notFoundCharacterId = -1L;
-        String updateModelType = "STABLE_DIFFUSION";
+        String updateCharacterVisionType = "STABLE_DIFFUSION";
         Long updateArtworkId = 2L;
         String updateCharacterName = "바뀐멍멍이";
         URL updateUrl = new URL("https://test.png");
         String updatedBasePrompt = "This is a base prompt";
-        ModifyCharacterRequest request = new ModifyCharacterRequest(updateModelType, updateArtworkId, updateCharacterName, updateUrl, updatedBasePrompt);
+        ModifyCharacterRequest request = new ModifyCharacterRequest(updateCharacterVisionType, updateArtworkId, updateCharacterName, updateUrl, updatedBasePrompt);
 
 
         // when & then

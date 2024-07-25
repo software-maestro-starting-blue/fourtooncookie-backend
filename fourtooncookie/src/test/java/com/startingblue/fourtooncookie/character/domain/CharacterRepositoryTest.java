@@ -46,7 +46,7 @@ class CharacterRepositoryTest {
         String characterName = "멍멍이";
         URL characterUrl = new URL("https://멍멍이-dalle3.png");
         String basePrompt = "This is a base prompt.";
-        Character character = new Character(ModelType.DALL_E_3, defaultArtwork, characterName, characterUrl, basePrompt);
+        Character character = new Character(CharacterVisionType.DALL_E_3, defaultArtwork, characterName, characterUrl, basePrompt);
 
         // when
         Character savedCharacter = characterRepository.save(character);
@@ -54,7 +54,7 @@ class CharacterRepositoryTest {
         // then
         assertThat(savedCharacter.getId()).isNotNull();
         assertThat(savedCharacter.getName()).isEqualTo(characterName);
-        assertThat(savedCharacter.getModelType()).isEqualTo(ModelType.DALL_E_3);
+        assertThat(savedCharacter.getCharacterVisionType()).isEqualTo(CharacterVisionType.DALL_E_3);
         assertThat(savedCharacter.getSelectionThumbnailUrl()).isEqualTo(characterUrl);
         assertThat(savedCharacter.getArtwork()).isEqualTo(defaultArtwork);
         assertThat(savedCharacter.getBasePrompt()).isEqualTo(basePrompt);
@@ -67,7 +67,7 @@ class CharacterRepositoryTest {
         String characterName = "멍멍이";
         URL characterUrl = new URL("https://test.png");
         String basePrompt = "This is a base prompt.";
-        Character character = new Character(ModelType.DALL_E_3, defaultArtwork, characterName, characterUrl, basePrompt);
+        Character character = new Character(CharacterVisionType.DALL_E_3, defaultArtwork, characterName, characterUrl, basePrompt);
         Character savedCharacter = characterRepository.save(character);
 
         // when
@@ -75,7 +75,7 @@ class CharacterRepositoryTest {
 
         // then
         assertThat(foundCharacter).isPresent();
-        assertThat(foundCharacter.get().getModelType()).isEqualTo(ModelType.DALL_E_3);
+        assertThat(foundCharacter.get().getCharacterVisionType()).isEqualTo(CharacterVisionType.DALL_E_3);
         assertThat(foundCharacter.get().getName()).isEqualTo(characterName);
         assertThat(foundCharacter.get().getSelectionThumbnailUrl()).isEqualTo(characterUrl);
         assertThat(foundCharacter.get().getBasePrompt()).isEqualTo(basePrompt);
@@ -88,22 +88,22 @@ class CharacterRepositoryTest {
         String dogDalle3CharacterName = "멍멍이";
         URL dogDalle3Url = new URL("https://멍멍이-dalle3.png");
         String dogDalle3CharacterBasePrompt = "This is a base prompt dog.";
-        Character dogDalle3Character = new Character(ModelType.DALL_E_3, defaultArtwork, dogDalle3CharacterName, dogDalle3Url, dogDalle3CharacterBasePrompt);
+        Character dogDalle3Character = new Character(CharacterVisionType.DALL_E_3, defaultArtwork, dogDalle3CharacterName, dogDalle3Url, dogDalle3CharacterBasePrompt);
 
         String catDalle3CharacterName = "나비";
         URL catDalle3Url = new URL("https://나비-dalle3.png");
         String catDalle3CharacterBasePrompt = "This is a base prompt cat.";
-        Character catDalle3Character = new Character(ModelType.DALL_E_3, defaultArtwork, catDalle3CharacterName, catDalle3Url, catDalle3CharacterBasePrompt);
+        Character catDalle3Character = new Character(CharacterVisionType.DALL_E_3, defaultArtwork, catDalle3CharacterName, catDalle3Url, catDalle3CharacterBasePrompt);
 
         String midjourneyCharacterName = "미드나비";
         URL midjourneyCharacterUrl = new URL("https://midjourney.png");
         String midjourneyCharacterNameCharacterBasePrompt = "This is a base prompt mid cat.";
-        Character dogMidjourney = new Character(ModelType.MIDJOURNEY, defaultArtwork, midjourneyCharacterName, midjourneyCharacterUrl, midjourneyCharacterNameCharacterBasePrompt);
+        Character dogMidjourney = new Character(CharacterVisionType.MIDJOURNEY, defaultArtwork, midjourneyCharacterName, midjourneyCharacterUrl, midjourneyCharacterNameCharacterBasePrompt);
 
         String stableDiffusionCharacterName = "스테이블디퓨전";
         URL stableDiffusionCharacterUrl = new URL("https://stable-diffusion.png");
         String stableDiffusionCharacterNameCharacterBasePrompt = "This is a base prompt stable diffusion.";
-        Character catStableDiffusionCharacter = new Character(ModelType.STABLE_DIFFUSION, defaultArtwork, stableDiffusionCharacterName, stableDiffusionCharacterUrl, stableDiffusionCharacterNameCharacterBasePrompt);
+        Character catStableDiffusionCharacter = new Character(CharacterVisionType.STABLE_DIFFUSION, defaultArtwork, stableDiffusionCharacterName, stableDiffusionCharacterUrl, stableDiffusionCharacterNameCharacterBasePrompt);
         characterRepository.saveAll(List.of(dogDalle3Character, catDalle3Character, dogMidjourney, catStableDiffusionCharacter));
 
         // when
@@ -113,8 +113,8 @@ class CharacterRepositoryTest {
         assertThat(savedCharacters).hasSize(4);
 
         assertThat(savedCharacters)
-                .extracting(Character::getModelType)
-                .containsExactly(ModelType.DALL_E_3, ModelType.DALL_E_3, ModelType.MIDJOURNEY, ModelType.STABLE_DIFFUSION);
+                .extracting(Character::getCharacterVisionType)
+                .containsExactly(CharacterVisionType.DALL_E_3, CharacterVisionType.DALL_E_3, CharacterVisionType.MIDJOURNEY, CharacterVisionType.STABLE_DIFFUSION);
 
         assertThat(savedCharacters)
                 .extracting(Character::getName)
@@ -146,18 +146,22 @@ class CharacterRepositoryTest {
     void update() throws MalformedURLException {
         // given
         String basePrompt = "This is a base prompt.";
-        Character character = new Character(ModelType.DALL_E_3, defaultArtwork, "멍멍이", new URL("https://멍멍이-dalle3.png"), basePrompt);
+        Character character = new Character(CharacterVisionType.DALL_E_3, defaultArtwork, "멍멍이", new URL("https://멍멍이-dalle3.png"), basePrompt);
         Character savedCharacter = characterRepository.save(character);
+
+        CharacterVisionType newCharacterVisionType = CharacterVisionType.STABLE_DIFFUSION;
+        String newName = "바뀐멍멍이";
+        URL newURL = new URL("https://바뀐멍멍이-stable-diffusion.png");
 
         // when
         String updateCharacterName = "바뀐멍멍이";
         URL updateUrl = new URL("https://test.png");
         String updateBasePrompt = "Updated base prompt.";
-        savedCharacter.update(character.getModelType(), character.getArtwork(), updateCharacterName, updateUrl, updateBasePrompt);
+        savedCharacter.update(character.getCharacterVisionType(), character.getArtwork(), updateCharacterName, updateUrl, updateBasePrompt);
         Character updatedCharacter = characterRepository.save(savedCharacter);
 
         // then
-        assertThat(updatedCharacter.getModelType()).isEqualTo(ModelType.DALL_E_3);
+        assertThat(updatedCharacter.getCharacterVisionType()).isEqualTo(CharacterVisionType.DALL_E_3);
         assertThat(updatedCharacter.getArtwork()).isEqualTo(defaultArtwork);
         assertThat(updatedCharacter.getName()).isEqualTo(updateCharacterName);
         assertThat(updatedCharacter.getSelectionThumbnailUrl()).isEqualTo(updateUrl);
@@ -169,7 +173,7 @@ class CharacterRepositoryTest {
     void delete() throws MalformedURLException {
         // given
         String basePrompt = "This is a base prompt.";
-        Character character = new Character(ModelType.DALL_E_3, defaultArtwork, "멍멍이", new URL("https://멍멍이-dalle3.png"), basePrompt);
+        Character character = new Character(CharacterVisionType.DALL_E_3, defaultArtwork, "멍멍이", new URL("https://멍멍이-dalle3.png"), basePrompt);
         Character savedCharacter = characterRepository.save(character);
 
         // when
