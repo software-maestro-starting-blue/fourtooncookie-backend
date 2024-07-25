@@ -18,7 +18,7 @@ import java.net.URL;
 public class Artwork {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "art_work_id")
+    @Column(name = "artwork_id")
     private Long id;
 
     @NotBlank
