@@ -48,7 +48,9 @@ class ArtworkRepositoryTest {
     @Test
     public void findById() throws MalformedURLException {
         // Given
-        Artwork artwork = new Artwork("Test Title", new URL("http://test.com/image.jpg"));
+        String title = "New Artwork";
+        URL url = new URL("http://test.com/newimage.jpg");
+        Artwork artwork = new Artwork(title, url);
         Artwork savedArtwork = artworkRepository.save(artwork);
 
         // When
@@ -56,13 +58,13 @@ class ArtworkRepositoryTest {
 
         // Then
         assertThat(foundArtwork).isPresent();
-        assertThat(foundArtwork.get().getTitle()).isEqualTo("Test Title");
-        assertThat(foundArtwork.get().getThumbnailUrl().toString()).isEqualTo("http://test.com/image.jpg");
+        assertThat(foundArtwork.get().getTitle()).isEqualTo(title);
+        assertThat(foundArtwork.get().getThumbnailUrl()).isEqualTo(url);
     }
 
     @DisplayName("저장된 모든 작품을 가져온다.")
     @Test
-    public void getSavedArtworkResponses() throws MalformedURLException {
+    public void findALl() throws MalformedURLException {
         // Given
         String title1 = "Title 1";
         URL url1 = new URL("http://test.com/image1.jpg");
@@ -112,7 +114,9 @@ class ArtworkRepositoryTest {
     @Test
     public void deleteById() throws MalformedURLException {
         // Given
-        Artwork artwork = new Artwork("Test Title", new URL("http://test.com/image.jpg"));
+        String title = "Title";
+        URL url = new URL("http://test.com/newimage.jpg");
+        Artwork artwork = new Artwork(title, url);
         Artwork savedArtwork = artworkRepository.save(artwork);
 
         Long deletedId = savedArtwork.getId();
