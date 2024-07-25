@@ -1,5 +1,7 @@
 package com.startingblue.fourtooncookie.character.service;
 
+import com.startingblue.fourtooncookie.artwork.domain.Artwork;
+import com.startingblue.fourtooncookie.artwork.service.ArtworkService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.ModelType;
@@ -20,13 +22,17 @@ import java.util.List;
 public class CharacterService {
 
     private final CharacterRepository characterRepository;
+    private final ArtworkService artworkService;
 
     public void addCharacter(final AddCharacterRequest request) {
         final ModelType modelType = ModelType.valueOf(request.modelType());
+        final Artwork artwork = artworkService.findById(request.artworkId());
         final Character character = new Character(
                 modelType,
+                artwork,
                 request.name(),
-                request.selectionThumbnailUrl()
+                request.selectionThumbnailUrl(),
+                request.basePrompt()
         );
 
         characterRepository.save(character);
@@ -36,10 +42,15 @@ public class CharacterService {
         final Character character = characterRepository
                 .findById(characterId)
                 .orElseThrow(CharacterNoSuchElementException::new);
+        final ModelType modelType = ModelType.valueOf(request.modelType());
+        final Artwork artwork = artworkService.findById(request.artworkId());
 
-        character.changeModelType(ModelType.from(request.modelType()));
-        character.changeName(request.name());
-        character.changeSelectionThumbnailUrl(request.selectionThumbnailUrl());
+        character.update(modelType,
+                artwork,
+                request.name(),
+                request.selectionThumbnailUrl(),
+                request.basePrompt());
+
         characterRepository.save(character);
     }
 

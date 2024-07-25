@@ -42,7 +42,7 @@ public class ArtworkService {
         artworkRepository.delete(artwork);
     }
 
-    private Artwork findById(Long artworkId) {
+    public Artwork findById(Long artworkId) {
         return artworkRepository.findById(artworkId)
                 .orElseThrow(ArtworkNoSuchElementException::new);
     }
