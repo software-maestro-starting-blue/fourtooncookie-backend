@@ -2,13 +2,12 @@ package com.startingblue.fourtooncookie.character.service;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
-import com.startingblue.fourtooncookie.character.domain.ModelType;
+import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.character.dto.request.AddCharacterRequest;
 import com.startingblue.fourtooncookie.character.dto.request.ModifyCharacterRequest;
 import com.startingblue.fourtooncookie.character.dto.response.CharacterResponse;
 import com.startingblue.fourtooncookie.character.dto.response.CharacterResponses;
 import com.startingblue.fourtooncookie.character.exception.CharacterNoSuchElementException;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,7 +44,7 @@ class CharacterServiceTest {
     void addCharacter() throws MalformedURLException {
         // given
         AddCharacterRequest request = new AddCharacterRequest("DALL_E_3", "멍멍이", new URL("https://멍멍이-dalle3.png"));
-        Character character = new Character(ModelType.DALL_E_3, "멍멍이", new URL("https://멍멍이-dalle3.png"));
+        Character character = new Character(CharacterVisionType.DALL_E_3, "멍멍이", new URL("https://멍멍이-dalle3.png"));
         when(characterRepository.save(any(Character.class))).thenReturn(character);
 
         // when
@@ -60,7 +59,7 @@ class CharacterServiceTest {
     void findById() throws MalformedURLException {
         // given
         Long characterId = 1L;
-        Character character = new Character(ModelType.DALL_E_3, "멍멍이", new URL("https://멍멍이-dalle3.png"));
+        Character character = new Character(CharacterVisionType.DALL_E_3, "멍멍이", new URL("https://멍멍이-dalle3.png"));
         when(characterRepository.findById(characterId)).thenReturn(Optional.of(character));
 
         // when
@@ -88,8 +87,8 @@ class CharacterServiceTest {
     @Test
     void showCharacters() throws MalformedURLException {
         // given
-        Character character1 = new Character(ModelType.DALL_E_3, "멍멍이", new URL("https://멍멍이-dalle3.png"));
-        Character character2 = new Character(ModelType.DALL_E_3, "나비", new URL("https://나비-dalle3.png"));
+        Character character1 = new Character(CharacterVisionType.DALL_E_3, "멍멍이", new URL("https://멍멍이-dalle3.png"));
+        Character character2 = new Character(CharacterVisionType.DALL_E_3, "나비", new URL("https://나비-dalle3.png"));
         when(characterRepository.findAll()).thenReturn(List.of(character1, character2));
 
         // when
@@ -112,14 +111,14 @@ class CharacterServiceTest {
         // given
         Long characterId = 1L;
         ModifyCharacterRequest request = new ModifyCharacterRequest("STABLE_DIFFUSION", "바뀐멍멍이", new URL("https://바뀐멍멍이.png"));
-        Character character = new Character(ModelType.DALL_E_3, "멍멍이", new URL("https://멍멍이-dalle3.png"));
+        Character character = new Character(CharacterVisionType.DALL_E_3, "멍멍이", new URL("https://멍멍이-dalle3.png"));
         when(characterRepository.findById(characterId)).thenReturn(Optional.of(character));
 
         // when
         characterService.modifyCharacter(characterId, request);
 
         // then
-        assertThat(character.getModelType()).isEqualTo(ModelType.STABLE_DIFFUSION);
+        assertThat(character.getCharacterVisionType()).isEqualTo(CharacterVisionType.STABLE_DIFFUSION);
         assertThat(character.getName()).isEqualTo("바뀐멍멍이");
         assertThat(character.getSelectionThumbnailUrl()).isEqualTo(new URL("https://바뀐멍멍이.png"));
         verify(characterRepository, times(1)).save(character);
@@ -129,7 +128,7 @@ class CharacterServiceTest {
     @Test
     void deleteCharacter() throws MalformedURLException {
         // given
-        Character character = new Character(ModelType.DALL_E_3, "멍멍이", new URL("https://멍멍이-dalle3.png"));
+        Character character = new Character(CharacterVisionType.DALL_E_3, "멍멍이", new URL("https://멍멍이-dalle3.png"));
         characterRepository.save(character);
         Long characterId = character.getId();
 
