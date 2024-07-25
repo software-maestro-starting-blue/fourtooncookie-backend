@@ -2,7 +2,7 @@ package com.startingblue.fourtooncookie.character.service;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
-import com.startingblue.fourtooncookie.character.domain.ModelType;
+import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.character.dto.request.AddCharacterRequest;
 import com.startingblue.fourtooncookie.character.dto.request.ModifyCharacterRequest;
 import com.startingblue.fourtooncookie.character.dto.response.CharacterResponse;
@@ -22,9 +22,9 @@ public class CharacterService {
     private final CharacterRepository characterRepository;
 
     public void addCharacter(final AddCharacterRequest request) {
-        final ModelType modelType = ModelType.valueOf(request.modelType());
+        final CharacterVisionType characterVisionType = CharacterVisionType.valueOf(request.modelType());
         final Character character = new Character(
-                modelType,
+                characterVisionType,
                 request.name(),
                 request.selectionThumbnailUrl()
         );
@@ -37,9 +37,7 @@ public class CharacterService {
                 .findById(characterId)
                 .orElseThrow(CharacterNoSuchElementException::new);
 
-        character.changeModelType(ModelType.from(request.modelType()));
-        character.changeName(request.name());
-        character.changeSelectionThumbnailUrl(request.selectionThumbnailUrl());
+        character.update(CharacterVisionType.valueOf(request.modelType()), request.name(), request.selectionThumbnailUrl());
         characterRepository.save(character);
     }
 
@@ -54,7 +52,7 @@ public class CharacterService {
         return new CharacterResponses(characters.stream()
                 .map(character -> new CharacterResponse(
                         character.getId(),
-                        character.getModelType().name(),
+                        character.getCharacterVisionType().name(),
                         character.getName(),
                         character.getSelectionThumbnailUrl()))
                 .toList());

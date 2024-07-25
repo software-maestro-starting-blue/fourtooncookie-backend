@@ -1,6 +1,7 @@
 package com.startingblue.fourtooncookie.character.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,27 +20,23 @@ public class Character {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private ModelType modelType;
+    private CharacterVisionType characterVisionType;
 
+    @NotNull
     private String name;
 
+    @NotNull
     private URL selectionThumbnailUrl;
 
-    public Character(final ModelType modelType, final String name, final URL selectionThumbnailUrl) {
-        this.modelType = modelType;
+    public Character(final CharacterVisionType characterVisionType, final String name, final URL selectionThumbnailUrl) {
+        this.characterVisionType = characterVisionType;
         this.name = name;
         this.selectionThumbnailUrl = selectionThumbnailUrl;
     }
 
-    public void changeModelType(final ModelType modelType) {
-        this.modelType = modelType;
-    }
-
-    public void changeName(final String name) {
+    public void update(final CharacterVisionType characterVisionType, final String name, final URL selectionThumbnailUrl) {
+        this.characterVisionType = characterVisionType;
         this.name = name;
-    }
-
-    public void changeSelectionThumbnailUrl(final URL selectionThumbnailUrl) {
         this.selectionThumbnailUrl = selectionThumbnailUrl;
     }
 }
