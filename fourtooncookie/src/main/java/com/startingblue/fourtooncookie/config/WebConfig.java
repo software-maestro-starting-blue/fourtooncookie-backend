@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.config;
 
-import com.startingblue.fourtooncookie.intercepter.JwtInterceptor;
+import com.startingblue.fourtooncookie.intercepter.AuthorizationInterceptor;
 import com.startingblue.fourtooncookie.member.dto.MemberArgumentResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +14,7 @@ import java.util.List;
 public class WebConfig implements WebMvcConfigurer {
 
     @Autowired
-    private JwtInterceptor jwtInterceptor;
+    private AuthorizationInterceptor authorizationInterceptor;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
@@ -23,7 +23,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(jwtInterceptor)
+        registry.addInterceptor(authorizationInterceptor)
                 .addPathPatterns("/**");
     }
 }
