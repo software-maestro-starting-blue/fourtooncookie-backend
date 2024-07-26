@@ -26,7 +26,8 @@ public class DiaryImageS3Service {
     @Value("${aws.diaryimage.bucket.name}")
     private String bucketName;
 
-    private static final Integer PresignedUrlDurationInMinutes = 10;
+    @Value("${aws.diaryimage.presignedurl.duration}")
+    private Integer PresignedUrlDurationInMinutes;
 
     private static final String IMAGE_FORMAT = ".png";
 
