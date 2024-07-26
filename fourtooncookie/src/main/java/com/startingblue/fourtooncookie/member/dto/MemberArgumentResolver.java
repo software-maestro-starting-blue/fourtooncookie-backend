@@ -9,9 +9,13 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import java.util.UUID;
+
 import static java.util.Objects.requireNonNull;
 
 public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
+
+    JwtExtractor jwtExtractor = new JwtExtractor();
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -27,8 +31,8 @@ public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
         String token = resolveToken(requireNonNull(request));
 
         if (token != null && !token.isEmpty()) {
-            Claims claims = JwtExtractor.parseToken(token);
-            Long memberId = claims.get("memberId", Long.class);
+            Claims claims = jwtExtractor.parseToken(token);
+            UUID memberId = claims.get("memberId", UUID.class);
             return new MemberDto(memberId);
         }
 

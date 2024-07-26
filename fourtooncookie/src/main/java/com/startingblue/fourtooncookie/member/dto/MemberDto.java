@@ -1,4 +1,6 @@
 package com.startingblue.fourtooncookie.member.dto;
 
-public record MemberDto(Long memberId) {
+import java.util.UUID;
+
+public record MemberDto(UUID memberId) {
 }
