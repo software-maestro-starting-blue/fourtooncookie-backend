@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +51,7 @@ public class DiaryService {
                 .orElseThrow(DiaryNoSuchElementException::new);
     }
 
-    public void createDiary(final DiarySaveRequest request, final Long memberId) {
+    public void createDiary(final DiarySaveRequest request, final UUID memberId) {
         Character character = characterService.findById(request.characterId());
         Member member = memberService.findById(memberId);
         Diary diary = Diary.builder()
@@ -60,15 +61,15 @@ public class DiaryService {
                 .hashtagsIds(request.hashtagIds())
                 .paintingImageUrls(DIARY_DEFAULT_IMAGE_URLS)
                 .character(character)
-                .member(member)
+                .memberId(member.getId())
                 .build();
         diaryRepository.save(diary);
         // todo vision
     }
 
-    public List<DiarySavedResponse> readDiariesByMember(final Long memberId, final int pageNumber, final int pageSize) {
+    public List<DiarySavedResponse> readDiariesByMember(final UUID memberId, final int pageNumber, final int pageSize) {
         Member foundMember = memberService.findById(memberId);
-        Page<Diary> diaries = diaryRepository.findAllByMemberOrderByDiaryDateDesc(foundMember, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "diaryDate")));
+        Page<Diary> diaries = diaryRepository.findAllByMemberIdOrderByDiaryDateDesc(foundMember.getId(), PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "diaryDate")));
         return diaries.stream()
                 .map(DiarySavedResponse::of)
                 .toList();

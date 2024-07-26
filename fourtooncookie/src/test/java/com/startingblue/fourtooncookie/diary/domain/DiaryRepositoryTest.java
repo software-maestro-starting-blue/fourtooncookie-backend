@@ -80,7 +80,7 @@ class DiaryRepositoryTest {
                 .paintingImageUrls(List.of(new URL("https://example.com/image.png")))
                 .hashtagsIds(List.of(1L, 2L, 3L))
                 .character(character)
-                .member(member)
+                .memberId(member.getId())
                 .build();
 
         // when
@@ -94,7 +94,7 @@ class DiaryRepositoryTest {
         assertThat(savedDiary.getPaintingImageUrls()).containsExactly(new URL("https://example.com/image.png"));
         assertThat(savedDiary.getHashtagsIds()).containsExactly(1L, 2L, 3L);
         assertThat(savedDiary.getCharacter()).isEqualTo(character);
-        assertThat(savedDiary.getMember()).isEqualTo(member);
+        assertThat(savedDiary.getMemberId()).isEqualTo(member.getId());
     }
 
     @DisplayName("멤버 별 일기를 일기 날짜 내림차순으로 조회한다.")
@@ -120,7 +120,7 @@ class DiaryRepositoryTest {
                 .paintingImageUrls(List.of(new URL("https://example.com/image1.png")))
                 .hashtagsIds(List.of(1L))
                 .character(character)
-                .member(member)
+                .memberId(member.getId())
                 .build();
 
         Diary diary2 = Diary.builder()
@@ -130,7 +130,7 @@ class DiaryRepositoryTest {
                 .paintingImageUrls(List.of(new URL("https://example.com/image2.png")))
                 .hashtagsIds(List.of(2L))
                 .character(character)
-                .member(member)
+                .memberId(member.getId())
                 .build();
 
         Diary diary3 = Diary.builder()
@@ -140,7 +140,7 @@ class DiaryRepositoryTest {
                 .paintingImageUrls(List.of(new URL("https://example.com/image3.png")))
                 .hashtagsIds(List.of(3L))
                 .character(character)
-                .member(member)
+                .memberId(member.getId())
                 .build();
 
         diaryRepository.saveAll(List.of(diary1, diary2, diary3));
@@ -148,7 +148,7 @@ class DiaryRepositoryTest {
         Pageable pageable = PageRequest.of(0, 2);
 
         // when
-        Page<Diary> diaryPage = diaryRepository.findAllByMemberOrderByDiaryDateDesc(member, pageable);
+        Page<Diary> diaryPage = diaryRepository.findAllByMemberIdOrderByDiaryDateDesc(member.getId(), pageable);
 
         // then
         assertThat(diaryPage.getTotalElements()).isEqualTo(3);
