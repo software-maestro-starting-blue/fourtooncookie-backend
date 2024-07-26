@@ -35,6 +35,7 @@ public class DiaryImageS3Service {
         try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
+                    .contentType("image/png")
                     .key(getKeyName(diaryId, gridPosition))
                     .build();
 
