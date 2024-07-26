@@ -7,9 +7,13 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.Duration;
 
 @RequiredArgsConstructor
 @Service
@@ -17,8 +21,12 @@ public class DiaryImageS3Service {
 
     private final S3Client s3Client;
 
+    private final S3Presigner s3Presigner;
+
     @Value("${aws.diaryimage.bucket.name}")
     private String bucketName;
+
+    private static final Integer PresignedUrlDurationInMinutes = 10;
 
     private static final String IMAGE_FORMAT = ".png";
 
@@ -35,31 +43,21 @@ public class DiaryImageS3Service {
         }
     }
 
-    public byte[] downloadImageByByteArray(Long diaryId, Integer gridPosition) {
+    public String generatePresignedImageUrl(Long diaryId, Integer gridPosition) {
         if (!isImageExist(diaryId, gridPosition)) {
             throw new RuntimeException("S3에 이미지가 존재하지 않습니다.");
         }
 
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
-                .key(getKeyName(diaryId, gridPosition))
+        String keyName = getKeyName(diaryId, gridPosition);
+
+        GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
+                .getObjectRequest(r -> r.bucket(bucketName).key(keyName))
+                .signatureDuration(Duration.ofMinutes(PresignedUrlDurationInMinutes))
                 .build();
 
-        ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(getObjectRequest);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(getObjectPresignRequest);
 
-        byte[] buffer = new byte[4096];
-        int bytesRead;
-
-        try {
-            while ((bytesRead = s3Object.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-
-            return outputStream.toByteArray();
-        } catch (IOException e) {
-            throw new RuntimeException("S3에서 다운로드된 이미지 변환 중 오류가 발생했습니다.", e);
-        }
+        return presignedRequest.url().toString();
     }
 
     public boolean isImageExist(Long diaryId, Integer gridPosition) {
