@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.config.authorization;
+package com.startingblue.fourtooncookie.config.authentication;
 
 import com.startingblue.fourtooncookie.jwt.JwtExtractor;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
@@ -18,7 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Component
 @Slf4j
-public class AuthorizationInterceptor implements HandlerInterceptor {
+public class AuthenticationInterceptor implements HandlerInterceptor {
 
     private static final String PREFIX_BEARER = "Bearer ";
 
