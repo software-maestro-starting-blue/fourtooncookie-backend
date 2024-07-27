@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.intercepter;
+package com.startingblue.fourtooncookie.config.authorization;
 
 import com.startingblue.fourtooncookie.jwt.JwtExtractor;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
