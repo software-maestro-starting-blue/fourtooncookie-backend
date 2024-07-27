@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.config;
 
-import com.startingblue.fourtooncookie.intercepter.AuthorizationInterceptor;
+import com.startingblue.fourtooncookie.config.authorization.AuthorizationInterceptor;
 import com.startingblue.fourtooncookie.member.dto.MemberArgumentResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
