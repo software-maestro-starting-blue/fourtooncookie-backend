@@ -1,6 +1,7 @@
 package com.startingblue.fourtooncookie.vision.apply.service;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
+import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.character.domain.ModelType;
 import com.startingblue.fourtooncookie.vision.reply.dto.VisionReplyEvent;
 import lombok.RequiredArgsConstructor;
@@ -91,7 +92,7 @@ public class DallE3VisionApplyService implements VisionApplyService {
     }
 
     @Override
-    public ModelType getModelType() {
-        return ModelType.DALL_E_3;
+    public CharacterVisionType getModelType() {
+        return CharacterVisionType.DALL_E_3;
     }
 }
