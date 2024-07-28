@@ -3,7 +3,6 @@ package com.startingblue.fourtooncookie.converter;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.net.MalformedURLException;
 import java.net.URL;
