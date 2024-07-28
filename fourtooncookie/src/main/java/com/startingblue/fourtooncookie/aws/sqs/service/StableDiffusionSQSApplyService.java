@@ -1,0 +1,46 @@
+package com.startingblue.fourtooncookie.aws.sqs.service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.startingblue.fourtooncookie.character.domain.Character;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
+
+@Service
+@RequiredArgsConstructor
+public class StableDiffusionSQSApplyService {
+
+    private final SqsClient sqsClient;
+
+    @Value("${aws.sqs.apply.url}")
+    private String applyQueueUrl;
+
+    public void sendMessage(Long diaryId, String prompt, Character character, Integer gridPosition) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode rootNode = objectMapper.createObjectNode();
+            rootNode.put("diaryId", diaryId);
+            rootNode.put("prompt", prompt);
+            rootNode.put("character", character.getName());
+            rootNode.put("gridPosition", gridPosition);
+
+            String message = objectMapper.writeValueAsString(rootNode);
+
+            SendMessageRequest sendMessageRequest = SendMessageRequest.builder()
+                    .queueUrl(applyQueueUrl)
+                    .messageBody(message)
+                    .build();
+
+            sqsClient.sendMessage(sendMessageRequest);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Json 구성 중 오류가 발생했습니다.", e);
+        } catch (Exception e) {
+            throw new RuntimeException("SQS에 메시지 전송 중 오류가 발생했습니다.", e);
+        }
+    }
+
+}
