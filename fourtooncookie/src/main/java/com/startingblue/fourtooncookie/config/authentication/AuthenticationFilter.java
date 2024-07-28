@@ -1,11 +1,10 @@
 package com.startingblue.fourtooncookie.config.authentication;
 
 import com.startingblue.fourtooncookie.jwt.JwtExtractor;
-import com.startingblue.fourtooncookie.member.domain.MemberRepository;
+import com.startingblue.fourtooncookie.member.service.MemberService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpFilter;
@@ -24,7 +23,8 @@ import java.util.UUID;
 public class AuthenticationFilter extends HttpFilter {
 
     private final JwtExtractor jwtExtractor;
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
+    private final AuthenticationExceptionHandler exceptionHandler;
 
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException {
@@ -32,14 +32,14 @@ public class AuthenticationFilter extends HttpFilter {
             String token = jwtExtractor.resolveToken(request);
             Claims claims = parseToken(token);
             UUID memberId = UUID.fromString(claims.getSubject());
-            verifyMemberExists(memberId);
+            memberService.verifyMemberExists(memberId);
 
             request.setAttribute("memberId", memberId);
             chain.doFilter(request, response);
         } catch (AuthenticationException e) {
-            handleAuthenticationException(e, response);
+            exceptionHandler.handleAuthenticationException(e, response);
         } catch (Exception e) {
-            handleGeneralException(e, response);
+            exceptionHandler.handleGeneralException(e, response);
         }
     }
 
@@ -59,23 +59,4 @@ public class AuthenticationFilter extends HttpFilter {
         }
     }
 
-    private void verifyMemberExists(UUID memberId) {
-        boolean existsById = memberRepository.existsById(memberId);
-        if (!existsById) {
-            log.error("Member ID not found: {}", memberId); // 멤버 ID가 없음을 경고 로그로 기록
-            throw new AuthenticationException("Member ID not found", HttpServletResponse.SC_UNAUTHORIZED);
-        }
-    }
-
-    private void handleAuthenticationException(AuthenticationException e, HttpServletResponse response) throws IOException {
-        log.error(e.getMessage(), e); // 인증 예외를 에러 로그로 기록
-        response.setStatus(e.getStatusCode());
-        response.getWriter().write(e.getMessage());
-    }
-
-    private void handleGeneralException(Exception e, HttpServletResponse response) throws IOException {
-        log.error("Authentication error", e); // 일반 예외를 에러 로그로 기록
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        response.getWriter().write("Internal server error");
-    }
 }
