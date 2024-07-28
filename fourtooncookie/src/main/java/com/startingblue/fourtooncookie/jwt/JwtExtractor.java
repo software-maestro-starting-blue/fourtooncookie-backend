@@ -39,6 +39,6 @@ public class JwtExtractor {
         if (Objects.nonNull(bearerToken) && bearerToken.startsWith(PREFIX_BEARER)) {
             return bearerToken.substring(PREFIX_BEARER.length());
         }
-        throw new IllegalArgumentException("토큰 에러");
+        throw new IllegalArgumentException("존재하지 않는 토큰입니다.");
     }
 }
