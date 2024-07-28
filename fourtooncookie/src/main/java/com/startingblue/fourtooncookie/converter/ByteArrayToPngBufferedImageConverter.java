@@ -2,7 +2,7 @@ package com.startingblue.fourtooncookie.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -10,7 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 @Converter
-@Service
+@Component
 public class ByteArrayToPngBufferedImageConverter implements AttributeConverter<byte[], BufferedImage> {
 
 

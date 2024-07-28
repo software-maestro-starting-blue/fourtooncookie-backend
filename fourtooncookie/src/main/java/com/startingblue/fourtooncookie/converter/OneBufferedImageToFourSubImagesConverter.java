@@ -2,7 +2,7 @@ package com.startingblue.fourtooncookie.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Converter
-@Service
+@Component
 public class OneBufferedImageToFourSubImagesConverter implements AttributeConverter<BufferedImage, List<BufferedImage>> {
 
     @Override
