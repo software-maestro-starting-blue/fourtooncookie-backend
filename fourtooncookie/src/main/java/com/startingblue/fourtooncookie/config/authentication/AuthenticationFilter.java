@@ -29,7 +29,7 @@ public class AuthenticationFilter extends HttpFilter {
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException {
         try {
-            String token = resolveToken(request);
+            String token = jwtExtractor.resolveToken(request);
             Claims claims = parseToken(token);
             UUID memberId = UUID.fromString(claims.getSubject());
             verifyMemberExists(memberId);
@@ -41,15 +41,6 @@ public class AuthenticationFilter extends HttpFilter {
         } catch (Exception e) {
             handleGeneralException(e, response);
         }
-    }
-
-    private String resolveToken(HttpServletRequest request) {
-        final String token = jwtExtractor.resolveToken(request);
-        if (token == null || token.isEmpty()) {
-            log.warn("JWT token is missing or empty"); // JWT 토큰이 없거나 비어있음을 경고 로그로 기록
-            throw new AuthenticationException("JWT token is missing or empty", HttpServletResponse.SC_UNAUTHORIZED);
-        }
-        return token;
     }
 
     private Claims parseToken(String token) {
