@@ -4,7 +4,6 @@ import com.startingblue.fourtooncookie.config.BaseEntity;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.converter.LongListToStringConverter;
 import com.startingblue.fourtooncookie.converter.UrlListToStringConverter;
-import com.startingblue.fourtooncookie.member.domain.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +15,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -51,8 +51,7 @@ public final class Diary extends BaseEntity {
     private Character character;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
+    private UUID memberId;
 
     public void update(String content,
                        List<Long> hashtagIds,
@@ -70,8 +69,8 @@ public final class Diary extends BaseEntity {
         this.hashtagsIds = new ArrayList<>(hashtagIds);
     }
 
-    public boolean isOwner(Long memberId) {
-        return this.member.getId().equals(memberId);
+    public boolean isOwner(UUID memberId) {
+        return this.memberId.equals(memberId);
     }
 
     @Override
@@ -86,7 +85,7 @@ public final class Diary extends BaseEntity {
                 Objects.equals(paintingImageUrls, diary.paintingImageUrls) &&
                 Objects.equals(hashtagsIds, diary.hashtagsIds) &&
                 Objects.equals(character, diary.character) &&
-                Objects.equals(member, diary.member) &&
+                Objects.equals(memberId, diary.memberId) &&
                 Objects.equals(getCreatedDateTime(), diary.getCreatedDateTime()) &&
                 Objects.equals(getModifiedDateTime(), diary.getModifiedDateTime());
     }
@@ -94,6 +93,6 @@ public final class Diary extends BaseEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, content, isFavorite, diaryDate, paintingImageUrls, hashtagsIds, character, member, getCreatedDateTime(), getModifiedDateTime());
+        return Objects.hash(id, content, isFavorite, diaryDate, paintingImageUrls, hashtagsIds, character, memberId, getCreatedDateTime(), getModifiedDateTime());
     }
 }

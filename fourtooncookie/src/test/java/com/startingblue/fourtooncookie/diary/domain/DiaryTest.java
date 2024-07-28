@@ -26,9 +26,11 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,6 +52,7 @@ class DiaryTest {
     private Artwork artwork;
     private Character character;
     private Member member;
+    private UUID memberUID;
 
     @BeforeEach
     void setUp() {
@@ -58,7 +61,8 @@ class DiaryTest {
         artwork = mock(Artwork.class);
         character = mock(Character.class);
         member = mock(Member.class);
-        when(member.getId()).thenReturn(1L);
+        memberUID = UUID.randomUUID();
+        when(member.getId()).thenReturn(memberUID);
     }
 
     @DisplayName("유효한 일기를 생성한다.")
@@ -69,7 +73,7 @@ class DiaryTest {
                 .content("This is a valid content.")
                 .diaryDate(LocalDate.now())
                 .character(character)
-                .member(member)
+                .memberId(member.getId())
                 .paintingImageUrls(Arrays.asList(new URL("http://example.com/image1"), new URL("http://example.com/image2")))
                 .hashtagsIds(Arrays.asList(1L, 2L))
                 .isFavorite(true)
@@ -90,7 +94,7 @@ class DiaryTest {
                 .content("")
                 .diaryDate(LocalDate.now())
                 .character(character)
-                .member(member)
+                .memberId(member.getId())
                 .build();
 
         // when
@@ -108,7 +112,7 @@ class DiaryTest {
                 .content("Valid content")
                 .diaryDate(null)
                 .character(character)
-                .member(member)
+                .memberId(member.getId())
                 .build();
 
         // when
@@ -126,7 +130,7 @@ class DiaryTest {
                 .content("Valid content")
                 .diaryDate(LocalDate.now())
                 .character(null)
-                .member(member)
+                .memberId(member.getId())
                 .build();
 
         // when
@@ -144,7 +148,7 @@ class DiaryTest {
                 .content("Valid content")
                 .diaryDate(LocalDate.now())
                 .character(character)
-                .member(null)
+                .memberId(null)
                 .build();
 
         // when
@@ -162,12 +166,13 @@ class DiaryTest {
                 .content("Content")
                 .diaryDate(LocalDate.now())
                 .character(character)
-                .member(member)
+                .memberId(member.getId())
                 .build();
 
         // then
-        assertTrue(diary.isOwner(1L));
-        assertFalse(diary.isOwner(2L));
+        assertTrue(diary.isOwner(memberUID));
+        UUID notExistUID = UUID.nameUUIDFromBytes("notExistUID".getBytes());
+        assertFalse(diary.isOwner(notExistUID));
     }
 
     @DisplayName("일기 내용, 해시태그, 캐릭터 업데이트")
@@ -244,7 +249,7 @@ class DiaryTest {
                 .paintingImageUrls(List.of(new URL("http://defaultImage.png")))
                 .hashtagsIds(List.of(1L, 2L))
                 .character(character)
-                .member(member)
+                .memberId(member.getId())
                 .build();
     }
 

@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/diary")
@@ -25,7 +26,7 @@ public class DiaryController {
 
     @PostMapping
     public ResponseEntity<Void> createDiary(@RequestBody final DiarySaveRequest request) {
-        diaryService.createDiary(request, 1L); // TODO : 우선 디폴트 값 넣어 놓음.
+        diaryService.createDiary(request, UUID.randomUUID()); // TODO : 우선 디폴트 값 넣어 놓음.
         return ResponseEntity.ok().build();
     }
 
@@ -34,7 +35,7 @@ public class DiaryController {
             HttpServletRequest httpRequest,
             @RequestParam(defaultValue = "0") @Min(0) @Max(200) final int pageNumber,
             @RequestParam(defaultValue = "10") @Min(1) @Max(10) final int pageSize) {
-        Long memberId = Long.parseLong(httpRequest.getHeader("memberId")); // TODO 현재는 헤더에 넣고, jwt 를 이용코드로 변경 예정
+        UUID memberId = UUID.fromString(httpRequest.getHeader("memberId")); // TODO 현재는 헤더에 넣고, jwt 를 이용코드로 변경 예정
         List<DiarySavedResponse> responses = diaryService.readDiariesByMember(memberId, pageNumber, pageSize);
         if (responses.isEmpty()) {
             return ResponseEntity.noContent().build();
