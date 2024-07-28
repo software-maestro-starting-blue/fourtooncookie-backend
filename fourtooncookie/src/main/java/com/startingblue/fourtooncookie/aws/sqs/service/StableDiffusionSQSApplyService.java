@@ -20,6 +20,17 @@ public class StableDiffusionSQSApplyService {
     private String applyQueueUrl;
 
     public void sendMessage(Long diaryId, String prompt, Character character, Integer gridPosition) {
+        String message = generateMessage(diaryId, prompt, character, gridPosition);
+
+        SendMessageRequest sendMessageRequest = SendMessageRequest.builder()
+                .queueUrl(applyQueueUrl)
+                .messageBody(message)
+                .build();
+
+        sqsClient.sendMessage(sendMessageRequest);
+    }
+
+    private String generateMessage(Long diaryId, String prompt, Character character, Integer gridPosition) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode rootNode = objectMapper.createObjectNode();
@@ -28,18 +39,9 @@ public class StableDiffusionSQSApplyService {
             rootNode.put("character", character.getName());
             rootNode.put("gridPosition", gridPosition);
 
-            String message = objectMapper.writeValueAsString(rootNode);
-
-            SendMessageRequest sendMessageRequest = SendMessageRequest.builder()
-                    .queueUrl(applyQueueUrl)
-                    .messageBody(message)
-                    .build();
-
-            sqsClient.sendMessage(sendMessageRequest);
+            return objectMapper.writeValueAsString(rootNode);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Json 구성 중 오류가 발생했습니다.", e);
-        } catch (Exception e) {
-            throw new RuntimeException("SQS에 메시지 전송 중 오류가 발생했습니다.", e);
         }
     }
 
