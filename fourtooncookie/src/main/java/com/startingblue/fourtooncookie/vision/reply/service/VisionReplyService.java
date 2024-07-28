@@ -1,10 +1,8 @@
 package com.startingblue.fourtooncookie.vision.reply.service;
 
-import com.startingblue.fourtooncookie.s3.service.DiaryImageS3Service;
+import com.startingblue.fourtooncookie.aws.s3.service.DiaryImageS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
