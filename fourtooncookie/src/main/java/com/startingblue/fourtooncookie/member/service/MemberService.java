@@ -2,12 +2,13 @@ package com.startingblue.fourtooncookie.member.service;
 
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
-import com.startingblue.fourtooncookie.member.dto.MemberReadDto;
-import com.startingblue.fourtooncookie.member.dto.MemberUpdateDto;
+import com.startingblue.fourtooncookie.member.dto.MemberSavedResponse;
+import com.startingblue.fourtooncookie.member.dto.MemberUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -17,29 +18,25 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-
-    public Member findById(UUID memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("member not found"));
+    public MemberSavedResponse readById(final UUID memberId) {
+        final Member member = findMemberOrThrow(memberId);
+        return new MemberSavedResponse(member.getId(), member.getEmail(), member.getName(), member.getBirth(), member.getGender());
     }
 
-    public void save(Member member) {
+    public void updateById(final UUID memberId, final MemberUpdateRequest memberUpdateRequest) {
+        Member member = findMemberOrThrow(memberId);
+        member.update(memberUpdateRequest.name(), memberUpdateRequest.birth(), memberUpdateRequest.gender());
         memberRepository.save(member);
     }
 
-    public MemberReadDto readById(final UUID memberId) {
-        final Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("member not found"));
-        
-        return new MemberReadDto(member.getId(), member.getEmail(), member.getName(), member.getBirth(), member.getGender());
+    public void softDeleteById(UUID memberId, LocalDateTime current) {
+        Member foundMember = findMemberOrThrow(memberId);
+        foundMember.softDelete(current);
+        memberRepository.save(foundMember);
     }
 
-    public void updateById(final UUID memberId, final MemberUpdateDto memberUpdateDto) {
-        //TODO: 구현 필요
-    }
-
-    public void deleteById(final UUID memberId) {
-        final Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("member not found"));
-        memberRepository.delete(member);
+    public Member findMemberOrThrow(UUID memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("Member with ID " + memberId + " not found."));
     }
 }
