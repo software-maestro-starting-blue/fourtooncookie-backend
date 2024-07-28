@@ -3,6 +3,8 @@ package com.startingblue.fourtooncookie.vision.apply.service;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.character.domain.ModelType;
+import com.startingblue.fourtooncookie.converter.ByteArrayToPngBufferedImageConverter;
+import com.startingblue.fourtooncookie.converter.OneBufferedImageToFourSubImagesConverter;
 import com.startingblue.fourtooncookie.vision.reply.dto.VisionReplyEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.image.*;
@@ -31,6 +33,10 @@ public class DallE3VisionApplyService implements VisionApplyService {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     private final OpenAiImageModel openAiImageModel;
+
+    private final ByteArrayToPngBufferedImageConverter byteArrayToPngBufferedImageConverter;
+
+    private final OneBufferedImageToFourSubImagesConverter oneBufferedImageToFourSubImagesConverter;
 
     @Override
     public void processVisionApply(Long diaryId, List<String> contents, Character character) {
@@ -62,33 +68,13 @@ public class DallE3VisionApplyService implements VisionApplyService {
     }
 
     private List<byte[]> convertImageB64JsonToFourImagesOfByteArray(String imageB64Json) {
-        try {
-            byte[] decodedBytes = Base64.getDecoder().decode(imageB64Json);
+        byte[] decodedBytes = Base64.getDecoder().decode(imageB64Json);
 
-            ByteArrayInputStream bais = new ByteArrayInputStream(decodedBytes);
-            BufferedImage originalImage = ImageIO.read(bais);
+        BufferedImage image = byteArrayToPngBufferedImageConverter.convertToDatabaseColumn(decodedBytes);
 
-            int width = originalImage.getWidth();
-            int height = originalImage.getHeight();
-            BufferedImage[] subImages = new BufferedImage[4];
+        List<BufferedImage> subImages = oneBufferedImageToFourSubImagesConverter.convertToDatabaseColumn(image);
 
-            subImages[0] = originalImage.getSubimage(0, 0, width / 2, height / 2); // top-left
-            subImages[1] = originalImage.getSubimage(width / 2, 0, width / 2, height / 2); // top-right
-            subImages[2] = originalImage.getSubimage(0, height / 2, width / 2, height / 2); // bottom-left
-            subImages[3] = originalImage.getSubimage(width / 2, height / 2, width / 2, height / 2); // bottom-right
-
-
-            List<byte[]> subImageBytes = new ArrayList<>();
-            for (int i = 0; i < 4; i++) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ImageIO.write(subImages[i], "png", baos);
-                subImageBytes.add(baos.toByteArray());
-            }
-
-            return subImageBytes;
-        } catch (IOException exception) {
-            throw new IllegalStateException("이미지를 4장으로 나누는 과정에서 오류가 나타남", exception);
-        }
+        return subImages.stream().map(byteArrayToPngBufferedImageConverter::convertToEntityAttribute).toList();
     }
 
     @Override
