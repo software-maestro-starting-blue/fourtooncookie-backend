@@ -45,15 +45,6 @@ public class StableDiffusionSQSReplyService {
                 });
     }
 
-    private void deleteMessage(Message message) {
-        DeleteMessageRequest deleteMessageRequest = DeleteMessageRequest.builder()
-                .queueUrl(replyQueueUrl)
-                .receiptHandle(message.receiptHandle())
-                .build();
-
-        sqsClient.deleteMessage(deleteMessageRequest);
-    }
-
     private VisionReplyEvent convertMessageToVisionReplyEvent(String message) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -68,5 +59,15 @@ public class StableDiffusionSQSReplyService {
             throw new RuntimeException("메시지를 VisionReplyEvent로 변환하는 중 오류가 발생했습니다.", e);
         }
     }
+
+    private void deleteMessage(Message message) {
+        DeleteMessageRequest deleteMessageRequest = DeleteMessageRequest.builder()
+                .queueUrl(replyQueueUrl)
+                .receiptHandle(message.receiptHandle())
+                .build();
+
+        sqsClient.deleteMessage(deleteMessageRequest);
+    }
+
 
 }
