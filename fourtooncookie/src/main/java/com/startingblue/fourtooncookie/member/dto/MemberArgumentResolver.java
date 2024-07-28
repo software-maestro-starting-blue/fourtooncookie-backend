@@ -28,7 +28,7 @@ public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
                                   NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) throws Exception {
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
-        String token = resolveToken(requireNonNull(request));
+        String token = jwtExtractor.resolveToken(requireNonNull(request));
 
         if (token != null && !token.isEmpty()) {
             Claims claims = jwtExtractor.parseToken(token);
@@ -36,14 +36,6 @@ public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
             return new MemberDto(memberId);
         }
 
-        return null;
-    }
-
-    private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
         return null;
     }
 }
