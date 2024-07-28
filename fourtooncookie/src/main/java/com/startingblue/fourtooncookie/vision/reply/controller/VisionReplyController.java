@@ -17,6 +17,6 @@ public class VisionReplyController {
 
     @PostMapping("/reply")
     public void replyVision(@RequestBody VisionReplyRequest request) {
-        visionReplyService.processVisionReply(request.diaryId(), request.images());
+        visionReplyService.processVisionReply(request.diaryId(), request.image(), request.gridPosition());
     }
 }
