@@ -2,6 +2,7 @@ package com.startingblue.fourtooncookie.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Converter
-@Service
+@Component
 public class LongListToStringConverter implements AttributeConverter<List<Long>, String> {
 
     private static final String EMPTY_LIST = "";
