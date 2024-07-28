@@ -2,7 +2,6 @@ package com.startingblue.fourtooncookie.vision.apply.service;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
-import com.startingblue.fourtooncookie.character.domain.ModelType;
 import com.startingblue.fourtooncookie.converter.ByteArrayToPngBufferedImageConverter;
 import com.startingblue.fourtooncookie.converter.OneBufferedImageToFourSubImagesConverter;
 import com.startingblue.fourtooncookie.vision.reply.dto.VisionReplyEvent;
@@ -14,12 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
