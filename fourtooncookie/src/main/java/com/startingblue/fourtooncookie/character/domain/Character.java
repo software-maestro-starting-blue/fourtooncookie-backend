@@ -1,6 +1,9 @@
 package com.startingblue.fourtooncookie.character.domain;
 
+import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,27 +22,35 @@ public class Character {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private ModelType modelType;
+    private CharacterVisionType characterVisionType;
 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "artwork_id")
+    private Artwork artwork;
+
+    @NotBlank
     private String name;
 
+    @NotNull
     private URL selectionThumbnailUrl;
 
-    public Character(final ModelType modelType, final String name, final URL selectionThumbnailUrl) {
-        this.modelType = modelType;
+    @NotBlank
+    private String basePrompt;
+  
+    public Character(final CharacterVisionType characterVisionType, final Artwork artwork, final String name, final URL selectionThumbnailUrl, final String basePrompt) {
+        this.characterVisionType = characterVisionType;
+        this.artwork = artwork;
         this.name = name;
         this.selectionThumbnailUrl = selectionThumbnailUrl;
+        this.basePrompt = basePrompt;
     }
 
-    public void changeModelType(final ModelType modelType) {
-        this.modelType = modelType;
-    }
-
-    public void changeName(final String name) {
+    public void update(final CharacterVisionType characterVisionType, final Artwork artwork, final String name, final URL selectionThumbnailUrl, final String basePrompt) {
+        this.characterVisionType = characterVisionType;
+        this.artwork = artwork;
         this.name = name;
-    }
-
-    public void changeSelectionThumbnailUrl(final URL selectionThumbnailUrl) {
         this.selectionThumbnailUrl = selectionThumbnailUrl;
+        this.basePrompt = basePrompt;
     }
 }
