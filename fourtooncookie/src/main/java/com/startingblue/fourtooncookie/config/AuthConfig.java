@@ -2,6 +2,7 @@ package com.startingblue.fourtooncookie.config;
 
 import com.startingblue.fourtooncookie.config.authentication.AuthenticationInterceptor;
 import com.startingblue.fourtooncookie.member.authorization.MemberAuthorizationInterceptor;
+
 import com.startingblue.fourtooncookie.member.dto.MemberArgumentResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +29,7 @@ public class AuthConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authenticationInterceptor)
                 .addPathPatterns("/**");
-
+      
         registry.addInterceptor(memberAuthorizationInterceptor)
                 .addPathPatterns("/member/**");
     }

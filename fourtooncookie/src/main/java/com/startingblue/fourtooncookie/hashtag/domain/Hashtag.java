@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.hashtag.domain;
 
+import com.startingblue.fourtooncookie.hashtag.exception.HashtagNoSuchElementException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -32,6 +33,6 @@ public enum Hashtag {
                 return hashtag;
             }
         }
-        throw new IllegalArgumentException("Hashtag with id " + id + " does not exist");
+        throw new HashtagNoSuchElementException();
     }
 }
