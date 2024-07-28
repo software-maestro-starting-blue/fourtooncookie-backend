@@ -90,7 +90,7 @@ class DiaryServiceTest {
         assertThat(savedDiary.getDiaryDate()).isEqualTo(LocalDate.of(2024, 7, 21));
         assertThat(savedDiary.getHashtagsIds()).isEqualTo(List.of(1L, 2L));
         assertThat(savedDiary.getCharacter()).isEqualTo(character);
-        assertThat(savedDiary.getMember()).isEqualTo(member);
+        assertThat(savedDiary.getMemberId()).isEqualTo(member.getId());
     }
 
     @DisplayName("저장된 일기를 삭제한다.")
@@ -231,7 +231,7 @@ class DiaryServiceTest {
                 .paintingImageUrls(List.of(new URL("http://defaultImage.png")))
                 .hashtagsIds(List.of(1L, 2L))
                 .character(character)
-                .member(member)
+                .memberId(member.getId())
                 .build();
     }
 

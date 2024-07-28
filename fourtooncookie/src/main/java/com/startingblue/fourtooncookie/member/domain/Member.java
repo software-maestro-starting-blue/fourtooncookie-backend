@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Slf4j
@@ -15,9 +16,9 @@ import java.time.LocalDate;
 public class Member {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "member_id")
-    private Long id;
+    private UUID id;
 
     private String email;
 

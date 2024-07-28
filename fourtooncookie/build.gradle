@@ -46,6 +46,13 @@ dependencies {
 	implementation platform('software.amazon.awssdk:bom:2.20.0')
 	// AWS SDK for S3
 	implementation 'software.amazon.awssdk:s3'
+
+	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+	implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.2'
+	implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
+
 }
 
 dependencyManagement {
