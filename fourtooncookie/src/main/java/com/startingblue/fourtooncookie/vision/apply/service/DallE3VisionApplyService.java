@@ -42,7 +42,7 @@ public class DallE3VisionApplyService implements VisionApplyService {
         List<byte[]> imageByteArrays = convertImageB64JsonToFourImagesOfByteArray(imageB64Json);
 
         for (int i = 0; i < 4; i++) {
-            //applicationEventPublisher.publishEvent(new VisionReplyEvent(diaryId, imageByteArrays.get(i), i)); // TODO: TSK-210에서 dto 자체를 수정하였음. 추후에는 작동할 코드
+            applicationEventPublisher.publishEvent(new VisionReplyEvent(diaryId, imageByteArrays.get(i), i));
         }
     }
 
