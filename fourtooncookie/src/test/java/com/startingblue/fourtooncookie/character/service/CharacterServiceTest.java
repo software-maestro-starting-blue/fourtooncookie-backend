@@ -138,7 +138,7 @@ class CharacterServiceTest {
                         charcter2Artwork.getTitle()
                 );
         assertThat(characterResponses.characterResponses())
-                .extracting(CharacterResponse::artworkThumnailUrl)
+                .extracting(CharacterResponse::artworkThumbnailUrl)
                 .containsExactly(
                         charcter1Artwork.getThumbnailUrl(),
                         charcter2Artwork.getThumbnailUrl()

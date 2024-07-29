@@ -19,7 +19,6 @@ import java.util.UUID;
 @Slf4j
 public final class MemberAuthorizationInterceptor implements HandlerInterceptor {
 
-    private static final String PREFIX_BEARER = "Bearer ";
     private static final String PATH_VARIABLE_KEY = "memberId";
 
     private final JwtExtractor jwtExtractor;

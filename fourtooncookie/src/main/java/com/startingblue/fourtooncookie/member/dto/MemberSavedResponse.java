@@ -5,5 +5,9 @@ import com.startingblue.fourtooncookie.member.domain.Gender;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public record MemberSavedResponse(UUID memberId, String email, String name, LocalDate birth, Gender gender) {
+public record MemberSavedResponse(String email, String name, Gender gender, LocalDate birth) {
+
+    public static MemberSavedResponse of(String email, String name, Gender gender, LocalDate birth) {
+        return new MemberSavedResponse(email, name, gender, birth);
+    }
 }
