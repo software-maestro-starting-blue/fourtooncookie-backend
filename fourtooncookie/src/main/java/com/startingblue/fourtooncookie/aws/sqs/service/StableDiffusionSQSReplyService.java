@@ -30,7 +30,7 @@ public class StableDiffusionSQSReplyService {
     @Value("${aws.sqs.reply.max-message-count}")
     private Integer maxMessageCount;
 
-    @Scheduled(fixedDelay = 1L)
+    @Scheduled(fixedDelay = 5 * 1000)
     public void handleMessages() {
         List<Message> messages = getMessagesFromSQS();
 
