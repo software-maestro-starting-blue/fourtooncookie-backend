@@ -27,7 +27,6 @@ class CharacterRepositoryTest {
     @Autowired
     private ArtworkRepository artworkRepository;
 
-
     @DisplayName("캐릭터를 저장한다.")
     @Test
     void save() throws MalformedURLException {
@@ -36,7 +35,13 @@ class CharacterRepositoryTest {
         Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
         URL characterUrl = new URL("https://멍멍이-dalle3.png");
         String basePrompt = "This is a base prompt.";
-        Character character = new Character(CharacterVisionType.DALL_E_3, artwork, characterName, characterUrl, basePrompt);
+        Character character = Character.builder()
+                .characterVisionType(CharacterVisionType.DALL_E_3)
+                .artwork(artwork)
+                .name(characterName)
+                .selectionThumbnailUrl(characterUrl)
+                .basePrompt(basePrompt)
+                .build();
 
         // when
         Character savedCharacter = characterRepository.save(character);
@@ -58,7 +63,14 @@ class CharacterRepositoryTest {
         String characterName = "멍멍이";
         URL characterUrl = new URL("https://test.png");
         String basePrompt = "This is a base prompt.";
-        Character character = new Character(CharacterVisionType.DALL_E_3, artwork, characterName, characterUrl, basePrompt);
+        Character character = Character.builder()
+                .characterVisionType(CharacterVisionType.DALL_E_3)
+                .paymentType(PaymentType.FREE)
+                .artwork(artwork)
+                .name(characterName)
+                .selectionThumbnailUrl(characterUrl)
+                .basePrompt(basePrompt)
+                .build();
         Character savedCharacter = characterRepository.save(character);
 
         // when
@@ -82,22 +94,51 @@ class CharacterRepositoryTest {
         String dogDalle3CharacterName = "멍멍이";
         URL dogDalle3Url = new URL("https://멍멍이-dalle3.png");
         String dogDalle3CharacterBasePrompt = "This is a base prompt dog.";
-        Character dogDalle3Character = new Character(CharacterVisionType.DALL_E_3, artwork, dogDalle3CharacterName, dogDalle3Url, dogDalle3CharacterBasePrompt);
+        Character dogDalle3Character = Character.builder()
+                .characterVisionType(CharacterVisionType.DALL_E_3)
+                .paymentType(PaymentType.FREE)
+                .artwork(artwork)
+                .name(dogDalle3CharacterName)
+                .selectionThumbnailUrl(dogDalle3Url)
+                .basePrompt(dogDalle3CharacterBasePrompt)
+                .build();
 
         String catDalle3CharacterName = "나비";
         URL catDalle3Url = new URL("https://나비-dalle3.png");
         String catDalle3CharacterBasePrompt = "This is a base prompt cat.";
-        Character catDalle3Character = new Character(CharacterVisionType.DALL_E_3, artwork, catDalle3CharacterName, catDalle3Url, catDalle3CharacterBasePrompt);
+        Character catDalle3Character = Character.builder()
+                .characterVisionType(CharacterVisionType.DALL_E_3)
+                .paymentType(PaymentType.FREE)
+                .artwork(artwork)
+                .name(catDalle3CharacterName)
+                .selectionThumbnailUrl(catDalle3Url)
+                .basePrompt(catDalle3CharacterBasePrompt)
+                .build();
 
         String midjourneyCharacterName = "미드나비";
         URL midjourneyCharacterUrl = new URL("https://midjourney.png");
         String midjourneyCharacterNameCharacterBasePrompt = "This is a base prompt mid cat.";
-        Character dogMidjourney = new Character(CharacterVisionType.MIDJOURNEY, artwork, midjourneyCharacterName, midjourneyCharacterUrl, midjourneyCharacterNameCharacterBasePrompt);
+        Character dogMidjourney = Character.builder()
+                .characterVisionType(CharacterVisionType.MIDJOURNEY)
+                .paymentType(PaymentType.PAID)
+                .artwork(artwork)
+                .name(midjourneyCharacterName)
+                .selectionThumbnailUrl(midjourneyCharacterUrl)
+                .basePrompt(midjourneyCharacterNameCharacterBasePrompt)
+                .build();
 
         String stableDiffusionCharacterName = "스테이블디퓨전";
         URL stableDiffusionCharacterUrl = new URL("https://stable-diffusion.png");
         String stableDiffusionCharacterNameCharacterBasePrompt = "This is a base prompt stable diffusion.";
-        Character catStableDiffusionCharacter = new Character(CharacterVisionType.STABLE_DIFFUSION, artwork, stableDiffusionCharacterName, stableDiffusionCharacterUrl, stableDiffusionCharacterNameCharacterBasePrompt);
+        Character catStableDiffusionCharacter = Character.builder()
+                .characterVisionType(CharacterVisionType.STABLE_DIFFUSION)
+                .paymentType(PaymentType.PAID)
+                .artwork(artwork)
+                .name(stableDiffusionCharacterName)
+                .selectionThumbnailUrl(stableDiffusionCharacterUrl)
+                .basePrompt(stableDiffusionCharacterNameCharacterBasePrompt)
+                .build();
+
         characterRepository.saveAll(List.of(dogDalle3Character, catDalle3Character, dogMidjourney, catStableDiffusionCharacter));
 
         // when
@@ -143,7 +184,14 @@ class CharacterRepositoryTest {
     @Test
     void update() throws MalformedURLException {
         // given
-        Character character = new Character(CharacterVisionType.DALL_E_3, new Artwork("Test Artwork", new URL("https://test.png")), "멍멍이", new URL("https://멍멍이-dalle3.png"), "This is a base prompt");
+        Character character = Character.builder()
+                .characterVisionType(CharacterVisionType.DALL_E_3)
+                .paymentType(PaymentType.FREE)
+                .artwork(new Artwork("Test Artwork", new URL("https://test.png")))
+                .name("멍멍이")
+                .selectionThumbnailUrl(new URL("https://멍멍이-dalle3.png"))
+                .basePrompt("This is a base prompt")
+                .build();
         Character savedCharacter = characterRepository.save(character);
 
         CharacterVisionType updateCharacterVisionType = CharacterVisionType.STABLE_DIFFUSION;
@@ -153,8 +201,15 @@ class CharacterRepositoryTest {
         String updateBasePrompt = "Updated base prompt.";
 
         // when
-        savedCharacter.update(updateCharacterVisionType, updateArtwork, updateCharacterName, updateUrl, updateBasePrompt);
-        Character updatedCharacter = characterRepository.save(savedCharacter);
+        Character updatedCharacter = savedCharacter.update(
+                updateCharacterVisionType,
+                PaymentType.FREE,
+                updateArtwork,
+                updateCharacterName,
+                updateUrl,
+                updateBasePrompt
+        );
+        updatedCharacter = characterRepository.save(updatedCharacter);
 
         // then
         assertThat(updatedCharacter.getCharacterVisionType()).isEqualTo(updateCharacterVisionType);
@@ -170,7 +225,14 @@ class CharacterRepositoryTest {
         // given
         Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
         String basePrompt = "This is a base prompt.";
-        Character character = new Character(CharacterVisionType.DALL_E_3, artwork, "멍멍이", new URL("https://멍멍이-dalle3.png"), basePrompt);
+        Character character = Character.builder()
+                .characterVisionType(CharacterVisionType.DALL_E_3)
+                .paymentType(PaymentType.FREE)
+                .artwork(artwork)
+                .name("멍멍이")
+                .selectionThumbnailUrl(new URL("https://멍멍이-dalle3.png"))
+                .basePrompt(basePrompt)
+                .build();
         Character savedCharacter = characterRepository.save(character);
 
         // when

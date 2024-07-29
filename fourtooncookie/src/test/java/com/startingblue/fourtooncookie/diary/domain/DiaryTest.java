@@ -4,6 +4,7 @@ import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
+import com.startingblue.fourtooncookie.character.domain.PaymentType;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
@@ -23,7 +24,6 @@ import org.springframework.test.context.ActiveProfiles;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -31,8 +31,6 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -58,24 +56,50 @@ class DiaryTest {
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-        artwork = mock(Artwork.class);
-        character = mock(Character.class);
-        member = mock(Member.class);
-        memberUID = UUID.randomUUID();
-        when(member.getId()).thenReturn(memberUID);
+
+        member = Member.builder()
+                .name("John Doe")
+                .birth(LocalDate.of(1990, 1, 1))
+                .email("john.doe@example.com")
+                .gender(Gender.MALE)
+                .role(Role.MEMBER)
+                .build();
+        member = memberRepository.save(member);
+        memberUID = member.getId();
+
+        try {
+            artwork = new Artwork("Test Artwork", new URL("https://test.png"));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
+        character = Character.builder()
+                .characterVisionType(CharacterVisionType.DALL_E_3)
+                .paymentType(PaymentType.FREE)
+                .artwork(artwork)
+                .name("CharacterName")
+                .selectionThumbnailUrl(createURL("https://character.png"))
+                .basePrompt("basePrompt")
+                .build();
+        character = characterRepository.save(character);
     }
 
     @DisplayName("유효한 일기를 생성한다.")
     @Test
-    void testDiaryCreationValid() throws MalformedURLException {
+    void testDiaryCreationValid() {
         // given
+        String validContent = "This is a valid content.";
+        URL imageUrl1 = createURL("http://example.com/image1");
+        URL imageUrl2 = createURL("http://example.com/image2");
+        List<Long> hashtagsIds = List.of(1L, 2L);
+
         Diary diary = Diary.builder()
-                .content("This is a valid content.")
+                .content(validContent)
                 .diaryDate(LocalDate.now())
                 .character(character)
                 .memberId(member.getId())
-                .paintingImageUrls(Arrays.asList(new URL("http://example.com/image1"), new URL("http://example.com/image2")))
-                .hashtagsIds(Arrays.asList(1L, 2L))
+                .paintingImageUrls(List.of(imageUrl1, imageUrl2))
+                .hashtagsIds(hashtagsIds)
                 .isFavorite(true)
                 .build();
 
@@ -90,8 +114,10 @@ class DiaryTest {
     @Test
     void testDiaryCreationInvalidContent() {
         // given
+        String emptyContent = "";
+
         Diary diary = Diary.builder()
-                .content("")
+                .content(emptyContent)
                 .diaryDate(LocalDate.now())
                 .character(character)
                 .memberId(member.getId())
@@ -108,8 +134,10 @@ class DiaryTest {
     @Test
     void testDiaryCreationNullDate() {
         // given
+        String validContent = "Valid content";
+
         Diary diary = Diary.builder()
-                .content("Valid content")
+                .content(validContent)
                 .diaryDate(null)
                 .character(character)
                 .memberId(member.getId())
@@ -126,8 +154,10 @@ class DiaryTest {
     @Test
     void testDiaryCreationNullCharacter() {
         // given
+        String validContent = "Valid content";
+
         Diary diary = Diary.builder()
-                .content("Valid content")
+                .content(validContent)
                 .diaryDate(LocalDate.now())
                 .character(null)
                 .memberId(member.getId())
@@ -144,8 +174,10 @@ class DiaryTest {
     @Test
     void testDiaryCreationNullMember() {
         // given
+        String validContent = "Valid content";
+
         Diary diary = Diary.builder()
-                .content("Valid content")
+                .content(validContent)
                 .diaryDate(LocalDate.now())
                 .character(character)
                 .memberId(null)
@@ -162,8 +194,10 @@ class DiaryTest {
     @Test
     void testIsOwner() {
         // given
+        String validContent = "Content";
+
         Diary diary = Diary.builder()
-                .content("Content")
+                .content(validContent)
                 .diaryDate(LocalDate.now())
                 .character(character)
                 .memberId(member.getId())
@@ -177,55 +211,94 @@ class DiaryTest {
 
     @DisplayName("일기 내용, 해시태그, 캐릭터 업데이트")
     @Test
-    void update() throws MalformedURLException {
+    void update() {
         // given
-        Character character = new Character(CharacterVisionType.DALL_E_3, artwork, "멍멍이", new URL("http://멍멍이.png"), "base Prompt");
-        characterRepository.save(character);
+        String initialCharacterName = "멍멍이";
+        String initialCharacterUrl = "http://멍멍이.png";
+        Character initialCharacter = Character.builder()
+                .characterVisionType(CharacterVisionType.DALL_E_3)
+                .paymentType(PaymentType.FREE)
+                .artwork(artwork)
+                .name(initialCharacterName)
+                .selectionThumbnailUrl(createURL(initialCharacterUrl))
+                .basePrompt("basePrompt")
+                .build();
+        characterRepository.save(initialCharacter);
 
-        Member member = createMember("민서", LocalDate.of(2000, 5, 31), Gender.MALE);
-        memberRepository.save(member);
+        String otherMemberName = "민서";
+        LocalDate otherMemberBirthDate = LocalDate.of(2000, 5, 31);
+        Member otherMember = Member.builder()
+                .name(otherMemberName)
+                .birth(otherMemberBirthDate)
+                .email("minseo@example.com")
+                .gender(Gender.MALE)
+                .role(Role.MEMBER)
+                .build();
+        memberRepository.save(otherMember);
 
-        Diary saveDiary = createDiary(LocalDate.of(2024, 7, 21), character, member);
+        LocalDate diaryDate = LocalDate.of(2024, 7, 21);
+        Diary saveDiary = createDiary(diaryDate, initialCharacter, otherMember);
         diaryRepository.save(saveDiary);
 
         Diary savedDiary = diaryRepository.findById(saveDiary.getId()).get();
 
         String newCharacterName = "오동이";
-        URL newCharacterUrl = new URL("http://오동이.png");
-        String newBasePrompt = "new Base Prompt";
-        Character newCharacter = new Character(CharacterVisionType.STABLE_DIFFUSION, artwork, newCharacterName, newCharacterUrl, newBasePrompt);
+        String newCharacterUrl = "http://오동이.png";
+        Character newCharacter = Character.builder()
+                .characterVisionType(CharacterVisionType.DALL_E_3)
+                .paymentType(PaymentType.FREE)
+                .artwork(artwork)
+                .name(newCharacterName)
+                .selectionThumbnailUrl(createURL(newCharacterUrl))
+                .basePrompt("new Base Prompt")
+                .build();
         characterRepository.save(newCharacter);
 
         // when
-        savedDiary.update("새로운 일기 내용", List.of(1L), newCharacter);
+        String updatedContent = "새로운 일기 내용";
+        List<Long> updatedHashtags = List.of(1L);
+        savedDiary.update(updatedContent, updatedHashtags, newCharacter);
 
         // then
-        assertThat(savedDiary.getContent()).isEqualTo("새로운 일기 내용");
-        assertThat(savedDiary.getHashtagsIds()).isEqualTo(List.of(1L));
+        assertThat(savedDiary.getContent()).isEqualTo(updatedContent);
+        assertThat(savedDiary.getHashtagsIds()).isEqualTo(updatedHashtags);
         assertThat(savedDiary.getCharacter()).isEqualTo(newCharacter);
         assertThat(savedDiary.getCharacter().getName()).isEqualTo(newCharacterName);
-        assertThat(savedDiary.getCharacter().getSelectionThumbnailUrl()).isEqualTo(newCharacterUrl);
-        assertThat(savedDiary.getCharacter().getBasePrompt()).isEqualTo(newBasePrompt);
+        assertThat(savedDiary.getCharacter().getSelectionThumbnailUrl()).isEqualTo(createURL(newCharacterUrl));
+        assertThat(savedDiary.getCharacter().getBasePrompt()).isEqualTo("new Base Prompt");
     }
 
     @DisplayName("일기 그림 이미지 URL 업데이트")
     @Test
-    void updatePaintingImageUrls() throws MalformedURLException {
+    void updatePaintingImageUrls() {
         // given
-        Character character = new Character(CharacterVisionType.DALL_E_3, artwork, "멍멍이", new URL("http://멍멍이.png"), "base Prompt");
         characterRepository.save(character);
 
-        Member member = createMember("민서", LocalDate.of(2000, 5, 31), Gender.MALE);
-        memberRepository.save(member);
+        String otherMemberName = "민서";
+        LocalDate otherMemberBirthDate = LocalDate.of(2000, 5, 31);
+        Member otherMember = Member.builder()
+                .name(otherMemberName)
+                .birth(otherMemberBirthDate)
+                .email("minseo@example.com")
+                .gender(Gender.MALE)
+                .role(Role.MEMBER)
+                .build();
+        memberRepository.save(otherMember);
 
-        Diary saveDiary = createDiary(LocalDate.of(2024, 7, 21), character, member);
+        LocalDate diaryDate = LocalDate.of(2024, 7, 21);
+        Diary saveDiary = createDiary(diaryDate, character, otherMember);
         diaryRepository.save(saveDiary);
 
         String url1 = "http://new1.png";
         String url2 = "http://new2.png";
         String url3 = "http://new3.png";
         String url4 = "http://new4.png";
-        List<URL> updatePaintingImageUrls = List.of(new URL(url1), new URL(url2), new URL(url3), new URL(url4));
+        List<URL> updatePaintingImageUrls = List.of(
+                createURL(url1),
+                createURL(url2),
+                createURL(url3),
+                createURL(url4)
+        );
 
         // when
         saveDiary.updatePaintingImageUrls(updatePaintingImageUrls);
@@ -241,25 +314,23 @@ class DiaryTest {
                 );
     }
 
-    private Diary createDiary(LocalDate diaryDate, Character character, Member member) throws MalformedURLException {
+    private Diary createDiary(LocalDate diaryDate, Character character, Member member) {
         return Diary.builder()
                 .content("Initial content")
                 .diaryDate(diaryDate)
                 .isFavorite(false)
-                .paintingImageUrls(List.of(new URL("http://defaultImage.png")))
+                .paintingImageUrls(List.of(createURL("http://defaultImage.png")))
                 .hashtagsIds(List.of(1L, 2L))
                 .character(character)
                 .memberId(member.getId())
                 .build();
     }
 
-    private Member createMember(String name, LocalDate birthDate, Gender gender) {
-        return Member.builder()
-                .name(name)
-                .birth(birthDate)
-                .email("temp@gmail.com")
-                .gender(gender)
-                .role(Role.MEMBER)
-                .build();
+    private URL createURL(String urlString) {
+        try {
+            return new URL(urlString);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -5,6 +5,7 @@ import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
+import com.startingblue.fourtooncookie.character.domain.PaymentType;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
@@ -61,24 +62,46 @@ class DiaryRepositoryTest {
     @Test
     void saveDiary() throws MalformedURLException {
         // given
+        String memberName = "testUser";
+        String memberEmail = "test@email.com";
+        LocalDate memberBirthDate = LocalDate.of(2024, 7, 23);
+        Gender memberGender = Gender.OTHER;
+        Role memberRole = Role.MEMBER;
+
         Member member = Member.builder()
-                .name("testUser")
-                .email("test@email.com")
-                .birth(LocalDate.of(2024, 7, 23))
-                .gender(Gender.OTHER)
-                .role(Role.MEMBER)
+                .name(memberName)
+                .email(memberEmail)
+                .birth(memberBirthDate)
+                .gender(memberGender)
+                .role(memberRole)
                 .build();
         memberRepository.save(member);
 
-        Character character = new Character(CharacterVisionType.DALL_E_3, artwork, "Test Character", new URL("https://testImagePng.com"), "Test base prompt");
+        String characterName = "Test Character";
+        URL characterUrl = new URL("https://testImagePng.com");
+        String basePrompt = "Test base prompt";
+
+        Character character = Character.builder()
+                .characterVisionType(CharacterVisionType.DALL_E_3)
+                .paymentType(PaymentType.FREE)
+                .artwork(artwork)
+                .name(characterName)
+                .selectionThumbnailUrl(characterUrl)
+                .basePrompt(basePrompt)
+                .build();
         characterRepository.save(character);
 
+        String diaryContent = "Test Content";
+        LocalDate diaryDate = LocalDate.now();
+        URL paintingImageUrl = new URL("https://example.com/image.png");
+        List<Long> hashtagsIds = List.of(1L, 2L, 3L);
+
         Diary diary = Diary.builder()
-                .content("Test Content")
+                .content(diaryContent)
                 .isFavorite(false)
-                .diaryDate(LocalDate.now())
-                .paintingImageUrls(List.of(new URL("https://example.com/image.png")))
-                .hashtagsIds(List.of(1L, 2L, 3L))
+                .diaryDate(diaryDate)
+                .paintingImageUrls(List.of(paintingImageUrl))
+                .hashtagsIds(hashtagsIds)
                 .character(character)
                 .memberId(member.getId())
                 .build();
@@ -88,11 +111,11 @@ class DiaryRepositoryTest {
 
         // then
         assertThat(savedDiary.getId()).isNotNull();
-        assertThat(savedDiary.getContent()).isEqualTo("Test Content");
+        assertThat(savedDiary.getContent()).isEqualTo(diaryContent);
         assertThat(savedDiary.isFavorite()).isFalse();
-        assertThat(savedDiary.getDiaryDate()).isEqualTo(LocalDate.now());
-        assertThat(savedDiary.getPaintingImageUrls()).containsExactly(new URL("https://example.com/image.png"));
-        assertThat(savedDiary.getHashtagsIds()).containsExactly(1L, 2L, 3L);
+        assertThat(savedDiary.getDiaryDate()).isEqualTo(diaryDate);
+        assertThat(savedDiary.getPaintingImageUrls()).containsExactly(paintingImageUrl);
+        assertThat(savedDiary.getHashtagsIds()).containsExactlyElementsOf(hashtagsIds);
         assertThat(savedDiary.getCharacter()).isEqualTo(character);
         assertThat(savedDiary.getMemberId()).isEqualTo(member.getId());
     }
@@ -101,44 +124,76 @@ class DiaryRepositoryTest {
     @Test
     void findAllByMemberWithPagination() throws MalformedURLException {
         // given
+        String memberName = "testUser";
+        String memberEmail = "test@email.com";
+        LocalDate memberBirthDate = LocalDate.of(2024, 7, 23);
+        Gender memberGender = Gender.OTHER;
+        Role memberRole = Role.MEMBER;
+
         Member member = Member.builder()
-                .name("testUser")
-                .email("test@email.com")
-                .birth(LocalDate.of(2024, 7, 23))
-                .gender(Gender.OTHER)
-                .role(Role.MEMBER)
+                .name(memberName)
+                .email(memberEmail)
+                .birth(memberBirthDate)
+                .gender(memberGender)
+                .role(memberRole)
                 .build();
         memberRepository.save(member);
 
-        Character character = new Character(CharacterVisionType.DALL_E_3, artwork, "Test Character", new URL("https://testImagePng.com"), "Test base prompt");
+        String characterName = "Test Character";
+        URL characterUrl = new URL("https://testImagePng.com");
+        String basePrompt = "Test base prompt";
+
+        Character character = Character.builder()
+                .characterVisionType(CharacterVisionType.DALL_E_3)
+                .paymentType(PaymentType.FREE)
+                .artwork(artwork)
+                .name(characterName)
+                .selectionThumbnailUrl(characterUrl)
+                .basePrompt(basePrompt)
+                .build();
         characterRepository.save(character);
 
+        String content1 = "Test Content 1";
+        LocalDate date1 = LocalDate.of(2024, 7, 23);
+        URL imageUrl1 = new URL("https://example.com/image1.png");
+        List<Long> hashtagsIds1 = List.of(1L);
+
+        String content2 = "Test Content 2";
+        LocalDate date2 = LocalDate.of(2024, 7, 24);
+        URL imageUrl2 = new URL("https://example.com/image2.png");
+        List<Long> hashtagsIds2 = List.of(2L);
+
+        String content3 = "Test Content 3";
+        LocalDate date3 = LocalDate.of(2024, 7, 25);
+        URL imageUrl3 = new URL("https://example.com/image3.png");
+        List<Long> hashtagsIds3 = List.of(3L);
+
         Diary diary1 = Diary.builder()
-                .content("Test Content 1")
+                .content(content1)
                 .isFavorite(false)
-                .diaryDate(LocalDate.of(2024, 7, 23))
-                .paintingImageUrls(List.of(new URL("https://example.com/image1.png")))
-                .hashtagsIds(List.of(1L))
+                .diaryDate(date1)
+                .paintingImageUrls(List.of(imageUrl1))
+                .hashtagsIds(hashtagsIds1)
                 .character(character)
                 .memberId(member.getId())
                 .build();
 
         Diary diary2 = Diary.builder()
-                .content("Test Content 2")
+                .content(content2)
                 .isFavorite(false)
-                .diaryDate(LocalDate.of(2024, 7, 24))
-                .paintingImageUrls(List.of(new URL("https://example.com/image2.png")))
-                .hashtagsIds(List.of(2L))
+                .diaryDate(date2)
+                .paintingImageUrls(List.of(imageUrl2))
+                .hashtagsIds(hashtagsIds2)
                 .character(character)
                 .memberId(member.getId())
                 .build();
 
         Diary diary3 = Diary.builder()
-                .content("Test Content 3")
+                .content(content3)
                 .isFavorite(false)
-                .diaryDate(LocalDate.of(2024, 7, 25))
-                .paintingImageUrls(List.of(new URL("https://example.com/image3.png")))
-                .hashtagsIds(List.of(3L))
+                .diaryDate(date3)
+                .paintingImageUrls(List.of(imageUrl3))
+                .hashtagsIds(hashtagsIds3)
                 .character(character)
                 .memberId(member.getId())
                 .build();
@@ -155,6 +210,6 @@ class DiaryRepositoryTest {
         assertThat(diaryPage.getContent()).hasSize(2);
         assertThat(diaryPage.getContent())
                 .extracting(Diary::getContent)
-                .containsExactly("Test Content 3", "Test Content 2");
+                .containsExactly(content3, content2);
     }
 }
