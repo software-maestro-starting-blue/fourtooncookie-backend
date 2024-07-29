@@ -41,9 +41,10 @@ public class CharacterService {
 
     public void modifyCharacter(final Long characterId, final ModifyCharacterRequest request) {
         Character character = findById(characterId);
+        CharacterVisionType visionType = CharacterVisionType.valueOf(request.visionType());
         Artwork artwork = artworkService.findById(request.artworkId());
 
-        character.update(request.visionType(),
+        character.update(visionType,
                 request.paymentType(),
                 artwork,
                 request.name(),
