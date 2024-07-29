@@ -25,32 +25,30 @@ public class CharacterService {
     private final ArtworkService artworkService;
 
     public void addCharacter(final AddCharacterRequest request) {
-        final CharacterVisionType modelType = CharacterVisionType.valueOf(request.characterVisionType());
-        final Artwork artwork = artworkService.findById(request.artworkId());
-        final Character character = new Character(
-                modelType,
-                artwork,
-                request.name(),
-                request.selectionThumbnailUrl(),
-                request.basePrompt()
-        );
+        CharacterVisionType visionType = CharacterVisionType.valueOf(request.characterVisionType());
+        Artwork artwork = artworkService.findById(request.artworkId());
 
+        Character character = Character.builder()
+                .characterVisionType(visionType)
+                .paymentType(request.paymentType())
+                .name(request.name())
+                .artwork(artwork)
+                .selectionThumbnailUrl(request.selectionThumbnailUrl())
+                .basePrompt(request.basePrompt())
+                .build();
         characterRepository.save(character);
     }
 
     public void modifyCharacter(final Long characterId, final ModifyCharacterRequest request) {
-        final Character character = characterRepository
-                .findById(characterId)
-                .orElseThrow(CharacterNoSuchElementException::new);
-        final CharacterVisionType modelType = CharacterVisionType.valueOf(request.modelType());
-        final Artwork artwork = artworkService.findById(request.artworkId());
+        Character character = findById(characterId);
+        Artwork artwork = artworkService.findById(request.artworkId());
 
-        character.update(modelType,
+        character.update(request.visionType(),
+                request.paymentType(),
                 artwork,
                 request.name(),
                 request.selectionThumbnailUrl(),
                 request.basePrompt());
-
         characterRepository.save(character);
     }
 
@@ -66,7 +64,7 @@ public class CharacterService {
         return new CharacterResponses(characters.stream()
                 .map(character -> new CharacterResponse(
                         character.getId(),
-                        character.getCharacterVisionType().name(),
+                        character.getPaymentType().name(),
                         character.getArtwork().getTitle(),
                         character.getArtwork().getThumbnailUrl(),
                         character.getName(),
