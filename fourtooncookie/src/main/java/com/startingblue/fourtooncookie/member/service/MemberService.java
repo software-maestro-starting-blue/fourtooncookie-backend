@@ -24,4 +24,11 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    public void verifyMemberExists(UUID memberId) {
+        boolean existsById = memberRepository.existsById(memberId);
+        if (!existsById) {
+            throw new IllegalArgumentException("Member ID not found: " + memberId);
+        }
+    }
+
 }
