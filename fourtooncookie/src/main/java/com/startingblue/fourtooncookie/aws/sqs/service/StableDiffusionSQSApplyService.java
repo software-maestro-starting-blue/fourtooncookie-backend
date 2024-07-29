@@ -37,7 +37,7 @@ public class StableDiffusionSQSApplyService {
             ObjectNode rootNode = objectMapper.createObjectNode();
             rootNode.put("diaryId", diaryId);
             rootNode.put("prompt", prompt);
-            rootNode.put("character", character.getName());
+            rootNode.put("characterId", character.getId());
             rootNode.put("gridPosition", gridPosition);
 
             return objectMapper.writeValueAsString(rootNode);
