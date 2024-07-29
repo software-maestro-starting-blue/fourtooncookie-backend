@@ -25,6 +25,7 @@ public class StableDiffusionSQSApplyService {
         SendMessageRequest sendMessageRequest = SendMessageRequest.builder()
                 .queueUrl(applyQueueUrl)
                 .messageBody(message)
+                .messageGroupId("apply")
                 .build();
 
         sqsClient.sendMessage(sendMessageRequest);
