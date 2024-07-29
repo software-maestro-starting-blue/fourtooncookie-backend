@@ -14,6 +14,8 @@ import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class StableDiffusionSQSReplyService {
@@ -30,6 +32,16 @@ public class StableDiffusionSQSReplyService {
 
     @Scheduled(fixedDelay = 1L)
     public void handleMessages() {
+        List<Message> messages = getMessagesFromSQS();
+
+        messages.forEach(message -> {
+                    VisionReplyEvent visionReplyEvent = convertMessageToVisionReplyEvent(message.body());
+                    applicationEventPublisher.publishEvent(visionReplyEvent);
+                    deleteMessage(message);
+                });
+    }
+
+    private List<Message> getMessagesFromSQS() {
         ReceiveMessageRequest receiveMessageRequest = ReceiveMessageRequest.builder()
                 .queueUrl(replyQueueUrl)
                 .maxNumberOfMessages(maxMessageCount)
@@ -37,12 +49,7 @@ public class StableDiffusionSQSReplyService {
 
         ReceiveMessageResponse receiveMessageResponse = sqsClient.receiveMessage(receiveMessageRequest);
 
-        receiveMessageResponse.messages()
-                .forEach(message -> {
-                    VisionReplyEvent visionReplyEvent = convertMessageToVisionReplyEvent(message.body());
-                    applicationEventPublisher.publishEvent(visionReplyEvent);
-                    deleteMessage(message);
-                });
+        return receiveMessageResponse.messages();
     }
 
     private VisionReplyEvent convertMessageToVisionReplyEvent(String message) {
