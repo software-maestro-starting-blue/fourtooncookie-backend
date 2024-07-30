@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.s3.service;
+package com.startingblue.fourtooncookie.aws.s3.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
