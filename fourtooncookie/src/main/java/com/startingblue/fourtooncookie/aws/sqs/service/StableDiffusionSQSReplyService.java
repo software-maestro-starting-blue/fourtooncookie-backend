@@ -24,6 +24,8 @@ public class StableDiffusionSQSReplyService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    private final ObjectMapper objectMapper;
+
     @Value("${aws.sqs.reply.url}")
     private String replyQueueUrl;
 
@@ -53,7 +55,6 @@ public class StableDiffusionSQSReplyService {
     }
 
     private VisionReplyEvent convertMessageToVisionReplyEvent(String message) {
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
             JsonNode rootNode = objectMapper.readTree(message);
 

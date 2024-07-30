@@ -16,6 +16,8 @@ public class StableDiffusionSQSApplyService {
 
     private final SqsClient sqsClient;
 
+    private final ObjectMapper objectMapper;
+
     @Value("${aws.sqs.apply.url}")
     private String applyQueueUrl;
 
@@ -33,7 +35,6 @@ public class StableDiffusionSQSApplyService {
 
     private String generateMessage(Long diaryId, String prompt, Character character, Integer gridPosition) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode rootNode = objectMapper.createObjectNode();
             rootNode.put("diaryId", diaryId);
             rootNode.put("prompt", prompt);
