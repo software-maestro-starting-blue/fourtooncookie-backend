@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URL;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -53,5 +54,18 @@ public class Artwork {
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Artwork artwork = (Artwork) o;
+        return Objects.equals(id, artwork.id) && Objects.equals(title, artwork.title) && Objects.equals(thumbnailUrl, artwork.thumbnailUrl);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, thumbnailUrl);
     }
 }
