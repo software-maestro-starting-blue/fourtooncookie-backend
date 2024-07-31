@@ -34,7 +34,7 @@ public class AuthenticationFilter extends HttpFilter {
             Claims claims = parseToken(token);
             UUID memberId = UUID.fromString(claims.getSubject());
 
-            if (memberService.isMemberExists(memberId)) {
+            if (memberService.verifyMemberExists(memberId)) {
                 request.setAttribute("memberId", memberId);
                 chain.doFilter(request, response);
             } else {
