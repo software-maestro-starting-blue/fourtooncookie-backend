@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -16,8 +17,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
-@SpringBootTest
-@Transactional
+@DataJpaTest
 class ArtworkRepositoryTest {
 
     @Autowired
@@ -25,7 +25,7 @@ class ArtworkRepositoryTest {
 
     @DisplayName("새로운 작품을 저장한다.")
     @Test
-    public void saveArtwork() throws MalformedURLException {
+    public void save() throws MalformedURLException {
         // Given
         String newTitle = "New Artwork";
         URL newUrl = new URL("http://test.com/newimage.jpg");
@@ -88,7 +88,7 @@ class ArtworkRepositoryTest {
 
     @DisplayName("저장된 작품을 업데이트한다.")
     @Test
-    public void updateArtwork() throws MalformedURLException {
+    public void update() throws MalformedURLException {
         // Given
         String oldTitle = "Old Title";
         URL oldUrl = new URL("http://test.com/oldimage.jpg");
@@ -112,7 +112,7 @@ class ArtworkRepositoryTest {
 
     @DisplayName("저장된 작품을 삭제한다.")
     @Test
-    public void deleteById() throws MalformedURLException {
+    public void delete() throws MalformedURLException {
         // Given
         String title = "Title";
         URL url = new URL("http://test.com/newimage.jpg");
