@@ -48,10 +48,12 @@ public class MemberService {
         return memberRepository.findById(memberId).orElseThrow(() -> new EntityNotFoundException("member not found"));
     }
 
-    public void isMemberExists(UUID memberId) {
+    public boolean isMemberExists(UUID memberId) {
         boolean existsById = memberRepository.existsById(memberId);
-        if (existsById) {
-            throw new EntityExistsException("Member ID exists: " + memberId);
+        if (!existsById) {
+            return false;
         }
+
+        return true;
     }
 }
