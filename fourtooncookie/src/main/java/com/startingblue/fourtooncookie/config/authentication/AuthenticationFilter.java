@@ -32,7 +32,7 @@ public class AuthenticationFilter extends HttpFilter {
             String token = jwtExtractor.resolveToken(request);
             Claims claims = parseToken(token);
             UUID memberId = UUID.fromString(claims.getSubject());
-            memberService.verifyMemberExists(memberId);
+            memberService.isMemberExists(memberId);
 
             request.setAttribute("memberId", memberId);
             chain.doFilter(request, response);

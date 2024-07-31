@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RestController
@@ -18,13 +17,13 @@ public final class MemberController {
 
     @GetMapping("/member/{memberId}")
     public ResponseEntity<MemberSavedResponse> readMember(@PathVariable final UUID memberId) {
-        MemberSavedResponse memberSavedResponse = memberService.readById(memberId);
+        MemberSavedResponse memberSavedResponse = memberService.getById(memberId);
         return ResponseEntity.ok(memberSavedResponse);
     }
 
     @PatchMapping("/member/{memberId}")
     public ResponseEntity<Void> updateMember(@PathVariable final UUID memberId, final MemberUpdateRequest memberUpdateRequest) {
-        memberService.updateById(memberId, memberUpdateRequest);
+        memberService.update(memberId, memberUpdateRequest);
         return ResponseEntity
                 .noContent()
                 .build();
@@ -32,8 +31,7 @@ public final class MemberController {
 
     @DeleteMapping("/member/{memberId}")
     public ResponseEntity<Void> softDeleteMember(@PathVariable final UUID memberId) {
-        LocalDateTime deleteLocalDateTime = LocalDateTime.now();
-        memberService.softDeleteById(memberId, deleteLocalDateTime);
+        memberService.softDelete(memberId);
         return ResponseEntity
                 .noContent()
                 .build();

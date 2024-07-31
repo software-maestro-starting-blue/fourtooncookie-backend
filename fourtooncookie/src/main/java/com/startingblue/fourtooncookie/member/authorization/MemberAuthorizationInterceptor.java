@@ -14,6 +14,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+
 @RequiredArgsConstructor
 @Component
 @Slf4j
@@ -26,22 +29,34 @@ public final class MemberAuthorizationInterceptor implements HandlerInterceptor 
     @Override
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) {
         final String token = jwtExtractor.resolveToken(request);
-        if (!token.isEmpty()) {
-            final Claims claims = jwtExtractor.parseToken(token);
-            final UUID memberId = UUID.fromString(claims.getSubject());
-
-            final Map<String, String> pathVariables = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-            if (Objects.isNull(pathVariables.get(PATH_VARIABLE_KEY))) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                return false;
-            }
-            final UUID pathVariableMemberID = UUID.fromString(pathVariables.get(PATH_VARIABLE_KEY));
-
-            if (Objects.equals(memberId, pathVariableMemberID)) {
-                return true;
-            }
+        if (token.isEmpty()) {
+            response.setStatus(SC_FORBIDDEN);
+            return false;
         }
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+
+        final Claims claims = jwtExtractor.parseToken(token);
+        final UUID memberId = UUID.fromString(claims.getSubject());
+
+        final Map<String, String> pathVariables = getPathVariables(request);
+        if (!pathVariables.containsKey(PATH_VARIABLE_KEY)) {
+            response.setStatus(SC_NOT_FOUND);
+            return false;
+        }
+
+        final UUID pathVariableMemberID = UUID.fromString(pathVariables.get(PATH_VARIABLE_KEY));
+        if (isAuthorized(memberId, pathVariableMemberID)) {
+            return true;
+        }
+
+        response.setStatus(SC_FORBIDDEN);
         return false;
+    }
+
+    private Map<String, String> getPathVariables(final HttpServletRequest request) {
+        return (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+    }
+
+    private boolean isAuthorized(final UUID memberId, final UUID pathVariableMemberID) {
+        return Objects.equals(memberId, pathVariableMemberID);
     }
 }

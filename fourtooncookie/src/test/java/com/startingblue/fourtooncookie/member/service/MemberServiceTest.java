@@ -33,7 +33,7 @@ public class MemberServiceTest {
 
     @Test
     @DisplayName("supabase에 저장된 멤버를 찾는다.")
-    void readById() {
+    void getById() {
         // given
         UUID memberId = UUID.randomUUID();
         String email = "test@example.com";
@@ -53,7 +53,7 @@ public class MemberServiceTest {
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
         // then
-        MemberSavedResponse memberSavedResponse = memberService.readById(memberId);
+        MemberSavedResponse memberSavedResponse = memberService.getById(memberId);
         assertThat(memberSavedResponse).isNotNull();
         assertThat(memberSavedResponse.email()).isEqualTo(email);
         assertThat(memberSavedResponse.name()).isEqualTo(name);
@@ -63,7 +63,7 @@ public class MemberServiceTest {
 
     @Test
     @DisplayName("supabase에 있는 멤버 정보를 수정한다.")
-    void updateById() {
+    void update() {
         UUID memberId = UUID.randomUUID();
         String oldEmail = "oldemail@example.com";
         String oldName = "Old Name";
@@ -87,12 +87,12 @@ public class MemberServiceTest {
         when(memberRepository.save(member)).thenReturn(member);
 
         MemberUpdateRequest updateRequest = new MemberUpdateRequest(newName, newBirth, newGender);
-        memberService.updateById(memberId, updateRequest);
+        memberService.update(memberId, updateRequest);
         Member updatedMember = memberRepository.findById(memberId).orElse(null);
 
         // then
         assertThat(updatedMember).isNotNull();
-        assertThat(updatedMember.getEmail()).isEqualTo(oldEmail); // Email is not updated in the updateById method
+        assertThat(updatedMember.getEmail()).isEqualTo(oldEmail); // Email is not updated in the update method
         assertThat(updatedMember.getName()).isEqualTo(newName);
         assertThat(updatedMember.getBirth()).isEqualTo(newBirth);
         assertThat(updatedMember.getGender()).isEqualTo(newGender);
@@ -118,7 +118,7 @@ public class MemberServiceTest {
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
         LocalDateTime current = LocalDateTime.now();
-        memberService.softDeleteById(memberId, current);
+        memberService.softDelete(memberId, current);
 
         Member deletedMember = memberRepository.findById(memberId).orElse(null);
         assertThat(deletedMember).isNotNull();
@@ -146,7 +146,7 @@ public class MemberServiceTest {
 
         LocalDateTime future = LocalDateTime.now().plusDays(1);
 
-        assertThatThrownBy(() -> memberService.softDeleteById(memberId, future))
+        assertThatThrownBy(() -> memberService.softDelete(memberId, future))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Current time cannot be after current time");
     }
@@ -171,7 +171,7 @@ public class MemberServiceTest {
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
         LocalDateTime past = LocalDateTime.now().minusDays(1);
-        memberService.softDeleteById(memberId, past);
+        memberService.softDelete(memberId, past);
 
         Member deletedMember = memberRepository.findById(memberId).orElse(null);
         assertThat(deletedMember).isNotNull();
@@ -197,7 +197,7 @@ public class MemberServiceTest {
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
-        assertThatThrownBy(() -> memberService.softDeleteById(memberId, null))
+        assertThatThrownBy(() -> memberService.softDelete(memberId, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Current time cannot be null");
     }
