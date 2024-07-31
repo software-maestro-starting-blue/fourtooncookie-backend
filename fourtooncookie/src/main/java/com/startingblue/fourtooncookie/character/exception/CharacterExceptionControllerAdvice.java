@@ -40,4 +40,10 @@ public class CharacterExceptionControllerAdvice {
     public String handleIllegalArgumentException(IllegalArgumentException e) {
         return e.getMessage();
     }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleException(Exception e) {
+        return e.getMessage();
+    }
 }
