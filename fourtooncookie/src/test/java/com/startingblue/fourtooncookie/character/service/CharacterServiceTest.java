@@ -55,7 +55,6 @@ class CharacterServiceTest {
         Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
         Character character = Character.builder()
                 .characterVisionType(characterVisionType)
-                .paymentType(request.paymentType())
                 .artwork(artwork)
                 .name(request.name())
                 .selectionThumbnailUrl(request.selectionThumbnailUrl())
@@ -84,7 +83,6 @@ class CharacterServiceTest {
         String basePrompt = "This is a base prompt";
         Character character = Character.builder()
                 .characterVisionType(CharacterVisionType.DALL_E_3)
-                .paymentType(PaymentType.FREE)
                 .artwork(new Artwork("Test Artwork", new URL("https://test.png")))
                 .name("멍멍이")
                 .selectionThumbnailUrl(new URL("https://멍멍이-dalle3.png"))
@@ -129,7 +127,7 @@ class CharacterServiceTest {
 
         Character character2 = Character.builder()
                 .characterVisionType(CharacterVisionType.STABLE_DIFFUSION)
-                .paymentType(PaymentType.PAID)
+                .paymentType(PaymentType.FREE)
                 .artwork(new Artwork("Test2 Artwork", new URL("https://test2.png")))
                 .name("멍멍이2")
                 .selectionThumbnailUrl(new URL("https://test2.png"))
@@ -183,7 +181,6 @@ class CharacterServiceTest {
         Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
         Character character = Character.builder()
                 .characterVisionType(CharacterVisionType.DALL_E_3)
-                .paymentType(PaymentType.FREE)
                 .artwork(artwork)
                 .name("멍멍이")
                 .selectionThumbnailUrl(new URL("https://멍멍이-dalle3.png"))
@@ -202,18 +199,8 @@ class CharacterServiceTest {
         // when
         when(characterRepository.findById(characterId)).thenReturn(Optional.of(character));
         when(artworkService.findById(request.artworkId())).thenReturn(updateArtwork);
-
-        Character updatedCharacter = character.update(
-                CharacterVisionType.valueOf(updateCharacterVisionType),
-                PaymentType.FREE,
-                updateArtwork,
-                updateCharacterName,
-                updateUrl,
-                updatedBasePrompt
-        );
-
-        when(characterRepository.save(any(Character.class))).thenReturn(updatedCharacter);
         characterService.modifyCharacter(characterId, request);
+        Character updatedCharacter = characterService.findById(characterId);
 
         // then
         assertThat(updatedCharacter.getCharacterVisionType()).isEqualTo(CharacterVisionType.valueOf(updateCharacterVisionType));
@@ -221,7 +208,7 @@ class CharacterServiceTest {
         assertThat(updatedCharacter.getSelectionThumbnailUrl()).isEqualTo(updateUrl);
         assertThat(updatedCharacter.getBasePrompt()).isEqualTo(updatedBasePrompt);
         assertThat(updatedCharacter.getArtwork()).isEqualTo(updateArtwork);
-        verify(characterRepository, times(1)).save(any(Character.class));
+        verify(characterRepository, times(1)).save(character);
     }
 
     @DisplayName("존재하지 않는 캐릭터는 수정하지 못한다.")
@@ -235,7 +222,6 @@ class CharacterServiceTest {
         URL updateUrl = new URL("https://test.png");
         String updatedBasePrompt = "This is a base prompt";
         ModifyCharacterRequest request = new ModifyCharacterRequest(updateCharacterVisionType, PaymentType.FREE, updateArtworkId, updateCharacterName, updateUrl, updatedBasePrompt);
-
 
         // when & then
         when(characterRepository.findById(notFoundCharacterId)).thenReturn(Optional.empty());
