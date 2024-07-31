@@ -53,7 +53,7 @@ public class DiaryService {
 
     public void createDiary(final DiarySaveRequest request, final UUID memberId) {
         Character character = characterService.findById(request.characterId());
-        Member member = memberService.findMemberOrThrow(memberId);
+        Member member = memberService.findById(memberId);
         Diary diary = Diary.builder()
                 .content(request.content())
                 .isFavorite(false)
@@ -68,7 +68,7 @@ public class DiaryService {
     }
 
     public List<DiarySavedResponse> readDiariesByMember(final UUID memberId, final int pageNumber, final int pageSize) {
-        Member foundMember = memberService.findMemberOrThrow(memberId);
+        Member foundMember = memberService.findById(memberId);
         Page<Diary> diaries = diaryRepository.findAllByMemberIdOrderByDiaryDateDesc(foundMember.getId(), PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "diaryDate")));
         return diaries.stream()
                 .map(DiarySavedResponse::of)
