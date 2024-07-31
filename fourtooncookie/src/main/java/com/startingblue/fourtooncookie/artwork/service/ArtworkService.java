@@ -6,7 +6,6 @@ import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkSaveRequest;
 import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkUpdateRequest;
 import com.startingblue.fourtooncookie.artwork.exception.ArtworkDuplicateException;
 import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
