@@ -1,6 +1,8 @@
 package com.startingblue.fourtooncookie.artwork.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -10,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URL;
+import java.util.Set;
 
 @Entity
 @Slf4j
@@ -23,6 +26,7 @@ public class Artwork {
     @Column(name = "artwork_id")
     private Long id;
 
+    @NotBlank(message = "작품명은 필수 입니다.")
     @Size(min = 1, max = 255, message = "작품명의 글자수는 1에서 255자 이내여야 합니다.")
     private String title;
 
@@ -33,10 +37,21 @@ public class Artwork {
     public Artwork(final String title, final URL thumbnailUrl) {
         this.title = title;
         this.thumbnailUrl = thumbnailUrl;
+        validate();
     }
 
     public void update(final String title, final URL thumbnailUrl) {
         this.title = title;
         this.thumbnailUrl = thumbnailUrl;
+        validate();
+    }
+
+    private void validate() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+        Set<ConstraintViolation<Artwork>> violations = validator.validate(this);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
     }
 }
