@@ -10,6 +10,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URL;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -79,5 +80,18 @@ public class Character {
             character.validate();
             return character;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Character character = (Character) o;
+        return Objects.equals(id, character.id) && characterVisionType == character.characterVisionType && paymentType == character.paymentType && Objects.equals(artwork, character.artwork) && Objects.equals(name, character.name) && Objects.equals(selectionThumbnailUrl, character.selectionThumbnailUrl) && Objects.equals(basePrompt, character.basePrompt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, characterVisionType, paymentType, artwork, name, selectionThumbnailUrl, basePrompt);
     }
 }
