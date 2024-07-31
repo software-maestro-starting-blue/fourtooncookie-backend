@@ -2,8 +2,8 @@ package com.startingblue.fourtooncookie.member.service;
 
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
-import com.startingblue.fourtooncookie.member.dto.MemberSavedResponse;
-import com.startingblue.fourtooncookie.member.dto.MemberUpdateRequest;
+import com.startingblue.fourtooncookie.member.dto.response.MemberSavedResponse;
+import com.startingblue.fourtooncookie.member.dto.request.MemberUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,8 +28,7 @@ public class MemberService {
     }
 
     public MemberSavedResponse readById(UUID memberId) {
-        Member member = findById(memberId);
-        return MemberSavedResponse.of(member.getEmail(), member.getName(), member.getGender(), member.getBirth());
+        return MemberSavedResponse.of(findById(memberId));
     }
 
 
