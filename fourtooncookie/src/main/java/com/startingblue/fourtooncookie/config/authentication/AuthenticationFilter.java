@@ -38,7 +38,7 @@ public class AuthenticationFilter extends HttpFilter {
                 request.setAttribute("memberId", memberId);
                 chain.doFilter(request, response);
             } else {
-                   throw new EntityNotFoundException();
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, String.format("Member with id %s not found", memberId));
             }
         } catch (AuthenticationException e) {
             exceptionHandler.handleAuthenticationException(e, response);
