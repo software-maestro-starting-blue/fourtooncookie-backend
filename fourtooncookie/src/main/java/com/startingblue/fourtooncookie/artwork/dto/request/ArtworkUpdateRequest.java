@@ -7,6 +7,6 @@ import jakarta.validation.constraints.Size;
 import java.net.URL;
 
 public record ArtworkUpdateRequest(
-        @NotBlank @Size(max = 255) String title,
-        @NotNull URL thumnailUrl) {
+        @NotBlank @Size(min = 1, max = 255) String title,
+        @NotNull(message = "작품 썸네일 URL이 존재해야 합니다.") URL thumbnailUrl) {
 }
