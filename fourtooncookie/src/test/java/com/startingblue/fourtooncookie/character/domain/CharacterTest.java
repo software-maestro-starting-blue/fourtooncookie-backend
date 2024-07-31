@@ -13,7 +13,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
 public class CharacterTest {
@@ -64,7 +64,7 @@ public class CharacterTest {
         String name = "";
         String basePrompt = "Base Prompt";
 
-        assertThrows(ConstraintViolationException.class, () -> {
+        assertThatThrownBy(() -> {
             Character.builder()
                     .characterVisionType(visionType)
                     .paymentType(paymentType)
@@ -73,7 +73,8 @@ public class CharacterTest {
                     .selectionThumbnailUrl(validUrl)
                     .basePrompt(basePrompt)
                     .build();
-        });
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("캐릭터 이름은 필수 입니다.");
     }
 
     @Test
@@ -84,7 +85,7 @@ public class CharacterTest {
         String name = "ValidName";
         String basePrompt = "Base Prompt";
 
-        assertThrows(ConstraintViolationException.class, () -> {
+        assertThatThrownBy(() -> {
             Character.builder()
                     .characterVisionType(visionType)
                     .paymentType(paymentType)
@@ -93,7 +94,8 @@ public class CharacterTest {
                     .selectionThumbnailUrl(validUrl)
                     .basePrompt(basePrompt)
                     .build();
-        });
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("캐릭터 작품은 필수 입니다.");
     }
 
     @Test
@@ -104,7 +106,7 @@ public class CharacterTest {
         String name = "ValidName";
         String basePrompt = "Base Prompt";
 
-        assertThrows(ConstraintViolationException.class, () -> {
+        assertThatThrownBy(() -> {
             Character.builder()
                     .characterVisionType(visionType)
                     .paymentType(paymentType)
@@ -113,7 +115,8 @@ public class CharacterTest {
                     .selectionThumbnailUrl(null)
                     .basePrompt(basePrompt)
                     .build();
-        });
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("캐릭터 선택 썸네일 URL은 필수 입니다.");
     }
 
     @Test
@@ -124,7 +127,7 @@ public class CharacterTest {
         String name = "ValidName";
         String basePrompt = "";
 
-        assertThrows(ConstraintViolationException.class, () -> {
+        assertThatThrownBy(() -> {
             Character.builder()
                     .characterVisionType(visionType)
                     .paymentType(paymentType)
@@ -133,7 +136,8 @@ public class CharacterTest {
                     .selectionThumbnailUrl(validUrl)
                     .basePrompt(basePrompt)
                     .build();
-        });
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("캐릭터 기본 프롬프트는 필수 입니다.");
     }
 
     @Test
@@ -143,7 +147,7 @@ public class CharacterTest {
         String name = "ValidName";
         String basePrompt = "Base Prompt";
 
-        assertThrows(ConstraintViolationException.class, () -> {
+        assertThatThrownBy(() -> {
             Character.builder()
                     .characterVisionType(visionType)
                     .paymentType(null)
@@ -152,7 +156,8 @@ public class CharacterTest {
                     .selectionThumbnailUrl(validUrl)
                     .basePrompt(basePrompt)
                     .build();
-        });
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("캐릭터 결제 유형은 필수 입니다.");
     }
 
     @Test
@@ -162,7 +167,7 @@ public class CharacterTest {
         String name = "ValidName";
         String basePrompt = "Base Prompt";
 
-        assertThrows(ConstraintViolationException.class, () -> {
+        assertThatThrownBy(() -> {
             Character.builder()
                     .characterVisionType(null)
                     .paymentType(paymentType)
@@ -171,7 +176,8 @@ public class CharacterTest {
                     .selectionThumbnailUrl(validUrl)
                     .basePrompt(basePrompt)
                     .build();
-        });
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("캐릭터 비전 유형은 필수 입니다");
     }
 
     @Test
@@ -228,8 +234,9 @@ public class CharacterTest {
         String newName = "";
         String newBasePrompt = "New Prompt";
 
-        assertThrows(ConstraintViolationException.class, () -> {
+        assertThatThrownBy(() -> {
             character.update(newVisionType, newPaymentType, artwork, newName, validUrl, newBasePrompt);
-        });
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("캐릭터 이름은 필수 입니다.");
     }
 }
