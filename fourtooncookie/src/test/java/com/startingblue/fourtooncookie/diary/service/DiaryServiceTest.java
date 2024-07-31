@@ -12,7 +12,9 @@ import com.startingblue.fourtooncookie.diary.dto.request.DiaryPaintingImagesUpda
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
-import com.startingblue.fourtooncookie.diary.exception.DiaryNoSuchElementException;
+import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponses;
+import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
+import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
@@ -30,6 +32,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -80,7 +83,7 @@ class DiaryServiceTest {
         memberRepository.save(member);
     }
 
-    @DisplayName("사용자가 작성한 일기를 저장한다.")
+    @DisplayName("작성한 일기를 저장한다.")
     @Test
     void createDiaryTest() {
         // given
@@ -100,6 +103,31 @@ class DiaryServiceTest {
         assertThat(savedDiary.getCharacter()).isEqualTo(character);
         assertThat(savedDiary.getMemberId()).isEqualTo(member.getId());
     }
+
+    @Test
+    @DisplayName("중복 일기 작성시 DiaryDuplicateException")
+    void testVerifyUniqueDiaryEntry_Duplicate() throws MalformedURLException {
+        // given
+        LocalDate duplicatedDiaryDate = LocalDate.of(2024, 7, 21);
+        UUID duplicatedMemberId = UUID.randomUUID();
+
+        Diary diary = Diary.builder()
+                .content("Test Content")
+                .isFavorite(false)
+                .diaryDate(duplicatedDiaryDate)
+                .paintingImageUrls(List.of(new URL("https://example.com/image.png")))
+                .hashtagsIds(List.of(1L))
+                .character(character)
+                .memberId(duplicatedMemberId)
+                .build();
+
+        // when & then
+        diaryRepository.save(diary);
+        assertThatThrownBy(() -> diaryService.verifyUniqueDiaryEntry(duplicatedMemberId, duplicatedDiaryDate))
+                .isInstanceOf(DiaryDuplicateException.class)
+                .hasMessageContaining("이미 " + duplicatedDiaryDate + "에 일기를 작성하셨습니다.");
+    }
+
 
     @DisplayName("저장된 일기를 삭제한다.")
     @Test
@@ -138,7 +166,7 @@ class DiaryServiceTest {
 
         // when & then
         assertThatThrownBy(() -> diaryService.findById(unsavedDiaryId))
-                .isInstanceOf(DiaryNoSuchElementException.class);
+                .isInstanceOf(DiaryNotFoundException.class);
     }
 
     @DisplayName("회원의 일기 목록을 페이지 단위로 읽어온다.")
@@ -151,9 +179,11 @@ class DiaryServiceTest {
         }
 
         // when
-        List<DiarySavedResponse> diariesPage1 = diaryService.readDiariesByMember(member.getId(), 0, 5);
-        List<DiarySavedResponse> diariesPage2 = diaryService.readDiariesByMember(member.getId(), 1, 5);
+        DiarySavedResponses diariesPages1 = DiarySavedResponses.of(diaryService.readDiariesByMember(member.getId(), 0, 5));
+        DiarySavedResponses diariesPages2 = DiarySavedResponses.of(diaryService.readDiariesByMember(member.getId(), 1, 5));
 
+        List<DiarySavedResponse> diariesPage1 = diariesPages1.diarySavedResponses();
+        List<DiarySavedResponse> diariesPage2 = diariesPages2.diarySavedResponses();
         // then
         assertThat(diariesPage1).hasSize(5);
         assertThat(diariesPage1.get(0).content()).isEqualTo("Content 10");
