@@ -1,94 +1,132 @@
 package com.startingblue.fourtooncookie.artwork.domain;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
-import org.junit.jupiter.api.BeforeAll;
+import jakarta.validation.ConstraintViolationException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class ArtworkTest {
+public class ArtworkTest {
 
-    static Validator validator;
+    private URL validUrl;
+    private URL newUrl;
 
-    @BeforeAll
-    public static void setUpValidator() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+    @BeforeEach
+    public void setUp() throws MalformedURLException {
+        validUrl = new URL("http://example.com/thumbnail.png");
+        newUrl = new URL("http://example.com/new-thumbnail.png");
     }
 
-    @DisplayName("유효한 작품 객체 생성 테스트")
     @Test
-    void createValidArtwork() throws MalformedURLException {
-        // Given
-        String title = "Valid Title";
-        URL thumbnailUrl = new URL("http://test.com/image.jpg");
+    @DisplayName("유효한 Artwork 객체 생성")
+    public void validArtworkCreation() {
+        String title = "ValidTitle";
 
-        // When
-        Artwork artwork = new Artwork(title, thumbnailUrl);
+        Artwork artwork = new Artwork(title, validUrl);
 
-        // Then
+        assertThat(artwork).isNotNull();
         assertThat(artwork.getTitle()).isEqualTo(title);
-        assertThat(artwork.getThumbnailUrl()).isEqualTo(thumbnailUrl);
+        assertThat(artwork.getThumbnailUrl()).isEqualTo(validUrl);
     }
 
-    @DisplayName("유효하지 않은 작품명으로 작품 객체 생성 시도시 예외 발생")
     @Test
-    void createArtworkWithInvalidTitle() throws MalformedURLException {
-        // Given
-        String invalidTitle = "";
-        URL thumbnailUrl = new URL("http://test.com/image.jpg");
+    @DisplayName("제목이 빈 문자열인 Artwork 객체 생성시 ConstraintViolationException")
+    public void testInvalidArtworkCreation_TitleBlank() {
+        String title = "";
 
-        // When
-        Artwork artwork = new Artwork(invalidTitle, thumbnailUrl);
-        Set<ConstraintViolation<Artwork>> violations = validator.validate(artwork);
-
-        // Then
-        assertThat(violations).hasSize(1);
-        ConstraintViolation<Artwork> violation = violations.iterator().next();
-        assertThat(violation.getMessage()).isEqualTo("작품명의 글자수는 1에서 255자 이내여야 합니다.");
+        assertThatThrownBy(() -> new Artwork(title, validUrl))
+                .isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("작품명은 필수 입니다.");
     }
 
-    @DisplayName("유효하지 않은 URL로 작품 객체 생성 시도시 예외 발생")
     @Test
-    void createArtworkWithInvalidUrl() {
-        // Given
-        String title = "Valid Title";
-        URL invalidUrl = null;
+    @DisplayName("제목이 null인 Artwork 객체 생성시 ConstraintViolationException")
+    public void testInvalidArtworkCreation_TitleNull() {
+        String title = null;
 
-        // When
-        Artwork artwork = new Artwork(title, invalidUrl);
-        Set<ConstraintViolation<Artwork>> violations = validator.validate(artwork);
-
-        // Then
-        assertThat(violations).hasSize(1);
-        ConstraintViolation<Artwork> violation = violations.iterator().next();
-        assertThat(violation.getMessage()).isEqualTo("작품 썸네일 URL이 존재해야 합니다.");
+        assertThatThrownBy(() -> new Artwork(title, validUrl))
+                .isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("작품명은 필수 입니다.");
     }
 
-    @DisplayName("작품 객체 업데이트 테스트")
     @Test
-    void updateArtwork() throws MalformedURLException {
-        // Given
-        String oldTitle = "Old Title";
-        URL oldUrl = new URL("http://test.com/oldimage.jpg");
-        Artwork artwork = new Artwork(oldTitle, oldUrl);
+    @DisplayName("썸네일 URL이 null인 Artwork 객체 생성 시 ConstraintViolationException")
+    public void testInvalidArtworkCreation_ThumbnailUrlNull() {
+        String title = "ValidTitle";
 
-        String newTitle = "New Title";
-        URL newUrl = new URL("http://test.com/newimage.jpg");
+        assertThatThrownBy(() -> new Artwork(title, null))
+                .isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("작품 썸네일 URL이 존재해야 합니다.");
+    }
 
-        // When
+    @Test
+    @DisplayName("제목이 256자 이상인 Artwork 객체 생성 시 ConstraintViolationException")
+    public void testInvalidArtworkCreation_TitleTooLong() {
+        String longTitle = "a".repeat(256);
+
+        assertThatThrownBy(() -> new Artwork(longTitle, validUrl))
+                .isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("작품명의 글자수는 1에서 255자 이내여야 합니다.");
+    }
+
+    @Test
+    @DisplayName("Artwork 객체 업데이트 테스트")
+    public void testUpdateArtwork() {
+        String initialTitle = "OldTitle";
+        Artwork artwork = new Artwork(initialTitle, validUrl);
+
+        String newTitle = "NewTitle";
+
         artwork.update(newTitle, newUrl);
 
-        // Then
         assertThat(artwork.getTitle()).isEqualTo(newTitle);
         assertThat(artwork.getThumbnailUrl()).isEqualTo(newUrl);
+    }
+
+    @Test
+    @DisplayName("업데이트 시 제목이 빈 문자열일 때 Artwork 객체 업데이트 테스트")
+    public void testUpdateArtwork_InvalidTitle() {
+        String initialTitle = "OldTitle";
+        Artwork artwork = new Artwork(initialTitle, validUrl);
+
+        String newTitle = "";
+
+        assertThatThrownBy(() -> {
+            artwork.update(newTitle, newUrl);
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("작품명은 필수 입니다.");
+    }
+
+    @Test
+    @DisplayName("업데이트 시 썸네일 URL이 null일 때 Artwork 객체 업데이트 테스트")
+    public void testUpdateArtwork_InvalidThumbnailUrl() {
+        String initialTitle = "OldTitle";
+        Artwork artwork = new Artwork(initialTitle, validUrl);
+
+        URL newThumbnailUrl = null;
+
+        assertThatThrownBy(() -> {
+            artwork.update(initialTitle, newThumbnailUrl);
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("작품 썸네일 URL이 존재해야 합니다.");
+    }
+
+    @Test
+    @DisplayName("업데이트 시 제목이 256자 이상일 때 Artwork 객체 업데이트 테스트")
+    public void testUpdateArtwork_TitleTooLong() {
+        String initialTitle = "OldTitle";
+        Artwork artwork = new Artwork(initialTitle, validUrl);
+
+        String longTitle = "a".repeat(256);
+
+        assertThatThrownBy(() -> {
+            artwork.update(longTitle, newUrl);
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("작품명의 글자수는 1에서 255자 이내여야 합니다.");
     }
 }
