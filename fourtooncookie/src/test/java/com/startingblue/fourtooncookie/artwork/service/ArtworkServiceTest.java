@@ -5,7 +5,7 @@ import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
 import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkSaveRequest;
 import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkUpdateRequest;
 import com.startingblue.fourtooncookie.artwork.dto.response.ArtworkSavedResponses;
-import com.startingblue.fourtooncookie.artwork.exception.ArtworkNoSuchElementException;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ class ArtworkServiceTest {
 
     @DisplayName("저장된 모든 작품을 가져온다.")
     @Test
-    public void getSavedArtworkResponses() throws MalformedURLException {
+    public void readAllArtworks() throws MalformedURLException {
         // Given
         String title1 = "Title 1";
         URL url1 = new URL("http://test.com/image1.jpg");
@@ -45,7 +45,7 @@ class ArtworkServiceTest {
         artworkRepository.save(artwork2);
 
         // When
-        ArtworkSavedResponses responses = artworkService.getSavedArtworkResponses();
+        ArtworkSavedResponses responses = ArtworkSavedResponses.of(artworkService.readAllArtworks());
 
         // Then
         assertThat(responses.artworks()).hasSize(2);
@@ -57,14 +57,14 @@ class ArtworkServiceTest {
 
     @DisplayName("새로운 작품을 저장한다.")
     @Test
-    public void saveArtwork() throws MalformedURLException {
+    public void createArtwork() throws MalformedURLException {
         // Given
         String newTitle = "New Artwork";
         URL newUrl = new URL("http://test.com/newimage.jpg");
         ArtworkSaveRequest request = new ArtworkSaveRequest(newTitle, newUrl);
 
         // When
-        artworkService.saveArtwork(request);
+        artworkService.createArtwork(request);
 
         // Then
         Optional<Artwork> savedArtwork = artworkRepository.findAll().stream()
@@ -130,8 +130,8 @@ class ArtworkServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> artworkService.updateArtwork(notFoundArtworkId, request))
-                .isInstanceOf(ArtworkNoSuchElementException.class)
-                .hasMessage("존재하지 않는 작품입니다.");
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Artwork with ID -1 not found");
     }
 
     @DisplayName("존재하지 않는 ID로 작품을 삭제 시도시 예외를 발생시킨다.")
@@ -142,7 +142,7 @@ class ArtworkServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> artworkService.deleteArtwork(notFoundArtworkId))
-                .isInstanceOf(ArtworkNoSuchElementException.class)
-                .hasMessage("존재하지 않는 작품입니다.");
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Artwork with ID -1 not found");
     }
 }
