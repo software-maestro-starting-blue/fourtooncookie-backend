@@ -190,7 +190,7 @@ class CharacterServiceTest {
 
         String updateCharacterVisionType = "STABLE_DIFFUSION";
         Long updateArtworkId = 2L;
-        Artwork updateArtwork = new Artwork("update Artwork", new URL("https://updateTest.png"));
+        Artwork updateArtwork = new Artwork("updateById Artwork", new URL("https://updateTest.png"));
         String updateCharacterName = "바뀐멍멍이";
         URL updateUrl = new URL("https://test.png");
         String updatedBasePrompt = "This is a base prompt";

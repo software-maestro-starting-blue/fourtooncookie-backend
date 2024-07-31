@@ -6,6 +6,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,10 +33,13 @@ public class AuthenticationFilter extends HttpFilter {
             String token = jwtExtractor.resolveToken(request);
             Claims claims = parseToken(token);
             UUID memberId = UUID.fromString(claims.getSubject());
-            memberService.verifyMemberExists(memberId);
 
-            request.setAttribute("memberId", memberId);
-            chain.doFilter(request, response);
+            if (memberService.verifyMemberExists(memberId)) {
+                request.setAttribute("memberId", memberId);
+                chain.doFilter(request, response);
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, String.format("Member with id %s not found", memberId));
+            }
         } catch (AuthenticationException e) {
             exceptionHandler.handleAuthenticationException(e, response);
         } catch (Exception e) {

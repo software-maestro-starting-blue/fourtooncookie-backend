@@ -195,7 +195,7 @@ class CharacterRepositoryTest {
         Character savedCharacter = characterRepository.save(character);
 
         CharacterVisionType updateCharacterVisionType = CharacterVisionType.STABLE_DIFFUSION;
-        Artwork updateArtwork = new Artwork("update Artwork", new URL("https://updateArtwork.png"));
+        Artwork updateArtwork = new Artwork("updateById Artwork", new URL("https://updateArtwork.png"));
         String updateCharacterName = "바뀐멍멍이";
         URL updateUrl = new URL("https://test.png");
         String updateBasePrompt = "Updated base prompt.";

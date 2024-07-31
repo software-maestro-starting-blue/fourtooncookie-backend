@@ -1,8 +1,6 @@
 package com.startingblue.fourtooncookie.config;
 
 import com.startingblue.fourtooncookie.config.authentication.AuthenticationFilter;
-import com.startingblue.fourtooncookie.jwt.JwtExtractor;
-import com.startingblue.fourtooncookie.member.domain.MemberRepository;
 import com.startingblue.fourtooncookie.member.dto.MemberArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
