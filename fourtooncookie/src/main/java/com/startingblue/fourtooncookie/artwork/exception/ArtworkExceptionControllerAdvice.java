@@ -1,9 +1,7 @@
 package com.startingblue.fourtooncookie.artwork.exception;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -26,6 +24,12 @@ public class ArtworkExceptionControllerAdvice {
     @ExceptionHandler(ArtworkDuplicateException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public String handleArtworkDuplicateException(ArtworkDuplicateException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleException(Exception e) {
         return e.getMessage();
     }
 
