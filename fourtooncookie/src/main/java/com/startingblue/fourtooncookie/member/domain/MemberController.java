@@ -23,7 +23,7 @@ public final class MemberController {
 
     @PatchMapping("/member/{memberId}")
     public ResponseEntity<Void> updateMember(@PathVariable final UUID memberId, final MemberUpdateRequest memberUpdateRequest) {
-        memberService.update(memberId, memberUpdateRequest);
+        memberService.updateById(memberId, memberUpdateRequest);
         return ResponseEntity
                 .noContent()
                 .build();
@@ -31,7 +31,7 @@ public final class MemberController {
 
     @DeleteMapping("/member/{memberId}")
     public ResponseEntity<Void> softDeleteMember(@PathVariable final UUID memberId) {
-        memberService.softDelete(memberId);
+        memberService.softDeleteById(memberId);
         return ResponseEntity
                 .noContent()
                 .build();

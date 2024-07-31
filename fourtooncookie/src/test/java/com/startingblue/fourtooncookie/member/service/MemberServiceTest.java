@@ -63,7 +63,7 @@ public class MemberServiceTest {
 
     @Test
     @DisplayName("supabase에 있는 멤버 정보를 수정한다.")
-    void update() {
+    void updateById() {
         UUID memberId = UUID.randomUUID();
         String oldEmail = "oldemail@example.com";
         String oldName = "Old Name";
@@ -87,12 +87,12 @@ public class MemberServiceTest {
         when(memberRepository.save(member)).thenReturn(member);
 
         MemberUpdateRequest updateRequest = new MemberUpdateRequest(newName, newBirth, newGender);
-        memberService.update(memberId, updateRequest);
+        memberService.updateById(memberId, updateRequest);
         Member updatedMember = memberRepository.findById(memberId).orElse(null);
 
         // then
         assertThat(updatedMember).isNotNull();
-        assertThat(updatedMember.getEmail()).isEqualTo(oldEmail); // Email is not updated in the update method
+        assertThat(updatedMember.getEmail()).isEqualTo(oldEmail); // Email is not updated in the updateById method
         assertThat(updatedMember.getName()).isEqualTo(newName);
         assertThat(updatedMember.getBirth()).isEqualTo(newBirth);
         assertThat(updatedMember.getGender()).isEqualTo(newGender);
@@ -100,7 +100,7 @@ public class MemberServiceTest {
 
     @Test
     @DisplayName("supabase에 저장된 멤버를 소프트 삭제 한다. deleteAt을 갱신 한다.")
-    void softDeleteById() {
+    void softDeleteByIdById() {
         UUID memberId = UUID.randomUUID();
         String email = "test@example.com";
         String name = "Test User";
@@ -118,7 +118,7 @@ public class MemberServiceTest {
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
         LocalDateTime current = LocalDateTime.now();
-        memberService.softDelete(memberId, current);
+        memberService.softDeleteById(memberId, current);
 
         Member deletedMember = memberRepository.findById(memberId).orElse(null);
         assertThat(deletedMember).isNotNull();
@@ -127,7 +127,7 @@ public class MemberServiceTest {
 
     @Test
     @DisplayName("현재 시간보다 미래의 날짜로 소프트 삭제를 시도하면 예외가 발생한다.")
-    void softDeleteById_withFutureDate() {
+    void softDeleteByIdById_withFutureDate() {
         UUID memberId = UUID.randomUUID();
         String email = "test@example.com";
         String name = "Test User";
@@ -146,14 +146,14 @@ public class MemberServiceTest {
 
         LocalDateTime future = LocalDateTime.now().plusDays(1);
 
-        assertThatThrownBy(() -> memberService.softDelete(memberId, future))
+        assertThatThrownBy(() -> memberService.softDeleteById(memberId, future))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Current time cannot be after current time");
     }
 
     @Test
     @DisplayName("현재 시간보다 과거의 날짜로 소프트 삭제를 시도하면 성공한다.")
-    void softDeleteById_withPastDate() {
+    void softDeleteByIdById_withPastDate() {
         UUID memberId = UUID.randomUUID();
         String email = "test@example.com";
         String name = "Test User";
@@ -171,7 +171,7 @@ public class MemberServiceTest {
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
         LocalDateTime past = LocalDateTime.now().minusDays(1);
-        memberService.softDelete(memberId, past);
+        memberService.softDeleteById(memberId, past);
 
         Member deletedMember = memberRepository.findById(memberId).orElse(null);
         assertThat(deletedMember).isNotNull();
@@ -180,7 +180,7 @@ public class MemberServiceTest {
 
     @Test
     @DisplayName("null 값을 사용하여 소프트 삭제를 시도하면 예외가 발생한다.")
-    void softDeleteById_withNull() {
+    void softDeleteByIdById_withNull() {
         UUID memberId = UUID.randomUUID();
         String email = "test@example.com";
         String name = "Test User";
@@ -197,7 +197,7 @@ public class MemberServiceTest {
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
-        assertThatThrownBy(() -> memberService.softDelete(memberId, null))
+        assertThatThrownBy(() -> memberService.softDeleteById(memberId, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Current time cannot be null");
     }

@@ -95,7 +95,7 @@ class ArtworkRepositoryTest {
         Artwork artwork = new Artwork(oldTitle, oldUrl);
         Artwork savedArtwork = artworkRepository.save(artwork);
 
-        String updateTitle = "update Title";
+        String updateTitle = "updateById Title";
         URL updateUrl = new URL("http://test.com/updateimage.jpg");
         savedArtwork.update(updateTitle, updateUrl);
 
