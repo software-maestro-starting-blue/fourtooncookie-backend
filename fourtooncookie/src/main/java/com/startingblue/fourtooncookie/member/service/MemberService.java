@@ -49,11 +49,6 @@ public class MemberService {
     }
 
     public boolean isMemberExists(UUID memberId) {
-        boolean existsById = memberRepository.existsById(memberId);
-        if (!existsById) {
-            return false;
-        }
-
-        return true;
+        return  memberRepository.existsById(memberId);
     }
 }
