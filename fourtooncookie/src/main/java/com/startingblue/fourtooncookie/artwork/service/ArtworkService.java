@@ -4,9 +4,7 @@ import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
 import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkSaveRequest;
 import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkUpdateRequest;
-import com.startingblue.fourtooncookie.artwork.dto.response.ArtworkSavedResponse;
-import com.startingblue.fourtooncookie.artwork.dto.response.ArtworkSavedResponses;
-import com.startingblue.fourtooncookie.artwork.exception.ArtworkNoSuchElementException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,17 +16,13 @@ public class ArtworkService {
 
     private final ArtworkRepository artworkRepository;
 
-    public ArtworkSavedResponses getSavedArtworkResponses() {
-        List<Artwork> artworks = artworkRepository.findAll();
-        List<ArtworkSavedResponse> artworkSavedResponses = artworks.stream()
-                .map(ArtworkSavedResponse::of)
-                .toList();
-        return new ArtworkSavedResponses(artworkSavedResponses);
-    }
-
-    public void saveArtwork(ArtworkSaveRequest request) {
+    public void createArtwork(ArtworkSaveRequest request) {
         Artwork artwork = new Artwork(request.title(), request.thumnailUrl());
         artworkRepository.save(artwork);
+    }
+
+    public List<Artwork> readAllArtworks() {
+        return artworkRepository.findAll();
     }
 
     public void updateArtwork(Long artworkId, ArtworkUpdateRequest request) {
@@ -44,6 +38,6 @@ public class ArtworkService {
 
     public Artwork findById(Long artworkId) {
         return artworkRepository.findById(artworkId)
-                .orElseThrow(ArtworkNoSuchElementException::new);
+                .orElseThrow(() -> new EntityNotFoundException("Artwork with ID " + artworkId + " not found"));
     }
 }
