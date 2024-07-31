@@ -6,11 +6,11 @@ import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.character.domain.PaymentType;
-import com.startingblue.fourtooncookie.character.dto.request.AddCharacterRequest;
-import com.startingblue.fourtooncookie.character.dto.request.ModifyCharacterRequest;
-import com.startingblue.fourtooncookie.character.dto.response.CharacterResponse;
-import com.startingblue.fourtooncookie.character.dto.response.CharacterResponses;
-import com.startingblue.fourtooncookie.character.exception.CharacterNoSuchElementException;
+import com.startingblue.fourtooncookie.character.dto.request.CharacterSaveRequest;
+import com.startingblue.fourtooncookie.character.dto.request.CharacterUpdateRequest;
+import com.startingblue.fourtooncookie.character.dto.response.CharacterSavedResponse;
+import com.startingblue.fourtooncookie.character.dto.response.CharacterSavedResponses;
+import com.startingblue.fourtooncookie.character.exception.CharacterNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,25 +49,28 @@ class CharacterServiceTest {
     @Test
     void addCharacter() throws MalformedURLException {
         // given
-        AddCharacterRequest request = new AddCharacterRequest("DALL_E_3", PaymentType.FREE, 1L, "멍멍이", new URL("https://멍멍이-dalle3.png"), "This is a base prompt");
+        CharacterSaveRequest request = new CharacterSaveRequest(CharacterVisionType.DALL_E_3, PaymentType.FREE, 1L, "멍멍이", new URL("https://멍멍이-dalle3.png"), "This is a base prompt");
 
-        CharacterVisionType characterVisionType = CharacterVisionType.valueOf(request.characterVisionType());
+        CharacterVisionType characterVisionType = CharacterVisionType.valueOf(request.characterVisionType().name());
         Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
         Character character = Character.builder()
                 .characterVisionType(characterVisionType)
+                .paymentType(PaymentType.FREE)
                 .artwork(artwork)
                 .name(request.name())
                 .selectionThumbnailUrl(request.selectionThumbnailUrl())
                 .basePrompt(request.basePrompt())
                 .build();
 
-        // when
         when(artworkService.findById(request.artworkId())).thenReturn(artwork);
         when(characterRepository.save(any(Character.class))).thenReturn(character);
-        characterService.addCharacter(request);
+
+        // when
+        characterService.createCharacter(request);
 
         // then
         assertThat(character.getCharacterVisionType()).isEqualTo(characterVisionType);
+        assertThat(character.getPaymentType()).isEqualTo(PaymentType.FREE);
         assertThat(character.getArtwork()).isEqualTo(artwork);
         assertThat(character.getName()).isEqualTo(request.name());
         assertThat(character.getSelectionThumbnailUrl()).isEqualTo(request.selectionThumbnailUrl());
@@ -83,7 +86,8 @@ class CharacterServiceTest {
         String basePrompt = "This is a base prompt";
         Character character = Character.builder()
                 .characterVisionType(CharacterVisionType.DALL_E_3)
-                .artwork(new Artwork("Test Artwork", new URL("https://test.png")))
+                .paymentType(PaymentType.FREE)
+                .artwork(new Artwork("artwork", new URL("https://test.png")))
                 .name("멍멍이")
                 .selectionThumbnailUrl(new URL("https://멍멍이-dalle3.png"))
                 .basePrompt(basePrompt)
@@ -95,6 +99,10 @@ class CharacterServiceTest {
 
         // then
         assertThat(foundCharacter).isNotNull();
+        assertThat(foundCharacter.getCharacterVisionType()).isEqualTo(CharacterVisionType.DALL_E_3);
+        assertThat(foundCharacter.getPaymentType()).isEqualTo(PaymentType.FREE);
+        assertThat(foundCharacter.getArtwork().getTitle()).isEqualTo("artwork");
+        assertThat(foundCharacter.getArtwork().getThumbnailUrl()).isEqualTo(new URL("https://test.png"));
         assertThat(foundCharacter.getName()).isEqualTo("멍멍이");
         assertThat(foundCharacter.getBasePrompt()).isEqualTo(basePrompt);
         verify(characterRepository, times(1)).findById(characterId);
@@ -108,7 +116,7 @@ class CharacterServiceTest {
         when(characterRepository.findById(notFoundCharacterId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(CharacterNoSuchElementException.class, () -> characterService.findById(notFoundCharacterId));
+        assertThrows(CharacterNotFoundException.class, () -> characterService.findById(notFoundCharacterId));
         verify(characterRepository, times(1)).findById(notFoundCharacterId);
     }
 
@@ -137,36 +145,36 @@ class CharacterServiceTest {
         when(characterRepository.findAll()).thenReturn(List.of(character1, character2));
 
         // when
-        CharacterResponses characterResponses = characterService.showCharacters();
+        CharacterSavedResponses characterSavedResponses = CharacterSavedResponses.of(characterService.readAllCharacters());
 
         // then
-        assertThat(characterResponses.characterResponses()).hasSize(2);
-        assertThat(characterResponses.characterResponses())
-                .extracting(CharacterResponse::paymentType)
+        assertThat(characterSavedResponses.characterSavedResponses()).hasSize(2);
+        assertThat(characterSavedResponses.characterSavedResponses())
+                .extracting(CharacterSavedResponse::paymentType)
                 .containsExactly(
                         character1.getPaymentType().toString(),
                         character2.getPaymentType().toString()
                 );
-        assertThat(characterResponses.characterResponses())
-                .extracting(CharacterResponse::artworkTitle)
+        assertThat(characterSavedResponses.characterSavedResponses())
+                .extracting(CharacterSavedResponse::artworkTitle)
                 .containsExactly(
                         character1.getArtwork().getTitle(),
                         character2.getArtwork().getTitle()
                 );
-        assertThat(characterResponses.characterResponses())
-                .extracting(CharacterResponse::artworkThumbnailUrl)
+        assertThat(characterSavedResponses.characterSavedResponses())
+                .extracting(CharacterSavedResponse::artworkThumbnailUrl)
                 .containsExactly(
                         character1.getArtwork().getThumbnailUrl(),
                         character2.getArtwork().getThumbnailUrl()
                 );
-        assertThat(characterResponses.characterResponses())
-                .extracting(CharacterResponse::name)
+        assertThat(characterSavedResponses.characterSavedResponses())
+                .extracting(CharacterSavedResponse::name)
                 .containsExactly(
                         character1.getName(),
                         character2.getName()
                 );
-        assertThat(characterResponses.characterResponses())
-                .extracting(CharacterResponse::selectionThumbnailUrl)
+        assertThat(characterSavedResponses.characterSavedResponses())
+                .extracting(CharacterSavedResponse::selectionThumbnailUrl)
                 .containsExactly(
                         character1.getSelectionThumbnailUrl(),
                         character2.getSelectionThumbnailUrl()
@@ -176,11 +184,12 @@ class CharacterServiceTest {
 
     @DisplayName("캐릭터를 수정한다.")
     @Test
-    void modifyCharacterSuccessfully() throws MalformedURLException {
+    void updateCharacterSuccessfully() throws MalformedURLException {
         // given
         Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
         Character character = Character.builder()
                 .characterVisionType(CharacterVisionType.DALL_E_3)
+                .paymentType(PaymentType.FREE)
                 .artwork(artwork)
                 .name("멍멍이")
                 .selectionThumbnailUrl(new URL("https://멍멍이-dalle3.png"))
@@ -188,23 +197,25 @@ class CharacterServiceTest {
                 .build();
         Long characterId = 1L;
 
-        String updateCharacterVisionType = "STABLE_DIFFUSION";
+        CharacterVisionType updateCharacterVisionType = CharacterVisionType.STABLE_DIFFUSION;
         Long updateArtworkId = 2L;
         Artwork updateArtwork = new Artwork("updateById Artwork", new URL("https://updateTest.png"));
         String updateCharacterName = "바뀐멍멍이";
         URL updateUrl = new URL("https://test.png");
         String updatedBasePrompt = "This is a base prompt";
-        ModifyCharacterRequest request = new ModifyCharacterRequest(updateCharacterVisionType, PaymentType.FREE, updateArtworkId, updateCharacterName, updateUrl, updatedBasePrompt);
+        CharacterUpdateRequest request = new CharacterUpdateRequest(updateCharacterVisionType, PaymentType.PAID, updateArtworkId, updateCharacterName, updateUrl, updatedBasePrompt);
 
-        // when
         when(characterRepository.findById(characterId)).thenReturn(Optional.of(character));
         when(artworkService.findById(request.artworkId())).thenReturn(updateArtwork);
-        characterService.modifyCharacter(characterId, request);
+
+        // when
+        characterService.updateCharacter(characterId, request);
         Character updatedCharacter = characterService.findById(characterId);
 
         // then
-        assertThat(updatedCharacter.getCharacterVisionType()).isEqualTo(CharacterVisionType.valueOf(updateCharacterVisionType));
+        assertThat(updatedCharacter.getCharacterVisionType()).isEqualTo(updateCharacterVisionType);
         assertThat(updatedCharacter.getName()).isEqualTo(updateCharacterName);
+        assertThat(updatedCharacter.getPaymentType()).isEqualTo(PaymentType.PAID);
         assertThat(updatedCharacter.getSelectionThumbnailUrl()).isEqualTo(updateUrl);
         assertThat(updatedCharacter.getBasePrompt()).isEqualTo(updatedBasePrompt);
         assertThat(updatedCharacter.getArtwork()).isEqualTo(updateArtwork);
@@ -216,16 +227,17 @@ class CharacterServiceTest {
     void throwExceptionWhenUpdateNotFoundCharacter() throws MalformedURLException {
         // given
         Long notFoundCharacterId = -1L;
-        String updateCharacterVisionType = "STABLE_DIFFUSION";
+        CharacterVisionType updateCharacterVisionType = CharacterVisionType.STABLE_DIFFUSION;
         Long updateArtworkId = 2L;
         String updateCharacterName = "바뀐멍멍이";
         URL updateUrl = new URL("https://test.png");
         String updatedBasePrompt = "This is a base prompt";
-        ModifyCharacterRequest request = new ModifyCharacterRequest(updateCharacterVisionType, PaymentType.FREE, updateArtworkId, updateCharacterName, updateUrl, updatedBasePrompt);
+        CharacterUpdateRequest request = new CharacterUpdateRequest(updateCharacterVisionType, PaymentType.FREE, updateArtworkId, updateCharacterName, updateUrl, updatedBasePrompt);
+
+        when(characterRepository.findById(notFoundCharacterId)).thenReturn(Optional.empty());
 
         // when & then
-        when(characterRepository.findById(notFoundCharacterId)).thenReturn(Optional.empty());
-        assertThrows(CharacterNoSuchElementException.class, () -> characterService.modifyCharacter(notFoundCharacterId, request));
+        assertThrows(CharacterNotFoundException.class, () -> characterService.updateCharacter(notFoundCharacterId, request));
         verify(characterRepository, times(1)).findById(notFoundCharacterId);
     }
 
@@ -237,6 +249,7 @@ class CharacterServiceTest {
         String basePrompt = "This is a base prompt";
         Character character = Character.builder()
                 .characterVisionType(CharacterVisionType.DALL_E_3)
+                .paymentType(PaymentType.FREE)
                 .artwork(new Artwork("Test Artwork", new URL("https://test.png")))
                 .name("멍멍이")
                 .selectionThumbnailUrl(new URL("https://멍멍이-dalle3.png"))
@@ -264,7 +277,7 @@ class CharacterServiceTest {
         when(characterRepository.findById(notFoundCharacterId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(CharacterNoSuchElementException.class, () -> characterService.deleteCharacter(notFoundCharacterId));
+        assertThrows(CharacterNotFoundException.class, () -> characterService.deleteCharacter(notFoundCharacterId));
         verify(characterRepository, times(1)).findById(notFoundCharacterId);
     }
 }

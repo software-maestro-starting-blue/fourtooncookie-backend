@@ -97,8 +97,8 @@ public class CharacterTest {
     }
 
     @Test
-    @DisplayName("Artwork 제목이 빈 값 또는 1글자 이하일 때 Character 객체 생성 시 ConstraintViolationException")
-    public void testInvalidCharacterCreation_ArtworkTitleTooShort() {
+    @DisplayName("썸네일 URL이 null인 Character 객체 생성 시 ConstraintViolationException")
+    public void testInvalidCharacterCreation_ThumbnailUrlNull() {
         CharacterVisionType visionType = CharacterVisionType.DALL_E_3;
         PaymentType paymentType = PaymentType.FREE;
         String name = "ValidName";
@@ -109,28 +109,27 @@ public class CharacterTest {
                     .characterVisionType(visionType)
                     .paymentType(paymentType)
                     .name(name)
-                    .artwork(new Artwork("", new URL("http://example.com/new-thumbnail.png")))
-                    .selectionThumbnailUrl(validUrl)
+                    .artwork(artwork)
+                    .selectionThumbnailUrl(null)
                     .basePrompt(basePrompt)
                     .build();
         });
     }
 
     @Test
-    @DisplayName("Artwork 제목이 255자 이상일 때 Character 객체 생성 시 ConstraintViolationException")
-    public void testInvalidCharacterCreation_ArtworkTitleTooLong() {
+    @DisplayName("기본 프롬프트가 빈 문자열인 Character 객체 생성 시 ConstraintViolationException")
+    public void testInvalidCharacterCreation_BasePromptBlank() {
         CharacterVisionType visionType = CharacterVisionType.DALL_E_3;
         PaymentType paymentType = PaymentType.FREE;
         String name = "ValidName";
-        String basePrompt = "Base Prompt";
-        String longTitle = "a".repeat(256);
+        String basePrompt = "";
 
         assertThrows(ConstraintViolationException.class, () -> {
             Character.builder()
                     .characterVisionType(visionType)
                     .paymentType(paymentType)
                     .name(name)
-                    .artwork(new Artwork(longTitle, new URL("http://example.com/new-thumbnail.png")))
+                    .artwork(artwork)
                     .selectionThumbnailUrl(validUrl)
                     .basePrompt(basePrompt)
                     .build();
@@ -138,7 +137,45 @@ public class CharacterTest {
     }
 
     @Test
-    @DisplayName("Character 객체 업데이트 테스트")
+    @DisplayName("캐릭터 결제 유형이 null인 Character 객체 생성 시 ConstraintViolationException")
+    public void testInvalidCharacterCreation_PaymentTypeNull() {
+        CharacterVisionType visionType = CharacterVisionType.DALL_E_3;
+        String name = "ValidName";
+        String basePrompt = "Base Prompt";
+
+        assertThrows(ConstraintViolationException.class, () -> {
+            Character.builder()
+                    .characterVisionType(visionType)
+                    .paymentType(null)
+                    .name(name)
+                    .artwork(artwork)
+                    .selectionThumbnailUrl(validUrl)
+                    .basePrompt(basePrompt)
+                    .build();
+        });
+    }
+
+    @Test
+    @DisplayName("캐릭터 비전 유형이 null인 Character 객체 생성 시 ConstraintViolationException")
+    public void testInvalidCharacterCreation_CharacterVisionTypeNull() {
+        PaymentType paymentType = PaymentType.FREE;
+        String name = "ValidName";
+        String basePrompt = "Base Prompt";
+
+        assertThrows(ConstraintViolationException.class, () -> {
+            Character.builder()
+                    .characterVisionType(null)
+                    .paymentType(paymentType)
+                    .name(name)
+                    .artwork(artwork)
+                    .selectionThumbnailUrl(validUrl)
+                    .basePrompt(basePrompt)
+                    .build();
+        });
+    }
+
+    @Test
+    @DisplayName("Character 객체 업데이트 성공")
     public void testUpdateCharacter() {
         CharacterVisionType initialVisionType = CharacterVisionType.DALL_E_3;
         PaymentType initialPaymentType = PaymentType.FREE;
@@ -170,7 +207,7 @@ public class CharacterTest {
     }
 
     @Test
-    @DisplayName("업데이트 시 이름이 빈 문자열일 때 Character 객체 업데이트 테스트")
+    @DisplayName("Character 업데이트 시 이름이 빈 문자열일 때 ConstraintViolationException")
     public void testUpdateCharacter_InvalidName() {
         CharacterVisionType initialVisionType = CharacterVisionType.DALL_E_3;
         PaymentType initialPaymentType = PaymentType.FREE;
