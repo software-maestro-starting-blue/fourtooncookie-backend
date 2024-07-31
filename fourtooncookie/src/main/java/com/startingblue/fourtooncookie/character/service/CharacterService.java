@@ -41,7 +41,7 @@ public class CharacterService {
 
     public void modifyCharacter(final Long characterId, final ModifyCharacterRequest request) {
         Character character = findById(characterId);
-        CharacterVisionType visionType = CharacterVisionType.valueOf(request.visionType());
+        CharacterVisionType visionType = CharacterVisionType.valueOf(request.characterVisionType());
         Artwork artwork = artworkService.findById(request.artworkId());
 
         character.update(visionType,
@@ -63,13 +63,14 @@ public class CharacterService {
         final List<Character> characters = characterRepository.findAll();
 
         return new CharacterResponses(characters.stream()
-                .map(character -> new CharacterResponse(
-                        character.getId(),
-                        character.getPaymentType().name(),
-                        character.getArtwork().getTitle(),
-                        character.getArtwork().getThumbnailUrl(),
-                        character.getName(),
-                        character.getSelectionThumbnailUrl()))
+                .map(character -> CharacterResponse.builder()
+                        .id(character.getId())
+                        .paymentType(character.getPaymentType().name())
+                        .artworkThumbnailUrl(character.getArtwork().getThumbnailUrl())
+                        .artworkTitle(character.getArtwork().getTitle())
+                        .name(character.getName())
+                        .selectionThumbnailUrl(character.getSelectionThumbnailUrl())
+                        .build())
                 .toList());
     }
 
