@@ -16,7 +16,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ActiveProfiles("test")
 @DataJpaTest
 class ArtworkRepositoryTest {
 
@@ -31,7 +30,7 @@ class ArtworkRepositoryTest {
         URL newUrl = new URL("http://test.com/newimage.jpg");
         ArtworkSaveRequest request = new ArtworkSaveRequest(newTitle, newUrl);
 
-        Artwork artwork = new Artwork(request.title(), request.thumnailUrl());
+        Artwork artwork = new Artwork(request.title(), request.thumbnailUrl());
 
         // When
         Artwork savedArtwork = artworkRepository.save(artwork);
