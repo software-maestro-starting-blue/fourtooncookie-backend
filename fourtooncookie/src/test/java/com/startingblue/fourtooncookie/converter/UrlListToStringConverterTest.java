@@ -55,6 +55,17 @@ class UrlListToStringConverterTest {
     }
 
     @Test
+    @DisplayName("String을 List<URL>으로 변환 (공백 포함)")
+    void testConvertToEntityAttributeTrim() throws MalformedURLException {
+        String input = "     http://example.com, http://example.org   , http://example.org";
+        List<URL> expected = List.of(new URL("http://example.com"), new URL("http://example.org"),
+                new URL("http://example.com"));
+        List<URL> actual = converter.convertToEntityAttribute(input);
+        System.out.println("Test ConvertToEntityAttribute: " + actual);
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
     @DisplayName("빈 String을 빈 List<URL>으로 변환")
     void testConvertToEntityAttributeEmpty() {
         String input = "";
