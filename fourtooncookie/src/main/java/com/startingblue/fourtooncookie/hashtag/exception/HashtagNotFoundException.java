@@ -1,8 +1,6 @@
 package com.startingblue.fourtooncookie.hashtag.exception;
 
-import java.util.NoSuchElementException;
-
-public class HashtagNotFoundException extends NoSuchElementException {
+public class HashtagNotFoundException extends RuntimeException {
 
     public HashtagNotFoundException() {
         super("Hashtag not found");

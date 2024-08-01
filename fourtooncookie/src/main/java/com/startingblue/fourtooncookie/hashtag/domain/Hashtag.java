@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.hashtag.domain;
 
+import com.startingblue.fourtooncookie.hashtag.exception.HashtagDuplicateException;
 import com.startingblue.fourtooncookie.hashtag.exception.HashtagNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -50,8 +51,8 @@ public enum Hashtag {
     private final String name;
     private final HashtagType hashtagType;
 
-    public static List<Hashtag> findHashtagsByIds(List<Long> ids) {
-        List<Hashtag> result = new ArrayList<>();
+    public static Set<Hashtag> findHashtagsByIds(List<Long> ids) {
+        Set<Hashtag> result = EnumSet.noneOf(Hashtag.class);
         for (Long id : ids) {
             Hashtag hashtag = findHashtagById(id);
             result.add(hashtag);
@@ -66,5 +67,24 @@ public enum Hashtag {
             }
         }
         throw new HashtagNotFoundException();
+    }
+
+    public static void verifyNoDuplicateIds() {
+        Set<Long> ids = new HashSet<>();
+        for (Hashtag hashtag : Hashtag.values()) {
+            if (!ids.add(hashtag.getId())) {
+                throw new HashtagDuplicateException("Duplicate ID found: " + hashtag.getId());
+            }
+        }
+    }
+
+    public static void verifyNoDuplicateNameAndType() {
+        Set<String> nameAndTypeSet = new HashSet<>();
+        for (Hashtag hashtag : Hashtag.values()) {
+            String nameAndType = hashtag.getName() + "-" + hashtag.getHashtagType().name();
+            if (!nameAndTypeSet.add(nameAndType)) {
+                throw new HashtagDuplicateException("Duplicate name and type combination found: " + nameAndType);
+            }
+        }
     }
 }
