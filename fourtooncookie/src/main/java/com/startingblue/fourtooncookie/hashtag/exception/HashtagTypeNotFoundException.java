@@ -9,8 +9,4 @@ public class HashtagTypeNotFoundException extends RuntimeException {
     public HashtagTypeNotFoundException(String message) {
         super(message);
     }
-
-    public HashtagTypeNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

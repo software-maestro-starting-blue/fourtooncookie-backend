@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice("com.startingblue.fourtooncookie.hashtag")
 public class HashtagExceptionControllerAdvice {
 
-    @ExceptionHandler(HashtagNoSuchElementException.class)
-    public ResponseEntity<?> handleHashtagNotFoundException(HashtagNoSuchElementException e) {
+    @ExceptionHandler(HashtagNotFoundException.class)
+    public ResponseEntity<?> handleHashtagNotFoundException(HashtagNotFoundException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
