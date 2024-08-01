@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,15 +14,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class HashtagTest {
 
     @Test
-    @DisplayName("유효한 ID 목록으로 해시태그 리스트를 성공적으로 반환")
+    @DisplayName("유효한 ID 목록으로 해시태그 세트를 성공적으로 반환")
     void findHashtagsByIds_validIds_shouldReturnHashtags() {
         List<Long> ids = Arrays.asList(1L, 100L, 200L);
-        List<Hashtag> hashtags = Hashtag.findHashtagsByIds(ids);
+        Set<Hashtag> hashtags = Hashtag.findHashtagsByIds(ids);
 
         assertEquals(3, hashtags.size());
-        assertEquals(Hashtag.CLEAR, hashtags.get(0));
-        assertEquals(Hashtag.EXCITED, hashtags.get(1));
-        assertEquals(Hashtag.FRIEND, hashtags.get(2));
+        assertTrue(hashtags.contains(Hashtag.CLEAR));
+        assertTrue(hashtags.contains(Hashtag.EXCITED));
+        assertTrue(hashtags.contains(Hashtag.FRIEND));
     }
 
     @Test
@@ -68,5 +69,17 @@ class HashtagTest {
                     fail("Unknown hashtag type");
             }
         }
+    }
+
+    @Test
+    @DisplayName("중복된 ID가 없는지 검증")
+    void verifyNoDuplicateIds_shouldNotThrowException() {
+        assertDoesNotThrow(() -> Hashtag.verifyNoDuplicateIds());
+    }
+
+    @Test
+    @DisplayName("중복된 이름과 타입 조합이 없는지 검증")
+    void verifyNoDuplicateNameAndType_shouldNotThrowException() {
+        assertDoesNotThrow(() -> Hashtag.verifyNoDuplicateNameAndType());
     }
 }
