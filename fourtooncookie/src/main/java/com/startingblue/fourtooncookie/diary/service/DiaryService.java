@@ -52,7 +52,7 @@ public class DiaryService {
     }
 
     public void createDiary(final DiarySaveRequest request, final UUID memberId) {
-        Character character = characterService.findById(request.characterId());
+        Character character = characterService.readById(request.characterId());
         Member member = memberService.findById(memberId);
         Diary diary = Diary.builder()
                 .content(request.content())
@@ -77,7 +77,7 @@ public class DiaryService {
 
     public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
         Diary existedDiary = findById(diaryId);
-        Character character = characterService.findById(request.characterId());
+        Character character = characterService.readById(request.characterId());
         existedDiary.update(request.content(), request.hashtagIds(), character);
         diaryRepository.save(existedDiary);
         // todo vision

@@ -97,7 +97,7 @@ class CharacterServiceTest {
         when(characterRepository.findById(characterId)).thenReturn(Optional.of(character));
 
         // when
-        Character foundCharacter = characterService.findById(characterId);
+        Character foundCharacter = characterService.readById(characterId);
 
         // then
         assertThat(foundCharacter).isNotNull();
@@ -118,7 +118,7 @@ class CharacterServiceTest {
         when(characterRepository.findById(notFoundCharacterId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(CharacterNotFoundException.class, () -> characterService.findById(notFoundCharacterId));
+        assertThrows(CharacterNotFoundException.class, () -> characterService.readById(notFoundCharacterId));
         verify(characterRepository, times(1)).findById(notFoundCharacterId);
     }
 
@@ -212,7 +212,7 @@ class CharacterServiceTest {
 
         // when
         characterService.updateCharacter(characterId, request);
-        Character updatedCharacter = characterService.findById(characterId);
+        Character updatedCharacter = characterService.readById(characterId);
 
         // then
         assertThat(updatedCharacter.getCharacterVisionType()).isEqualTo(updateCharacterVisionType);
