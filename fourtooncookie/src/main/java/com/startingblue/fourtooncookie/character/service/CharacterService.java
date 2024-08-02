@@ -24,7 +24,6 @@ public class CharacterService {
     private final CharacterRepository characterRepository;
     private final ArtworkService artworkService;
 
-
     public void createCharacter(final CharacterSaveRequest request) {
         CharacterVisionType visionType = findByCharacterVisionType(request.characterVisionType());
         Artwork artwork = artworkService.findById(request.artworkId());
@@ -47,7 +46,7 @@ public class CharacterService {
     }
 
     public void updateCharacter(final Long characterId, final CharacterUpdateRequest request) {
-        Character character = findById(characterId);
+        Character character = readById(characterId);
         Artwork artwork = artworkService.findById(request.artworkId());
 
         character.update(request.characterVisionType(),
@@ -60,12 +59,12 @@ public class CharacterService {
     }
 
     public void deleteCharacter(final Long characterId) {
-        Character foundCharacter = findById(characterId);
+        Character foundCharacter = readById(characterId);
         characterRepository.delete(foundCharacter);
     }
 
     @Transactional(readOnly = true)
-    public Character findById(Long characterId) {
+    public Character readById(Long characterId) {
         return characterRepository.findById(characterId)
                         .orElseThrow(CharacterNotFoundException::new);
     }
