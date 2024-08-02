@@ -21,7 +21,7 @@ public class ArtworkService {
     private final ArtworkRepository artworkRepository;
 
     public void createArtwork(ArtworkSaveRequest request) {
-        validateUniqueArtwork(request.title(), request.thumbnailUrl());
+        verifyDuplicateArtwork(request.title(), request.thumbnailUrl());
         artworkRepository.save(new Artwork(request.title(), request.thumbnailUrl()));
     }
 
@@ -31,24 +31,24 @@ public class ArtworkService {
     }
 
     public void updateArtwork(Long artworkId, ArtworkUpdateRequest request) {
-        Artwork artwork = findById(artworkId);
+        Artwork artwork = readById(artworkId);
         artwork.update(request.title(), request.thumbnailUrl());
         artworkRepository.save(artwork);
     }
 
     public void deleteArtwork(Long artworkId) {
-        Artwork artwork = findById(artworkId);
+        Artwork artwork = readById(artworkId);
         artworkRepository.delete(artwork);
     }
 
     @Transactional(readOnly = true)
-    public Artwork findById(Long artworkId) {
+    public Artwork readById(Long artworkId) {
         return artworkRepository.findById(artworkId)
                 .orElseThrow(() -> new ArtworkNotFoundException("Artwork with ID " + artworkId + " not found"));
     }
 
     @Transactional(readOnly = true)
-    public void validateUniqueArtwork(String title, URL thumbnailUrl) {
+    public void verifyDuplicateArtwork(String title, URL thumbnailUrl) {
         if (artworkRepository.existsByTitle(title)) {
             throw new ArtworkDuplicateException("Artwork with title '" + title + "' already exists.");
         }

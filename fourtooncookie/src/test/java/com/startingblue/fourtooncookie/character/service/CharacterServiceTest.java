@@ -62,7 +62,7 @@ class CharacterServiceTest {
                 .build();
 
         // when
-        when(artworkService.findById(request.artworkId())).thenReturn(artwork);
+        when(artworkService.readById(request.artworkId())).thenReturn(artwork);
         when(characterRepository.save(any(Character.class))).thenReturn(character);
         characterService.addCharacter(request);
 
@@ -198,7 +198,7 @@ class CharacterServiceTest {
 
         // when
         when(characterRepository.findById(characterId)).thenReturn(Optional.of(character));
-        when(artworkService.findById(request.artworkId())).thenReturn(updateArtwork);
+        when(artworkService.readById(request.artworkId())).thenReturn(updateArtwork);
         characterService.modifyCharacter(characterId, request);
         Character updatedCharacter = characterService.findById(characterId);
 
