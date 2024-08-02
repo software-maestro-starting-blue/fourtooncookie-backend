@@ -1,6 +1,8 @@
 package com.startingblue.fourtooncookie.member.authorization;
 
 import com.startingblue.fourtooncookie.jwt.JwtExtractor;
+import com.startingblue.fourtooncookie.member.authorization.exception.InvalidPathVariableException;
+import com.startingblue.fourtooncookie.member.authorization.exception.TokenNotFoundException;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,9 +16,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
-import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-
 @RequiredArgsConstructor
 @Component
 @Slf4j
@@ -27,36 +26,61 @@ public final class MemberAuthorizationInterceptor implements HandlerInterceptor 
     private final JwtExtractor jwtExtractor;
 
     @Override
-    public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) {
-        final String token = jwtExtractor.resolveToken(request);
-        if (token.isEmpty()) {
-            response.setStatus(SC_FORBIDDEN);
-            return false;
-        }
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        try {
+            final String token = extractToken(request);
+            final Claims claims = jwtExtractor.parseToken(token);
+            final UUID memberId = extractMemberId(claims);
+            final UUID pathVariableMemberID = extractPathVariableMemberId(request);
 
-        final Claims claims = jwtExtractor.parseToken(token);
-        final UUID memberId = UUID.fromString(claims.getSubject());
-
-        final Map<String, String> pathVariables = getPathVariables(request);
-        if (!pathVariables.containsKey(PATH_VARIABLE_KEY)) {
-            response.setStatus(SC_NOT_FOUND);
-            return false;
-        }
-
-        final UUID pathVariableMemberID = UUID.fromString(pathVariables.get(PATH_VARIABLE_KEY));
-        if (isAuthorized(memberId, pathVariableMemberID)) {
+            if (!isAuthorized(memberId, pathVariableMemberID)) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return false;
+            }
             return true;
+        } catch (TokenNotFoundException | InvalidPathVariableException e) {
+            log.error("Authorization error: ", e);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return false;
         }
-
-        response.setStatus(SC_FORBIDDEN);
-        return false;
     }
 
-    private Map<String, String> getPathVariables(final HttpServletRequest request) {
+    private String extractToken(HttpServletRequest request) throws TokenNotFoundException {
+        String token = jwtExtractor.resolveToken(request);
+        if (token == null || token.isEmpty()) {
+            throw new TokenNotFoundException("No token provided.");
+        }
+        return token;
+    }
+
+    private UUID extractMemberId(Claims claims) throws InvalidPathVariableException {
+        try {
+            return UUID.fromString(claims.getSubject());
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid member ID in JWT", e);
+            throw new InvalidPathVariableException("Invalid member ID in JWT");
+        }
+    }
+
+    private UUID extractPathVariableMemberId(HttpServletRequest request) throws InvalidPathVariableException {
+        Map<String, String> pathVariables = getPathVariables(request);
+        String memberIdStr = pathVariables.get(PATH_VARIABLE_KEY);
+        if (memberIdStr == null) {
+            throw new InvalidPathVariableException("Member ID path variable not found");
+        }
+        try {
+            return UUID.fromString(memberIdStr);
+        } catch (IllegalArgumentException e) {
+            log.error("Error extracting member ID from path variables", e);
+            throw new InvalidPathVariableException("Member ID path variable is not valid UUID");
+        }
+    }
+
+    private Map<String, String> getPathVariables(HttpServletRequest request) {
         return (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
     }
 
-    private boolean isAuthorized(final UUID memberId, final UUID pathVariableMemberID) {
-        return Objects.equals(memberId, pathVariableMemberID);
+    private boolean isAuthorized(UUID memberId, UUID pathVariableMemberId) {
+        return Objects.equals(memberId, pathVariableMemberId);
     }
 }
