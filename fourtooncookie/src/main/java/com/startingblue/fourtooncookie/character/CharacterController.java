@@ -26,9 +26,10 @@ public final class CharacterController {
     }
 
     @GetMapping
-    public ResponseEntity<CharacterSavedResponses> readCharacters() {
+    public ResponseEntity<CharacterSavedResponses> readAllCharacters() {
+        CharacterSavedResponses responses = CharacterSavedResponses.of(characterService.readAllCharacters());
         return ResponseEntity
-                .ok(CharacterSavedResponses.of(characterService.readAllCharacters()));
+                .ok(responses);
     }
 
     @PutMapping("/{characterId}")
