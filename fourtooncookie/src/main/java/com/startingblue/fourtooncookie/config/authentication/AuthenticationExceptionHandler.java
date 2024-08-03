@@ -12,7 +12,7 @@ public class AuthenticationExceptionHandler {
 
     public void handleAuthenticationException(AuthenticationException e, HttpServletResponse response) throws IOException {
         log.error(e.getMessage(), e);
-        response.setStatus(e.getStatusCode());
+        response.setStatus(e.getStatusCode().value());
         response.getWriter().write(e.getMessage());
     }
 

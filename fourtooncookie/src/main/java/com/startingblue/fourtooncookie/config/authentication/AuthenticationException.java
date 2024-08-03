@@ -1,18 +1,18 @@
 package com.startingblue.fourtooncookie.config.authentication;
 
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 public final class AuthenticationException extends RuntimeException {
-    private final int statusCode;
 
-    public AuthenticationException(String message, int statusCode) {
+    private final HttpStatus statusCode = HttpStatus.UNAUTHORIZED;
+
+    public AuthenticationException(String message) {
         super(message);
-        this.statusCode = statusCode;
     }
 
-    public AuthenticationException(String message, int statusCode, Throwable cause) {
+    public AuthenticationException(String message, Throwable cause) {
         super(message, cause);
-        this.statusCode = statusCode;
     }
 }
