@@ -2,13 +2,11 @@ package com.startingblue.fourtooncookie.hashtag.domain;
 
 import com.startingblue.fourtooncookie.hashtag.exception.HashtagDuplicateException;
 import com.startingblue.fourtooncookie.hashtag.exception.HashtagNotFoundException;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.*;
 
 @Getter
-@AllArgsConstructor
 public enum Hashtag {
 
     // Weather
@@ -47,9 +45,23 @@ public enum Hashtag {
     ACQUAINTANCE(203L, "지인", HashtagType.MET_PERSON),
     NO_ONE(204L, "안만남", HashtagType.MET_PERSON);
 
+    private static final long WEATHER_MIN_ID = 1L;
+    private static final long WEATHER_MAX_ID = 99L;
+    private static final long EMOTION_MIN_ID = 100L;
+    private static final long EMOTION_MAX_ID = 199L;
+    private static final long MET_PERSON_MIN_ID = 200L;
+    private static final long MET_PERSON_MAX_ID = 299L;
+
     private final Long id;
     private final String name;
     private final HashtagType hashtagType;
+
+    Hashtag(Long id, String name, HashtagType hashtagType) {
+        hashtagType.validateHashtagId(id);
+        this.id = id;
+        this.name = name;
+        this.hashtagType = hashtagType;
+    }
 
     public static Set<Hashtag> findHashtagsByIds(List<Long> ids) {
         Set<Hashtag> result = EnumSet.noneOf(Hashtag.class);
@@ -69,7 +81,7 @@ public enum Hashtag {
         throw new HashtagNotFoundException();
     }
 
-    public static void verifyNoDuplicateIds() {
+    public static void verifyUniqueIds() {
         Set<Long> ids = new HashSet<>();
         for (Hashtag hashtag : Hashtag.values()) {
             if (!ids.add(hashtag.getId())) {
@@ -78,7 +90,7 @@ public enum Hashtag {
         }
     }
 
-    public static void verifyNoDuplicateNameAndType() {
+    public static void verifyUniqueNameAndType() {
         Set<String> nameAndTypeSet = new HashSet<>();
         for (Hashtag hashtag : Hashtag.values()) {
             String nameAndType = hashtag.getName() + "-" + hashtag.getHashtagType().name();
@@ -86,5 +98,10 @@ public enum Hashtag {
                 throw new HashtagDuplicateException("Duplicate name and type combination found: " + nameAndType);
             }
         }
+    }
+
+    public static void validateAllHashtags() {
+        verifyUniqueIds();
+        verifyUniqueNameAndType();
     }
 }
