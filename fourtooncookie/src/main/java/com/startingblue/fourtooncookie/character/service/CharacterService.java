@@ -28,7 +28,7 @@ public class CharacterService {
         CharacterVisionType visionType = findByCharacterVisionType(request.characterVisionType());
         Artwork artwork = artworkService.findById(request.artworkId());
 
-        verifyDuplicateCharacter(request.name(), artwork, request.paymentType(), visionType);
+        verifyUniqueCharacter(request.name(), artwork, request.paymentType(), visionType);
 
         characterRepository.save(Character.builder()
                 .characterVisionType(visionType)
@@ -73,7 +73,7 @@ public class CharacterService {
         return CharacterVisionType.valueOf(characterVisionType.name());
     }
 
-    private void verifyDuplicateCharacter(String name, Artwork artwork, PaymentType paymentType, CharacterVisionType visionType) {
+    private void verifyUniqueCharacter(String name, Artwork artwork, PaymentType paymentType, CharacterVisionType visionType) {
         boolean isDuplicate = characterRepository.existsByName(name) &&
                 characterRepository.existsByArtwork(artwork) &&
                 characterRepository.existsByPaymentType(paymentType) &&
