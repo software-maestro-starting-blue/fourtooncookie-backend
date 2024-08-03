@@ -4,6 +4,7 @@ import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
 import com.startingblue.fourtooncookie.member.dto.response.MemberSavedResponse;
 import com.startingblue.fourtooncookie.member.dto.request.MemberUpdateRequest;
+import com.startingblue.fourtooncookie.member.exception.MemberNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,12 +24,12 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public MemberSavedResponse getById(UUID memberId) {
-        return MemberSavedResponse.of(findById(memberId));
+    public Member readById(UUID memberId) {
+        return  memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("member not found"));
     }
 
     public void updateById(final UUID memberId, final MemberUpdateRequest memberUpdateRequest) {
-        Member member = findById(memberId);
+        Member member = readById(memberId);
         member.update(memberUpdateRequest.name(), memberUpdateRequest.birth(), memberUpdateRequest.gender());
         memberRepository.save(member);
     }
@@ -38,13 +39,9 @@ public class MemberService {
     }
 
     public void softDeleteById(UUID memberId, LocalDateTime current) {
-        Member foundMember = findById(memberId);
+        Member foundMember = readById(memberId);
         foundMember.softDelete(current);
         memberRepository.save(foundMember);
-    }
-
-    public Member findById(UUID memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new EntityNotFoundException("member not found"));
     }
 
     public boolean verifyMemberExists(UUID memberId) {

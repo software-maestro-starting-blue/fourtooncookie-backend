@@ -4,6 +4,7 @@ import com.startingblue.fourtooncookie.member.dto.response.MemberSavedResponse;
 import com.startingblue.fourtooncookie.member.dto.request.MemberUpdateRequest;
 import com.startingblue.fourtooncookie.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,12 +18,12 @@ public final class MemberController {
 
     @GetMapping("/member/{memberId}")
     public ResponseEntity<MemberSavedResponse> readMember(@PathVariable final UUID memberId) {
-        MemberSavedResponse memberSavedResponse = memberService.getById(memberId);
-        return ResponseEntity.ok(memberSavedResponse);
+        MemberSavedResponse response = MemberSavedResponse.of(memberService.readById(memberId));
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/member/{memberId}")
-    public ResponseEntity<Void> updateMember(@PathVariable final UUID memberId, final MemberUpdateRequest memberUpdateRequest) {
+    public ResponseEntity<HttpStatus> updateMember(@PathVariable final UUID memberId, final MemberUpdateRequest memberUpdateRequest) {
         memberService.updateById(memberId, memberUpdateRequest);
         return ResponseEntity
                 .noContent()
@@ -30,7 +31,7 @@ public final class MemberController {
     }
 
     @DeleteMapping("/member/{memberId}")
-    public ResponseEntity<Void> softDeleteMember(@PathVariable final UUID memberId) {
+    public ResponseEntity<HttpStatus> softDeleteMember(@PathVariable final UUID memberId) {
         memberService.softDeleteById(memberId);
         return ResponseEntity
                 .noContent()
