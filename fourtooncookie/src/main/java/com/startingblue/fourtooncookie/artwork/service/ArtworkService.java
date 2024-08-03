@@ -21,7 +21,7 @@ public class ArtworkService {
     private final ArtworkRepository artworkRepository;
 
     public void createArtwork(ArtworkSaveRequest request) {
-        verifyDuplicateArtwork(request.title(), request.thumbnailUrl());
+        verifyUniqueArtwork(request.title(), request.thumbnailUrl());
         artworkRepository.save(new Artwork(request.title(), request.thumbnailUrl()));
     }
 
@@ -48,7 +48,7 @@ public class ArtworkService {
     }
 
     @Transactional(readOnly = true)
-    public void verifyDuplicateArtwork(String title, URL thumbnailUrl) {
+    public void verifyUniqueArtwork(String title, URL thumbnailUrl) {
         if (artworkRepository.existsByTitle(title)) {
             throw new ArtworkDuplicateException("Artwork with title '" + title + "' already exists.");
         }
