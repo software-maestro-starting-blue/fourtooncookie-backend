@@ -16,22 +16,22 @@ public final class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/member/{memberId}")
-    public ResponseEntity<MemberSavedResponse> readMember(@PathVariable final UUID memberId) {
+    @GetMapping("/member")
+    public ResponseEntity<MemberSavedResponse> readMember(UUID memberId) {
         MemberSavedResponse response = MemberSavedResponse.of(memberService.readById(memberId));
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/member/{memberId}")
-    public ResponseEntity<HttpStatus> updateMember(@PathVariable final UUID memberId, final MemberUpdateRequest memberUpdateRequest) {
+    @PatchMapping("/member")
+    public ResponseEntity<HttpStatus> updateMember(UUID memberId, final MemberUpdateRequest memberUpdateRequest) {
         memberService.updateById(memberId, memberUpdateRequest);
         return ResponseEntity
                 .noContent()
                 .build();
     }
 
-    @DeleteMapping("/member/{memberId}")
-    public ResponseEntity<HttpStatus> softDeleteMember(@PathVariable final UUID memberId) {
+    @DeleteMapping("/member")
+    public ResponseEntity<HttpStatus> softDeleteMember(UUID memberId) {
         memberService.softDeleteById(memberId);
         return ResponseEntity
                 .noContent()
