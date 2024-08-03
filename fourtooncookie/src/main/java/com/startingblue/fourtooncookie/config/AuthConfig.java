@@ -17,9 +17,11 @@ public class AuthConfig implements WebMvcConfigurer {
 
     private final AuthenticationFilter authenticationFilter;
 
+    private final MemberArgumentResolver memberArgumentResolver;
+
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new MemberArgumentResolver());
+        resolvers.add(memberArgumentResolver);
     }
 
     @Bean
