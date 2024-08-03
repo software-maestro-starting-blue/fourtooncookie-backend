@@ -47,7 +47,7 @@ public class UrlListToStringConverter implements AttributeConverter<List<URL>, S
                             throw new ConversionException("Malformed URL: " + urlString, e);
                         }
                     })
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (Exception e) {
             throw new ConversionException("Error converting String to List<URL>", e);
         }

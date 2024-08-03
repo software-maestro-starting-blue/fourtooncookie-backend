@@ -39,7 +39,7 @@ public class LongListToStringConverter implements AttributeConverter<List<Long>,
         try {
             return Arrays.stream(dbData.split(","))
                     .map(Long::valueOf)
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (NumberFormatException e) {
             throw new ConversionException("Error converting String to List<Long>", e);
         }
