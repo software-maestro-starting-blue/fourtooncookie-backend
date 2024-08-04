@@ -48,7 +48,7 @@ public class DiaryService {
     private final CharacterService characterService;
 
     public void createDiary(final DiarySaveRequest request, final UUID memberId) {
-        Character character = characterService.findById(request.characterId());
+        Character character = characterService.readById(request.characterId());
         Member member = memberService.findById(memberId);
 
         verifyUniqueDiary(memberId, request.diaryDate());
@@ -84,7 +84,8 @@ public class DiaryService {
 
     public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
         Diary existedDiary = readById(diaryId);
-        Character character = characterService.findById(request.characterId());
+        Character character = characterService.readById(request.characterId());
+
         existedDiary.update(request.content(), request.hashtagIds(), character);
         diaryRepository.save(existedDiary);
 

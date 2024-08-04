@@ -1,5 +1,7 @@
 package com.startingblue.fourtooncookie.diary.domain;
 
+import com.startingblue.fourtooncookie.artwork.domain.Artwork;
+import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,13 +28,42 @@ public class DiaryTest {
     @Mock
     private Character character;
 
-    private URL validUrl;
-    private UUID validMemberId;
+    private Member member;
+    private UUID memberUID;
+    @Autowired
+    private ArtworkRepository artworkRepository;
 
     @BeforeEach
-    public void setUp() throws MalformedURLException {
-        validUrl = new URL("http://example.com/image.png");
-        validMemberId = UUID.randomUUID();
+    void setUp() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+
+        member = Member.builder()
+                .name("John Doe")
+                .birth(LocalDate.of(1990, 1, 1))
+                .email("john.doe@example.com")
+                .gender(Gender.MALE)
+                .role(Role.MEMBER)
+                .build();
+        member = memberRepository.save(member);
+        memberUID = member.getId();
+
+        try {
+            artwork = new Artwork("Test Artwork", new URL("https://test.png"));
+            artworkRepository.save(artwork);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
+        character = Character.builder()
+                .characterVisionType(CharacterVisionType.DALL_E_3)
+                .paymentType(PaymentType.FREE)
+                .artwork(artwork)
+                .name("CharacterName")
+                .selectionThumbnailUrl(createURL("https://character.png"))
+                .basePrompt("basePrompt")
+                .build();
+        character = characterRepository.save(character);
     }
 
     @Test
