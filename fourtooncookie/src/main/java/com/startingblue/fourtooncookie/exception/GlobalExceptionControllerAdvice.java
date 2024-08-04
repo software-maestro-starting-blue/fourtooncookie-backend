@@ -3,10 +3,9 @@ package com.startingblue.fourtooncookie.exception;
 import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
 import com.startingblue.fourtooncookie.character.exception.CharacterNotFoundException;
 import com.startingblue.fourtooncookie.config.authentication.AuthenticationException;
-import com.startingblue.fourtooncookie.validator.NotEmptyList;
+import com.startingblue.fourtooncookie.hashtag.exception.HashtagNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -54,6 +53,13 @@ public class GlobalExceptionControllerAdvice {
     public String handleArtworkNotFoundException(ArtworkNotFoundException e, WebRequest request) {
         log.error("Filter Artwork not found: ", e);
         return "Artwork not found";
+    }
+
+    @ExceptionHandler(HashtagNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleHashtagNotFoundException(HashtagNotFoundException e, WebRequest request) {
+        log.error("Filter Hashtag not found: ", e);
+        return "Hashtag not found";
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
