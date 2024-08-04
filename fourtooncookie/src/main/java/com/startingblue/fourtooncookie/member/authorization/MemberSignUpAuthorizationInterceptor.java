@@ -8,9 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.HandlerMapping;
 
-import java.util.Map;
 import java.util.UUID;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
@@ -53,6 +51,6 @@ public class MemberSignUpAuthorizationInterceptor implements HandlerInterceptor 
     }
 
     private boolean isAuthorized(UUID memberId) {
-        return memberService.isMemberSignUpAuthorized(memberId);
+        return memberService.verifyMemberSignUp(memberId);
     }
 }
