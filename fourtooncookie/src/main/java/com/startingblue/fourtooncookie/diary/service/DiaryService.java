@@ -51,7 +51,7 @@ public class DiaryService {
         Character character = characterService.findById(request.characterId());
         Member member = memberService.findById(memberId);
 
-        verifyUniqueDiaryEntry(memberId, request.diaryDate());
+        verifyUniqueDiary(memberId, request.diaryDate());
 
         Diary diary = Diary.builder()
                 .content(request.content())
@@ -109,7 +109,7 @@ public class DiaryService {
     }
 
     @Transactional(readOnly = true)
-    public void verifyUniqueDiaryEntry(UUID memberId, LocalDate diaryDate) {
+    private void verifyUniqueDiary(UUID memberId, LocalDate diaryDate) {
         if (diaryRepository.existsByMemberIdAndDiaryDate(memberId, diaryDate)) {
             throw new DiaryDuplicateException("이미 " + diaryDate + "에 일기를 작성하셨습니다.");
         }

@@ -104,31 +104,6 @@ class DiaryServiceTest {
         assertThat(savedDiary.getMemberId()).isEqualTo(member.getId());
     }
 
-    @Test
-    @DisplayName("중복 일기 작성시 DiaryDuplicateException")
-    void testVerifyUniqueDiaryEntry_Duplicate() throws MalformedURLException {
-        // given
-        LocalDate duplicatedDiaryDate = LocalDate.of(2024, 7, 21);
-        UUID duplicatedMemberId = UUID.randomUUID();
-
-        Diary diary = Diary.builder()
-                .content("Test Content")
-                .isFavorite(false)
-                .diaryDate(duplicatedDiaryDate)
-                .paintingImageUrls(List.of(new URL("https://example.com/image.png")))
-                .hashtagsIds(List.of(1L))
-                .character(character)
-                .memberId(duplicatedMemberId)
-                .build();
-
-        // when & then
-        diaryRepository.save(diary);
-        assertThatThrownBy(() -> diaryService.verifyUniqueDiaryEntry(duplicatedMemberId, duplicatedDiaryDate))
-                .isInstanceOf(DiaryDuplicateException.class)
-                .hasMessageContaining("이미 " + duplicatedDiaryDate + "에 일기를 작성하셨습니다.");
-    }
-
-
     @DisplayName("저장된 일기를 삭제한다.")
     @Test
     void deleteDiaryTest() throws MalformedURLException {
