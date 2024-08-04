@@ -4,7 +4,6 @@ import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.service.CharacterService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
-import com.startingblue.fourtooncookie.diary.dto.request.DiaryPaintingImagesUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
