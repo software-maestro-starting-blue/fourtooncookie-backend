@@ -92,14 +92,6 @@ public class DiaryService {
         // todo vision
     }
 
-    public void updateDiary(Long diaryId, DiaryPaintingImagesUpdateRequest request) {
-        Diary existedDiary = readById(diaryId);
-
-        existedDiary.updatePaintingImageUrls(request.paintingImageUrls());
-        diaryRepository.save(existedDiary);
-        // todo vision
-    }
-
     public void deleteDiary(Long diaryId) {
         Diary foundDiary = readById(diaryId);
         diaryRepository.delete(foundDiary);
