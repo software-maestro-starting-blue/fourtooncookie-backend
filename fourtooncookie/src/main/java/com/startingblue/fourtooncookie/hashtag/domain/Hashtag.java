@@ -8,6 +8,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 @Getter
 public enum Hashtag {
@@ -66,11 +67,11 @@ public enum Hashtag {
         this.hashtagType = hashtagType;
     }
 
-    public static Set<Hashtag> findHashtagsByIds(List<Long> ids) {
-        Set<Hashtag> result = EnumSet.noneOf(Hashtag.class);
+    public static Set<Long> findHashtagIdsByIds(List<Long> ids) {
+        ConcurrentSkipListSet<Long> result = new ConcurrentSkipListSet<>();
         for (Long id : ids) {
             Hashtag hashtag = findHashtagById(id);
-            result.add(hashtag);
+            result.add(hashtag.getId());
         }
         return result;
     }
