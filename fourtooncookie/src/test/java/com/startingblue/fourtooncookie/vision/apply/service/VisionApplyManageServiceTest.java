@@ -43,7 +43,7 @@ public class VisionApplyManageServiceTest {
 
     @Test
     @DisplayName("다이어리로 이미지 생성 성공")
-    void testCreateImageByDiary() {
+    void testApplyCreateImageByDiary() {
         Long diaryId = 1L;
         String content = "Test content";
         Character character = mock(Character.class);
@@ -59,7 +59,7 @@ public class VisionApplyManageServiceTest {
         when(llmService.getLLMResult(any(), any())).thenReturn(llmResult);
 
         // Call the method under test
-        visionApplyManageService.createImageByDiary(diaryId, content, character);
+        visionApplyManageService.applyCreateImageByDiary(diaryId, content, character);
 
         // Verify the processVisionApply method was called
         ArgumentCaptor<List<String>> captor = ArgumentCaptor.forClass(List.class);

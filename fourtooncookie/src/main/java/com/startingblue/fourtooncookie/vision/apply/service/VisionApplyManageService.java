@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,7 +26,7 @@ public class VisionApplyManageService {
     private final LLMService llmService;
 
     @Async
-    public void createImageByDiary(Long diaryId, String content, Character character) {
+    public void applyCreateImageByDiary(Long diaryId, String content, Character character) {
         VisionApplyService visionApplyService = findVisionApplyServiceByVisionType(character.getCharacterVisionType());
         List<String> contents = splitContentIntoParts(content);
         visionApplyService.processVisionApply(diaryId, contents, character);
