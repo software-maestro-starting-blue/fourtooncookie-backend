@@ -27,7 +27,7 @@ public class DiaryController {
     @PostMapping
     public ResponseEntity<HttpStatus> createDiary(UUID memberId,
                                                   @RequestBody final DiarySaveRequest request) {
-        diaryService.createDiary(request, memberId); // TODO : 우선 디폴트 값 넣어 놓음.
+        diaryService.createDiary(request, memberId);
         return status(HttpStatus.CREATED).build();
     }
 
