@@ -4,46 +4,58 @@ import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
 import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkSaveRequest;
 import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkUpdateRequest;
-import com.startingblue.fourtooncookie.artwork.dto.response.ArtworkSavedResponse;
-import com.startingblue.fourtooncookie.artwork.dto.response.ArtworkSavedResponses;
-import com.startingblue.fourtooncookie.artwork.exception.ArtworkNoSuchElementException;
+import com.startingblue.fourtooncookie.artwork.exception.ArtworkDuplicateException;
+import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URL;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ArtworkService {
 
     private final ArtworkRepository artworkRepository;
 
-    public ArtworkSavedResponses getSavedArtworkResponses() {
-        List<Artwork> artworks = artworkRepository.findAll();
-        List<ArtworkSavedResponse> artworkSavedResponses = artworks.stream()
-                .map(ArtworkSavedResponse::of)
-                .toList();
-        return new ArtworkSavedResponses(artworkSavedResponses);
+    public void createArtwork(ArtworkSaveRequest request) {
+        verifyUniqueArtwork(request.title(), request.thumbnailUrl());
+        artworkRepository.save(new Artwork(request.title(), request.thumbnailUrl()));
     }
 
-    public void saveArtwork(ArtworkSaveRequest request) {
-        Artwork artwork = new Artwork(request.title(), request.thumnailUrl());
-        artworkRepository.save(artwork);
+    @Transactional(readOnly = true)
+    public List<Artwork> readAllArtworks() {
+        return artworkRepository.findAll();
     }
 
     public void updateArtwork(Long artworkId, ArtworkUpdateRequest request) {
-        Artwork artwork = findById(artworkId);
-        artwork.update(request.title(), request.thumnailUrl());
+        Artwork artwork = readById(artworkId);
+        artwork.update(request.title(), request.thumbnailUrl());
         artworkRepository.save(artwork);
     }
 
     public void deleteArtwork(Long artworkId) {
-        Artwork artwork = findById(artworkId);
+        Artwork artwork = readById(artworkId);
         artworkRepository.delete(artwork);
     }
 
-    public Artwork findById(Long artworkId) {
+    @Transactional(readOnly = true)
+    public Artwork readById(Long artworkId) {
         return artworkRepository.findById(artworkId)
-                .orElseThrow(ArtworkNoSuchElementException::new);
+                .orElseThrow(() -> new ArtworkNotFoundException("Artwork with ID " + artworkId + " not found"));
+    }
+
+    @Transactional(readOnly = true)
+    public void verifyUniqueArtwork(String title, URL thumbnailUrl) {
+        if (artworkRepository.existsByTitle(title)) {
+            throw new ArtworkDuplicateException("Artwork with title '" + title + "' already exists.");
+        }
+        if (artworkRepository.existsByThumbnailUrl(thumbnailUrl)) {
+            throw new ArtworkDuplicateException("Artwork with thumbnail URL '" + thumbnailUrl + "' already exists.");
+        }
     }
 }
+
+

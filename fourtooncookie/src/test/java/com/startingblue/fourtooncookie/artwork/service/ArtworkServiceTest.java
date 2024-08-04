@@ -5,14 +5,15 @@ import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
 import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkSaveRequest;
 import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkUpdateRequest;
 import com.startingblue.fourtooncookie.artwork.dto.response.ArtworkSavedResponses;
-import com.startingblue.fourtooncookie.artwork.exception.ArtworkNoSuchElementException;
+import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
+import com.startingblue.fourtooncookie.artwork.exception.ArtworkDuplicateException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.transaction.Transactional;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
@@ -20,8 +21,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@ActiveProfiles("test")
 @SpringBootTest
+@ActiveProfiles("test")
 @Transactional
 class ArtworkServiceTest {
 
@@ -33,7 +34,7 @@ class ArtworkServiceTest {
 
     @DisplayName("저장된 모든 작품을 가져온다.")
     @Test
-    public void getSavedArtworkResponses() throws MalformedURLException {
+    public void readAllArtworks() throws MalformedURLException {
         // Given
         String title1 = "Title 1";
         URL url1 = new URL("http://test.com/image1.jpg");
@@ -45,26 +46,26 @@ class ArtworkServiceTest {
         artworkRepository.save(artwork2);
 
         // When
-        ArtworkSavedResponses responses = artworkService.getSavedArtworkResponses();
+        ArtworkSavedResponses responses = ArtworkSavedResponses.of(artworkService.readAllArtworks());
 
         // Then
         assertThat(responses.artworks()).hasSize(2);
         assertThat(responses.artworks().get(0).title()).isEqualTo(title1);
-        assertThat(responses.artworks().get(0).thumnailUrl()).isEqualTo(url1);
+        assertThat(responses.artworks().get(0).thumbnailUrl()).isEqualTo(url1);
         assertThat(responses.artworks().get(1).title()).isEqualTo(title2);
-        assertThat(responses.artworks().get(1).thumnailUrl()).isEqualTo(url2);
+        assertThat(responses.artworks().get(1).thumbnailUrl()).isEqualTo(url2);
     }
 
     @DisplayName("새로운 작품을 저장한다.")
     @Test
-    public void saveArtwork() throws MalformedURLException {
+    public void createArtwork() throws MalformedURLException {
         // Given
         String newTitle = "New Artwork";
         URL newUrl = new URL("http://test.com/newimage.jpg");
         ArtworkSaveRequest request = new ArtworkSaveRequest(newTitle, newUrl);
 
         // When
-        artworkService.saveArtwork(request);
+        artworkService.createArtwork(request);
 
         // Then
         Optional<Artwork> savedArtwork = artworkRepository.findAll().stream()
@@ -130,8 +131,8 @@ class ArtworkServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> artworkService.updateArtwork(notFoundArtworkId, request))
-                .isInstanceOf(ArtworkNoSuchElementException.class)
-                .hasMessage("존재하지 않는 작품입니다.");
+                .isInstanceOf(ArtworkNotFoundException.class)
+                .hasMessage("Artwork with ID -1 not found");
     }
 
     @DisplayName("존재하지 않는 ID로 작품을 삭제 시도시 예외를 발생시킨다.")
@@ -142,7 +143,41 @@ class ArtworkServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> artworkService.deleteArtwork(notFoundArtworkId))
-                .isInstanceOf(ArtworkNoSuchElementException.class)
-                .hasMessage("존재하지 않는 작품입니다.");
+                .isInstanceOf(ArtworkNotFoundException.class)
+                .hasMessage("Artwork with ID -1 not found");
+    }
+
+    @DisplayName("중복된 제목으로 작품 저장 시도시 예외를 발생시킨다.")
+    @Test
+    public void createArtworkWithDuplicateTitle() throws MalformedURLException {
+        // Given
+        String title = "Duplicate Title";
+        URL url = new URL("http://test.com/image.jpg");
+        Artwork artwork = new Artwork(title, url);
+        artworkRepository.save(artwork);
+
+        ArtworkSaveRequest request = new ArtworkSaveRequest(title, new URL("http://test.com/newimage.jpg"));
+
+        // When & Then
+        assertThatThrownBy(() -> artworkService.createArtwork(request))
+                .isInstanceOf(ArtworkDuplicateException.class)
+                .hasMessage("Artwork with title 'Duplicate Title' already exists.");
+    }
+
+    @DisplayName("중복된 URL로 작품 저장 시도시 예외를 발생시킨다.")
+    @Test
+    public void createArtworkWithDuplicateUrl() throws MalformedURLException {
+        // Given
+        String title = "New Title";
+        URL url = new URL("http://test.com/duplicateimage.jpg");
+        Artwork artwork = new Artwork(title, url);
+        artworkRepository.save(artwork);
+
+        ArtworkSaveRequest request = new ArtworkSaveRequest("Another Title", url);
+
+        // When & Then
+        assertThatThrownBy(() -> artworkService.createArtwork(request))
+                .isInstanceOf(ArtworkDuplicateException.class)
+                .hasMessage("Artwork with thumbnail URL 'http://test.com/duplicateimage.jpg' already exists.");
     }
 }

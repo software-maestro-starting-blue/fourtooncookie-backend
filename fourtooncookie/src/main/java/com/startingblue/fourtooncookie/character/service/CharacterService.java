@@ -26,7 +26,7 @@ public class CharacterService {
 
     public void addCharacter(final AddCharacterRequest request) {
         CharacterVisionType visionType = CharacterVisionType.valueOf(request.characterVisionType());
-        Artwork artwork = artworkService.findById(request.artworkId());
+        Artwork artwork = artworkService.readById(request.artworkId());
 
         Character character = Character.builder()
                 .characterVisionType(visionType)
@@ -42,7 +42,7 @@ public class CharacterService {
     public void modifyCharacter(final Long characterId, final ModifyCharacterRequest request) {
         Character character = findById(characterId);
         CharacterVisionType visionType = CharacterVisionType.valueOf(request.characterVisionType());
-        Artwork artwork = artworkService.findById(request.artworkId());
+        Artwork artwork = artworkService.readById(request.artworkId());
 
         character.update(visionType,
                 request.paymentType(),
