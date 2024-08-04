@@ -2,17 +2,15 @@ package com.startingblue.fourtooncookie.artwork.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice("com.startingblue.fourtooncookie.artwork")
+@Slf4j
 public class ArtworkExceptionControllerAdvice {
-
-    private static final Logger log = LoggerFactory.getLogger(ArtworkExceptionControllerAdvice.class);
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -40,13 +38,6 @@ public class ArtworkExceptionControllerAdvice {
     public String handleArtworkDuplicateException(ArtworkDuplicateException e) {
         log.error(e.getMessage(), e);
         return "Artwork duplicate";
-    }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleException(Exception e) {
-        log.error(e.getMessage(), e);
-        return "Server Error";
     }
 
 }
