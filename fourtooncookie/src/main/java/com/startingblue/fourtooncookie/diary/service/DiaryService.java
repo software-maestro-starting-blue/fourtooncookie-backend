@@ -69,7 +69,7 @@ public class DiaryService {
 
     @Transactional(readOnly = true)
     public List<Diary> readDiariesByMemberId(final UUID memberId, final int pageNumber, final int pageSize) {
-        Member foundMember = memberService.findById(memberId);
+        Member foundMember = memberService.readById(memberId);
         Page<Diary> diaries = diaryRepository.findAllByMemberIdOrderByDiaryDateDesc(
                 foundMember.getId(),
                 PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "diaryDate"))
@@ -89,8 +89,14 @@ public class DiaryService {
 
         existedDiary.update(request.content(), request.hashtagIds(), character);
         diaryRepository.save(existedDiary);
+        // todo vision
+    }
 
+    public void updateDiary(Long diaryId, DiaryPaintingImagesUpdateRequest request) {
+        Diary existedDiary = readById(diaryId);
 
+        existedDiary.updatePaintingImageUrls(request.paintingImageUrls());
+        diaryRepository.save(existedDiary);
         // todo vision
     }
 
