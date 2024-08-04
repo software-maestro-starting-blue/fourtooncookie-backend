@@ -5,11 +5,11 @@ import com.startingblue.fourtooncookie.artwork.service.ArtworkService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
-import com.startingblue.fourtooncookie.character.dto.request.AddCharacterRequest;
-import com.startingblue.fourtooncookie.character.dto.request.ModifyCharacterRequest;
-import com.startingblue.fourtooncookie.character.dto.response.CharacterResponse;
-import com.startingblue.fourtooncookie.character.dto.response.CharacterResponses;
-import com.startingblue.fourtooncookie.character.exception.CharacterNoSuchElementException;
+import com.startingblue.fourtooncookie.character.domain.PaymentType;
+import com.startingblue.fourtooncookie.character.dto.request.CharacterSaveRequest;
+import com.startingblue.fourtooncookie.character.dto.request.CharacterUpdateRequest;
+import com.startingblue.fourtooncookie.character.exception.CharacterDuplicateException;
+import com.startingblue.fourtooncookie.character.exception.CharacterNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,27 +24,32 @@ public class CharacterService {
     private final CharacterRepository characterRepository;
     private final ArtworkService artworkService;
 
-    public void addCharacter(final AddCharacterRequest request) {
-        CharacterVisionType visionType = CharacterVisionType.valueOf(request.characterVisionType());
-        Artwork artwork = artworkService.readById(request.artworkId());
+    public void createCharacter(final CharacterSaveRequest request) {
+        CharacterVisionType visionType = findByCharacterVisionType(request.characterVisionType());
+        Artwork artwork = artworkService.findById(request.artworkId());
 
-        Character character = Character.builder()
+        verifyUniqueCharacter(request.name(), artwork, request.paymentType(), visionType);
+
+        characterRepository.save(Character.builder()
                 .characterVisionType(visionType)
                 .paymentType(request.paymentType())
                 .name(request.name())
                 .artwork(artwork)
                 .selectionThumbnailUrl(request.selectionThumbnailUrl())
                 .basePrompt(request.basePrompt())
-                .build();
-        characterRepository.save(character);
+                .build());
     }
 
-    public void modifyCharacter(final Long characterId, final ModifyCharacterRequest request) {
-        Character character = findById(characterId);
-        CharacterVisionType visionType = CharacterVisionType.valueOf(request.characterVisionType());
-        Artwork artwork = artworkService.readById(request.artworkId());
+    @Transactional(readOnly = true)
+    public List<Character> readAllCharacters() {
+        return characterRepository.findAll();
+    }
 
-        character.update(visionType,
+    public void updateCharacter(final Long characterId, final CharacterUpdateRequest request) {
+        Character character = readById(characterId);
+        Artwork artwork = artworkService.findById(request.artworkId());
+
+        character.update(request.characterVisionType(),
                 request.paymentType(),
                 artwork,
                 request.name(),
@@ -54,28 +59,28 @@ public class CharacterService {
     }
 
     public void deleteCharacter(final Long characterId) {
-        Character foundCharacter = findById(characterId);
+        Character foundCharacter = readById(characterId);
         characterRepository.delete(foundCharacter);
     }
 
     @Transactional(readOnly = true)
-    public CharacterResponses showCharacters() {
-        final List<Character> characters = characterRepository.findAll();
-
-        return new CharacterResponses(characters.stream()
-                .map(character -> CharacterResponse.builder()
-                        .id(character.getId())
-                        .paymentType(character.getPaymentType().name())
-                        .artworkThumbnailUrl(character.getArtwork().getThumbnailUrl())
-                        .artworkTitle(character.getArtwork().getTitle())
-                        .name(character.getName())
-                        .selectionThumbnailUrl(character.getSelectionThumbnailUrl())
-                        .build())
-                .toList());
+    public Character readById(Long characterId) {
+        return characterRepository.findById(characterId)
+                        .orElseThrow(CharacterNotFoundException::new);
     }
 
-    public Character findById(Long characterId) {
-        return characterRepository.findById(characterId)
-                        .orElseThrow(CharacterNoSuchElementException::new);
+    private CharacterVisionType findByCharacterVisionType(CharacterVisionType characterVisionType) {
+        return CharacterVisionType.valueOf(characterVisionType.name());
+    }
+
+    private void verifyUniqueCharacter(String name, Artwork artwork, PaymentType paymentType, CharacterVisionType visionType) {
+        boolean isDuplicate = characterRepository.existsByName(name) &&
+                characterRepository.existsByArtwork(artwork) &&
+                characterRepository.existsByPaymentType(paymentType) &&
+                characterRepository.existsByCharacterVisionType(visionType);
+
+        if (isDuplicate) {
+            throw new CharacterDuplicateException("중복된 캐릭터입니다. 동일한 이름, 작품, 결제 유형, 캐릭터 비전 유형을 가진 캐릭터가 이미 존재합니다.");
+        }
     }
 }
