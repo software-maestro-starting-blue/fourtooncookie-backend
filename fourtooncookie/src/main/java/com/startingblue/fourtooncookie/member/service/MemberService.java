@@ -45,6 +45,12 @@ public class MemberService {
     }
 
     public boolean verifyMemberExists(UUID memberId) {
-        return  memberRepository.existsById(memberId);
+        return memberRepository.existsById(memberId);
     }
+
+    public boolean isMemberSignUpAuthorized(UUID memberId) {
+        Member member = readById(memberId);
+        return member != null && member.getName() != null || !member.getName().isEmpty();
+    }
+
 }

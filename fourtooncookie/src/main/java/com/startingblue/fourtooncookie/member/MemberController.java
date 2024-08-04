@@ -23,7 +23,7 @@ public final class MemberController {
     }
 
     @PatchMapping("/member")
-    public ResponseEntity<HttpStatus> updateMember(UUID memberId, final MemberUpdateRequest memberUpdateRequest) {
+    public ResponseEntity<HttpStatus> updateMember(UUID memberId, @RequestBody MemberUpdateRequest memberUpdateRequest) {
         memberService.updateById(memberId, memberUpdateRequest);
         return ResponseEntity
                 .noContent()
