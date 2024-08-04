@@ -26,11 +26,9 @@ public class Member {
     @Column(name = "email")
     private String email;
 
-    @NotNull
     @Column(name = "name")
     private String name;
 
-    @NotNull
     @Column(name = "birth")
     private LocalDate birth;
 

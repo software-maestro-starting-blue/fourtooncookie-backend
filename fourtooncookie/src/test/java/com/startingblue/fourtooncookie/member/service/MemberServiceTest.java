@@ -53,7 +53,7 @@ public class MemberServiceTest {
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
         // then
-        MemberSavedResponse memberSavedResponse = memberService.getById(memberId);
+        MemberSavedResponse memberSavedResponse = MemberSavedResponse.of(memberService.readById(memberId));
         assertThat(memberSavedResponse).isNotNull();
         assertThat(memberSavedResponse.email()).isEqualTo(email);
         assertThat(memberSavedResponse.name()).isEqualTo(name);

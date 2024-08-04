@@ -48,8 +48,8 @@ public class DiaryService {
     private final CharacterService characterService;
 
     public void createDiary(final DiarySaveRequest request, final UUID memberId) {
+        Member member = memberService.readById(memberId);
         Character character = characterService.readById(request.characterId());
-        Member member = memberService.findById(memberId);
 
         verifyUniqueDiary(memberId, request.diaryDate());
 
@@ -65,6 +65,7 @@ public class DiaryService {
         diaryRepository.save(diary);
         // todo vision
     }
+
 
     @Transactional(readOnly = true)
     public List<Diary> readDiariesByMemberId(final UUID memberId, final int pageNumber, final int pageSize) {
@@ -91,13 +92,6 @@ public class DiaryService {
 
 
         // todo vision
-    }
-
-    // TODO listener 로 코드 이동 예정
-    public void updateDiary(Long diaryId, DiaryPaintingImagesUpdateRequest request) {
-        Diary existedDiary = readById(diaryId);
-        existedDiary.updatePaintingImageUrls(request.paintingImageUrls());
-        diaryRepository.save(existedDiary);
     }
 
     public void deleteDiary(Long diaryId) {

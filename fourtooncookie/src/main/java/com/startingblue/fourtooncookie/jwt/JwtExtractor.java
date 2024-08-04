@@ -1,8 +1,9 @@
 package com.startingblue.fourtooncookie.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import com.startingblue.fourtooncookie.config.authentication.AuthenticationException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -26,12 +27,24 @@ public class JwtExtractor {
     public Claims parseToken(final String token) {
         final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .requireIssuer(ISSUER)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .requireIssuer(ISSUER)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (SignatureException e) {
+            throw new AuthenticationException("Invalid JWT signature", e);
+        } catch (ExpiredJwtException e) {
+            throw new AuthenticationException("Expired JWT token", e);
+        } catch (UnsupportedJwtException e) {
+            throw new AuthenticationException("Unsupported JWT token", e);
+        } catch (MalformedJwtException e) {
+            throw new AuthenticationException("Malformed JWT token", e);
+        } catch (IllegalArgumentException e) {
+            throw new AuthenticationException("JWT token compact of handler are invalid", e);
+        }
     }
 
     public String resolveToken(final HttpServletRequest request) {
@@ -39,6 +52,6 @@ public class JwtExtractor {
         if (Objects.nonNull(bearerToken) && bearerToken.startsWith(PREFIX_BEARER)) {
             return bearerToken.substring(PREFIX_BEARER.length());
         }
-        throw new IllegalArgumentException("존재하지 않는 토큰입니다.");
+        throw new AuthenticationException("Token does not exist.");
     }
 }
