@@ -3,7 +3,6 @@ package com.startingblue.fourtooncookie.aws.s3.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
@@ -11,8 +10,6 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.time.Duration;
 
 @RequiredArgsConstructor
@@ -20,67 +17,80 @@ import java.time.Duration;
 public class DiaryImageS3Service {
 
     private final S3Client s3Client;
-
     private final S3Presigner s3Presigner;
 
     @Value("${aws.diaryimage.bucket.name}")
     private String bucketName;
 
     @Value("${aws.diaryimage.presignedurl.duration}")
-    private Integer PresignedUrlDurationInMinutes;
+    private Integer preSignedUrlDurationInMinutes;
 
     private static final String IMAGE_FORMAT = ".png";
+    private static final String CONTENT_TYPE = "image/png";
 
     public void uploadImage(Long diaryId, byte[] image, Integer gridPosition) {
+        String keyName = getKeyName(diaryId, gridPosition);
         try {
-            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .contentType("image/png")
-                    .key(getKeyName(diaryId, gridPosition))
-                    .build();
-
+            PutObjectRequest putObjectRequest = createPutObjectRequest(keyName);
             s3Client.putObject(putObjectRequest, RequestBody.fromBytes(image));
         } catch (Exception e) {
-            throw new RuntimeException("S3에 이미지 업로드 중 오류가 발생했습니다.", e);
+            throw new RuntimeException(String.format("S3에 이미지 업로드 중 오류가 발생했습니다. Key: %s", keyName), e);
         }
     }
 
-    public String generatePresignedImageUrl(Long diaryId, Integer gridPosition) {
+    private String getKeyName(Long diaryId, Integer gridPosition) {
+        return String.format("%d/%d%s", diaryId, gridPosition, IMAGE_FORMAT);
+    }
+
+    private PutObjectRequest createPutObjectRequest(String keyName) {
+        return PutObjectRequest.builder()
+                .bucket(bucketName)
+                .contentType(CONTENT_TYPE)
+                .key(keyName)
+                .build();
+    }
+
+    public String generatePreSignedImageUrl(Long diaryId, Integer gridPosition) {
         if (!isImageExist(diaryId, gridPosition)) {
-            throw new RuntimeException("S3에 이미지가 존재하지 않습니다.");
+            throw new RuntimeException(String.format("S3에 이미지가 존재하지 않습니다. Key: %s", getKeyName(diaryId, gridPosition)));
         }
 
         String keyName = getKeyName(diaryId, gridPosition);
 
-        GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
+        try {
+            GetObjectPresignRequest getObjectPresignRequest = createGetObjectPresignRequest(keyName);
+            PresignedGetObjectRequest preSignedRequest = s3Presigner.presignGetObject(getObjectPresignRequest);
+            return preSignedRequest.url().toString();
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("S3에서 프리사인 URL 생성 중 오류가 발생했습니다. Key: %s", keyName), e);
+        }
+    }
+
+    private GetObjectPresignRequest createGetObjectPresignRequest(String keyName) {
+        return GetObjectPresignRequest.builder()
                 .getObjectRequest(r -> r.bucket(bucketName).key(keyName))
-                .signatureDuration(Duration.ofMinutes(PresignedUrlDurationInMinutes))
+                .signatureDuration(Duration.ofMinutes(preSignedUrlDurationInMinutes))
                 .build();
-
-        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(getObjectPresignRequest);
-
-        return presignedRequest.url().toString();
     }
 
     public boolean isImageExist(Long diaryId, Integer gridPosition) {
         String keyName = getKeyName(diaryId, gridPosition);
         try {
-            HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(keyName)
-                    .build();
-
+            HeadObjectRequest headObjectRequest = createHeadObjectRequest(keyName);
             s3Client.headObject(headObjectRequest);
-            return true; // 파일이 존재하면 true 반환
+            return true;
         } catch (NoSuchKeyException e) {
-            return false; // 파일이 존재하지 않으면 false 반환
+            return false;
         } catch (Exception e) {
-            throw new RuntimeException("S3에 이미지 존재 여부 확인 중 오류가 발생했습니다.", e);
+            throw new RuntimeException(String.format("S3에 이미지 존재 여부 확인 중 오류가 발생했습니다. Key: %s", keyName), e);
         }
     }
 
-    private String getKeyName(Long diaryId, Integer gridPosition) {
-        return diaryId + "/" + gridPosition + IMAGE_FORMAT;
+    private HeadObjectRequest createHeadObjectRequest(String keyName) {
+        return HeadObjectRequest.builder()
+                .bucket(bucketName)
+                .key(keyName)
+                .build();
     }
 
 }
