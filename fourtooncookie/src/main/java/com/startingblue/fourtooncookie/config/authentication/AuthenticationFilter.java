@@ -1,7 +1,5 @@
 package com.startingblue.fourtooncookie.config.authentication;
 
-import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
-import com.startingblue.fourtooncookie.character.exception.CharacterNotFoundException;
 import com.startingblue.fourtooncookie.jwt.JwtExtractor;
 import com.startingblue.fourtooncookie.member.service.MemberService;
 import io.jsonwebtoken.Claims;

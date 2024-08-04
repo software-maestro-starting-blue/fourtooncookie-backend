@@ -4,7 +4,6 @@ import com.startingblue.fourtooncookie.hashtag.exception.HashtagDuplicateExcepti
 import com.startingblue.fourtooncookie.hashtag.exception.HashtagNotFoundException;
 import lombok.Getter;
 
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

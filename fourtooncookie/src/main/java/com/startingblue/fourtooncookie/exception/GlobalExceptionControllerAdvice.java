@@ -12,7 +12,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,28 +35,28 @@ public class GlobalExceptionControllerAdvice {
 
     @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public String handleAuthenticationException(AuthenticationException e, WebRequest request) {
+    public String handleAuthenticationException(AuthenticationException e) {
         log.error("Authentication Filter error: ", e);
         return "Authentication Filter error";
     }
 
     @ExceptionHandler(CharacterNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleCharacterNotFoundException(CharacterNotFoundException e, WebRequest request) {
+    public String handleCharacterNotFoundException(CharacterNotFoundException e) {
         log.error("Filter Character not found: ", e);
         return "Character not found";
     }
 
     @ExceptionHandler(ArtworkNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleArtworkNotFoundException(ArtworkNotFoundException e, WebRequest request) {
+    public String handleArtworkNotFoundException(ArtworkNotFoundException e) {
         log.error("Filter Artwork not found: ", e);
         return "Artwork not found";
     }
 
     @ExceptionHandler(HashtagNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleHashtagNotFoundException(HashtagNotFoundException e, WebRequest request) {
+    public String handleHashtagNotFoundException(HashtagNotFoundException e) {
         log.error("Filter Hashtag not found: ", e);
         return "Hashtag not found";
     }
