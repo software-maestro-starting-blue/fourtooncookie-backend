@@ -9,5 +9,5 @@ public interface VisionApplyService {
 
     void processVisionApply(Long diaryId, List<String> contents, Character character);
 
-    CharacterVisionType getModelType();
+    CharacterVisionType getVisionType();
 }
