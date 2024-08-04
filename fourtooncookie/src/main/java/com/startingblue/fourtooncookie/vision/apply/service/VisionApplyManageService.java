@@ -9,40 +9,41 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Service
 public class VisionApplyManageService {
 
-    @Value("${ai.split.prompt}")
-    private String CONTENT_SPLIT_SYSTEM_PROMPT;
+    private static final String RESULT_SPLIT_REGEX = "\\.";
+    private static final int CONTENT_PARTS = 4;
 
-    private final static String RESULT_SPLIT_REGEX = "\\.";
+    @Value("${ai.split.prompt}")
+    private String contentSplitSystemPrompt;
 
     private final List<VisionApplyService> visionApplyServices;
-
     private final LLMService llmService;
-
 
     @Async
     public void createImageByDiary(Long diaryId, String content, Character character) {
-        VisionApplyService visionApplyService = findVisionApplyServiceByModelType(character.getCharacterVisionType());
-
-        List<String> contents = seperateContentBy4contents(content);
-
+        VisionApplyService visionApplyService = findVisionApplyServiceByVisionType(character.getCharacterVisionType());
+        List<String> contents = splitContentIntoParts(content);
         visionApplyService.processVisionApply(diaryId, contents, character);
     }
 
-    private VisionApplyService findVisionApplyServiceByModelType(CharacterVisionType modelType) {
+    private VisionApplyService findVisionApplyServiceByVisionType(CharacterVisionType visionType) {
         return visionApplyServices.stream()
-                .filter(visionApplyService -> visionApplyService.getModelType().equals(modelType))
+                .filter(service -> service.getVisionType().equals(visionType))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No Vision Service Found"));
+                .orElseThrow(() -> new IllegalStateException("No Vision Service Found for Vision Type: " + visionType));
     }
 
-    private List<String> seperateContentBy4contents(String content) {
-        String result = llmService.getLLMResult(CONTENT_SPLIT_SYSTEM_PROMPT, content);
-        return List.of(result.split(RESULT_SPLIT_REGEX));
+    private List<String> splitContentIntoParts(String content) {
+        String result = llmService.getLLMResult(contentSplitSystemPrompt, content);
+        return Stream.of(result.split(RESULT_SPLIT_REGEX))
+                .limit(CONTENT_PARTS)
+                .collect(Collectors.toList());
     }
-
 }
