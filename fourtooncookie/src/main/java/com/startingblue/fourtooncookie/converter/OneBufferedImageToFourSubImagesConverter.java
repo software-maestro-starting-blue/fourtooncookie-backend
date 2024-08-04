@@ -1,7 +1,6 @@
 package com.startingblue.fourtooncookie.converter;
 
 import com.startingblue.fourtooncookie.converter.exception.ConversionException;
-import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import org.springframework.stereotype.Component;
 
@@ -12,17 +11,7 @@ import java.util.List;
 
 @Converter
 @Component
-public class OneBufferedImageToFourSubImagesConverter implements AttributeConverter<BufferedImage, List<BufferedImage>> {
-
-    @Override
-    public List<BufferedImage> convertToDatabaseColumn(BufferedImage attribute) {
-        return splitImageToSubImages(attribute);
-    }
-
-    @Override
-    public BufferedImage convertToEntityAttribute(List<BufferedImage> dbData) {
-        return combineSubImagesToImage(dbData);
-    }
+public class OneBufferedImageToFourSubImagesConverter {
 
     public List<BufferedImage> splitImageToSubImages(BufferedImage image) {
         if (image == null) {

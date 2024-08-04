@@ -2,8 +2,8 @@ package com.startingblue.fourtooncookie.diary.domain;
 
 import com.startingblue.fourtooncookie.config.BaseEntity;
 import com.startingblue.fourtooncookie.character.domain.Character;
-import com.startingblue.fourtooncookie.converter.LongListToStringConverter;
-import com.startingblue.fourtooncookie.converter.UrlListToStringConverter;
+import com.startingblue.fourtooncookie.converter.jpa.LongListToStringConverter;
+import com.startingblue.fourtooncookie.converter.jpa.UrlListToStringConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -1,22 +1,24 @@
-package com.startingblue.fourtooncookie.converter;
+package com.startingblue.fourtooncookie.converter.jpa;
 
 import com.startingblue.fourtooncookie.converter.exception.ConversionException;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import org.springframework.stereotype.Component;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Converter
 @Component
-public class LongListToStringConverter implements AttributeConverter<List<Long>, String> {
+public class UrlListToStringConverter implements AttributeConverter<List<URL>, String> {
 
     private static final String EMPTY_LIST_STRING = "";
 
     @Override
-    public String convertToDatabaseColumn(List<Long> attribute) {
+    public String convertToDatabaseColumn(List<URL> attribute) {
         if (isAttributeEmpty(attribute)) {
             return EMPTY_LIST_STRING;
         }
@@ -26,26 +28,32 @@ public class LongListToStringConverter implements AttributeConverter<List<Long>,
                     .map(String::valueOf)
                     .collect(Collectors.joining(","));
         } catch (Exception e) {
-            throw new ConversionException("Error converting List<Long> to String", e);
+            throw new ConversionException("Error converting List<URL> to String", e);
         }
     }
 
     @Override
-    public List<Long> convertToEntityAttribute(String dbData) {
+    public List<URL> convertToEntityAttribute(String dbData) {
         if (isDBColumnEmpty(dbData)) {
             return List.of();
         }
 
         try {
             return Arrays.stream(dbData.split(","))
-                    .map(Long::valueOf)
+                    .map(urlString -> {
+                        try {
+                            return new URL(urlString);
+                        } catch (MalformedURLException e) {
+                            throw new ConversionException("Malformed URL: " + urlString, e);
+                        }
+                    })
                     .toList();
-        } catch (NumberFormatException e) {
-            throw new ConversionException("Error converting String to List<Long>", e);
+        } catch (Exception e) {
+            throw new ConversionException("Error converting String to List<URL>", e);
         }
     }
 
-    private static boolean isAttributeEmpty(List<Long> attribute) {
+    private static boolean isAttributeEmpty(List<URL> attribute) {
         return attribute == null || attribute.isEmpty();
     }
 

@@ -25,7 +25,7 @@ class ByteArrayToPngBufferedImageConverterTest {
         BufferedImage inputImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
         byte[] byteArray = convertBufferedImageToByteArray(inputImage);
 
-        BufferedImage outputImage = converter.convertToDatabaseColumn(byteArray);
+        BufferedImage outputImage = converter.convertByteArrayToBufferedImage(byteArray);
 
         assertThat(outputImage).isNotNull();
         assertThat(outputImage.getWidth()).isEqualTo(inputImage.getWidth());
@@ -37,7 +37,7 @@ class ByteArrayToPngBufferedImageConverterTest {
     void testConvertToEntityAttribute() throws Exception {
         BufferedImage inputImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
 
-        byte[] byteArray = converter.convertToEntityAttribute(inputImage);
+        byte[] byteArray = converter.convertBufferedImageToByteArray(inputImage);
 
         assertThat(byteArray).isNotEmpty();
 
@@ -50,18 +50,18 @@ class ByteArrayToPngBufferedImageConverterTest {
 
     @Test
     @DisplayName("byte[]가 null일 때 예외 발생")
-    void testConvertToDatabaseColumnWithNull() {
+    void testConvertByteArrayToBufferedImageNull() {
         assertThatThrownBy(() -> {
-            converter.convertToDatabaseColumn(null);
+            converter.convertByteArrayToBufferedImage(null);
         }).isInstanceOf(ConversionException.class)
                 .hasMessageContaining("Byte array attribute is null");
     }
 
     @Test
     @DisplayName("BufferedImage가 null일 때 예외 발생")
-    void testConvertToEntityAttributeWithNull() {
+    void testConvertByteArrayToBufferedImageWithNull() {
         assertThatThrownBy(() -> {
-            converter.convertToEntityAttribute(null);
+            converter.convertBufferedImageToByteArray(null);
         }).isInstanceOf(ConversionException.class)
                 .hasMessageContaining("BufferedImage attribute is null");
     }
