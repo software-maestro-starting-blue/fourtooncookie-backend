@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,12 +25,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DataJpaTest
 @ActiveProfiles("test")
-@SpringBootTest
-@Transactional
 class DiaryRepositoryTest {
 
     @Autowired
@@ -49,11 +49,6 @@ class DiaryRepositoryTest {
 
     @BeforeEach
     void setUp() throws MalformedURLException {
-        diaryRepository.deleteAllInBatch();
-        memberRepository.deleteAllInBatch();
-        characterRepository.deleteAllInBatch();
-        artworkRepository.deleteAllInBatch();
-
         artwork = new Artwork("Test Artwork", new URL("https://test.com/artwork.png"));
         artwork = artworkRepository.save(artwork);
     }
@@ -62,34 +57,8 @@ class DiaryRepositoryTest {
     @Test
     void saveDiary() throws MalformedURLException {
         // given
-        String memberName = "testUser";
-        String memberEmail = "test@email.com";
-        LocalDate memberBirthDate = LocalDate.of(2024, 7, 23);
-        Gender memberGender = Gender.OTHER;
-        Role memberRole = Role.MEMBER;
-
-        Member member = Member.builder()
-                .name(memberName)
-                .email(memberEmail)
-                .birth(memberBirthDate)
-                .gender(memberGender)
-                .role(memberRole)
-                .build();
-        memberRepository.save(member);
-
-        String characterName = "Test Character";
-        URL characterUrl = new URL("https://testImagePng.com");
-        String basePrompt = "Test base prompt";
-
-        Character character = Character.builder()
-                .characterVisionType(CharacterVisionType.DALL_E_3)
-                .paymentType(PaymentType.FREE)
-                .artwork(artwork)
-                .name(characterName)
-                .selectionThumbnailUrl(characterUrl)
-                .basePrompt(basePrompt)
-                .build();
-        characterRepository.save(character);
+        Member member = createMember();
+        Character character = createCharacter();
 
         String diaryContent = "Test Content";
         LocalDate diaryDate = LocalDate.now();
@@ -124,81 +93,12 @@ class DiaryRepositoryTest {
     @Test
     void findAllByMemberWithPagination() throws MalformedURLException {
         // given
-        String memberName = "testUser";
-        String memberEmail = "test@email.com";
-        LocalDate memberBirthDate = LocalDate.of(2024, 7, 23);
-        Gender memberGender = Gender.OTHER;
-        Role memberRole = Role.MEMBER;
+        Member member = createMember();
+        Character character = createCharacter();
 
-        Member member = Member.builder()
-                .name(memberName)
-                .email(memberEmail)
-                .birth(memberBirthDate)
-                .gender(memberGender)
-                .role(memberRole)
-                .build();
-        memberRepository.save(member);
-
-        String characterName = "Test Character";
-        URL characterUrl = new URL("https://testImagePng.com");
-        String basePrompt = "Test base prompt";
-
-        Character character = Character.builder()
-                .characterVisionType(CharacterVisionType.DALL_E_3)
-                .paymentType(PaymentType.FREE)
-                .artwork(artwork)
-                .name(characterName)
-                .selectionThumbnailUrl(characterUrl)
-                .basePrompt(basePrompt)
-                .build();
-        characterRepository.save(character);
-
-        String content1 = "Test Content 1";
-        LocalDate date1 = LocalDate.of(2024, 7, 23);
-        URL imageUrl1 = new URL("https://example.com/image1.png");
-        List<Long> hashtagsIds1 = List.of(1L);
-
-        String content2 = "Test Content 2";
-        LocalDate date2 = LocalDate.of(2024, 7, 24);
-        URL imageUrl2 = new URL("https://example.com/image2.png");
-        List<Long> hashtagsIds2 = List.of(2L);
-
-        String content3 = "Test Content 3";
-        LocalDate date3 = LocalDate.of(2024, 7, 25);
-        URL imageUrl3 = new URL("https://example.com/image3.png");
-        List<Long> hashtagsIds3 = List.of(3L);
-
-        Diary diary1 = Diary.builder()
-                .content(content1)
-                .isFavorite(false)
-                .diaryDate(date1)
-                .paintingImageUrls(List.of(imageUrl1))
-                .hashtagsIds(hashtagsIds1)
-                .character(character)
-                .memberId(member.getId())
-                .build();
-
-        Diary diary2 = Diary.builder()
-                .content(content2)
-                .isFavorite(false)
-                .diaryDate(date2)
-                .paintingImageUrls(List.of(imageUrl2))
-                .hashtagsIds(hashtagsIds2)
-                .character(character)
-                .memberId(member.getId())
-                .build();
-
-        Diary diary3 = Diary.builder()
-                .content(content3)
-                .isFavorite(false)
-                .diaryDate(date3)
-                .paintingImageUrls(List.of(imageUrl3))
-                .hashtagsIds(hashtagsIds3)
-                .character(character)
-                .memberId(member.getId())
-                .build();
-
-        diaryRepository.saveAll(List.of(diary1, diary2, diary3));
+        createDiary(member, character, "Test Content 1", LocalDate.of(2024, 7, 23), "https://example.com/image1.png", List.of(1L));
+        createDiary(member, character, "Test Content 2", LocalDate.of(2024, 7, 24), "https://example.com/image2.png", List.of(2L));
+        createDiary(member, character, "Test Content 3", LocalDate.of(2024, 7, 25), "https://example.com/image3.png", List.of(3L));
 
         Pageable pageable = PageRequest.of(0, 2);
 
@@ -210,6 +110,99 @@ class DiaryRepositoryTest {
         assertThat(diaryPage.getContent()).hasSize(2);
         assertThat(diaryPage.getContent())
                 .extracting(Diary::getContent)
-                .containsExactly(content3, content2);
+                .containsExactly("Test Content 3", "Test Content 2");
+    }
+
+    @DisplayName("멤버 ID와 일기 날짜로 일기 존재 여부 확인 테스트")
+    @Test
+    void testExistsByMemberIdAndDiaryDate() throws MalformedURLException {
+        // given
+        Member member = createMember();
+        Character character = createCharacter();
+
+        LocalDate diaryDate = LocalDate.now();
+        createDiary(member, character, "Test Content", diaryDate, "https://example.com/image.png", List.of(1L));
+
+        // when
+        boolean exists = diaryRepository.existsByMemberIdAndDiaryDate(member.getId(), diaryDate);
+
+        // then
+        assertThat(exists).isTrue();
+    }
+
+    @DisplayName("멤버 ID와 일기 날짜로 일기 존재하지 않음 테스트")
+    @Test
+    void testNotExistsByMemberIdAndDiaryDate() {
+        // given
+        UUID memberId = UUID.randomUUID();
+        LocalDate diaryDate = LocalDate.now();
+
+        // when
+        boolean exists = diaryRepository.existsByMemberIdAndDiaryDate(memberId, diaryDate);
+
+        // then
+        assertThat(exists).isFalse();
+    }
+
+    @DisplayName("일기 즐겨찾기 상태 업데이트 테스트")
+    @Test
+    void testUpdateFavorite() throws MalformedURLException {
+        // given
+        Member member = createMember();
+        Character character = createCharacter();
+
+        Diary diary = createDiary(member, character, "Test Content", LocalDate.now(), "https://example.com/image.png", List.of(1L));
+
+        // when
+        diary.updateFavorite(true);
+        diaryRepository.save(diary);
+
+        // then
+        Diary updatedDiary = diaryRepository.findById(diary.getId()).orElseThrow();
+        assertThat(updatedDiary.isFavorite()).isTrue();
+
+        // when
+        diary.updateFavorite(false);
+        diaryRepository.save(diary);
+
+        // then
+        updatedDiary = diaryRepository.findById(diary.getId()).orElseThrow();
+        assertThat(updatedDiary.isFavorite()).isFalse();
+    }
+
+    private Member createMember() {
+        Member member = Member.builder()
+                .name("testUser")
+                .email("test@email.com")
+                .birth(LocalDate.of(2024, 7, 23))
+                .gender(Gender.OTHER)
+                .role(Role.MEMBER)
+                .build();
+        return memberRepository.save(member);
+    }
+
+    private Character createCharacter() throws MalformedURLException {
+        Character character = Character.builder()
+                .characterVisionType(CharacterVisionType.DALL_E_3)
+                .paymentType(PaymentType.FREE)
+                .artwork(artwork)
+                .name("Test Character")
+                .selectionThumbnailUrl(new URL("https://testImagePng.com"))
+                .basePrompt("Test base prompt")
+                .build();
+        return characterRepository.save(character);
+    }
+
+    private Diary createDiary(Member member, Character character, String content, LocalDate date, String imageUrl, List<Long> hashtags) throws MalformedURLException {
+        Diary diary = Diary.builder()
+                .content(content)
+                .isFavorite(false)
+                .diaryDate(date)
+                .paintingImageUrls(List.of(new URL(imageUrl)))
+                .hashtagsIds(hashtags)
+                .character(character)
+                .memberId(member.getId())
+                .build();
+        return diaryRepository.save(diary);
     }
 }
