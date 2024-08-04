@@ -1,14 +1,12 @@
 package com.startingblue.fourtooncookie.llm.service;
 
-import org.junit.jupiter.api.BeforeEach;
+import com.startingblue.fourtooncookie.llm.exception.LLMException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.ai.chat.messages.SystemMessage;
-import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -19,6 +17,7 @@ import org.springframework.ai.openai.api.OpenAiApi;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -49,18 +48,15 @@ public class OpenAIGpt4oLLMServiceTest {
     }
 
     @Test
-    @DisplayName("OpenAI API 호출 시 예외가 발생하면 적절한 오류 메시지를 반환한다.")
+    @DisplayName("OpenAI API 호출 시 예외가 발생하면 LLMException을 반환한다.")
     void testGetLLMResult_Exception() {
         // given
         String systemPrompt = "This is a system prompt.";
         String userPrompt = "This is a user prompt.";
         when(openAiChatModel.call(any(Prompt.class))).thenThrow(new RuntimeException("API Error"));
 
-        // when
-        String actualResponse = openAIGpt4oLLMService.getLLMResult(systemPrompt, userPrompt);
-
-        // then
-        assertEquals("잠시 후 다시 시도해 주세요.", actualResponse);
+        // when & then
+        assertThrows(LLMException.class, () -> openAIGpt4oLLMService.getLLMResult(systemPrompt, userPrompt));
     }
 
     @Test
