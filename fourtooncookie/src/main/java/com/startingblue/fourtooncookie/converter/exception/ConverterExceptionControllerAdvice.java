@@ -15,21 +15,21 @@ public class ConverterExceptionControllerAdvice {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleIllegalArgumentException(IllegalArgumentException e) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(), e);
         return "Bad Request";
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleRuntimeExceptionException(RuntimeException e) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(), e);
         return "Bad Request";
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleException(Exception e) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(), e);
         return "Server Error";
     }
 }
