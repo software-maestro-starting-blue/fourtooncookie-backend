@@ -2,26 +2,35 @@ package com.startingblue.fourtooncookie.member.exception;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice("com.startingblue.fourtooncookie.member")
+@Slf4j
 public class MemberExceptionControllerAdvice {
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<String> handleEntityNotFoundExceptionException(EntityNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Member not found: " + e.getMessage());
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleEntityNotFoundExceptionException(EntityNotFoundException e) {
+        log.error(e.getMessage(), e);
+        return "Member Not Found";
     }
 
     @ExceptionHandler(EntityExistsException.class)
-    public ResponseEntity<String> handleEntityExistsExceptionException(EntityExistsException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Member Exists: " + e.getMessage());
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleEntityExistsExceptionException(EntityExistsException e) {
+        log.error(e.getMessage(), e);
+        return "Member Exists";
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleEntityIllegalArgumentExceptionException(IllegalArgumentException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Member IllegalArgumentException " + e.getMessage());
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleIllegalArgumentException(IllegalArgumentException e) {
+        log.error(e.getMessage(), e);
+        return "Bad Request";
     }
 }
