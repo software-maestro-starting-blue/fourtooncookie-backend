@@ -108,4 +108,10 @@ public class DiaryService {
             throw new DiaryDuplicateException("이미 " + diaryDate + "에 일기를 작성하셨습니다.");
         }
     }
+
+    @Transactional(readOnly = true)
+    public boolean verifyDiaryOwner(UUID memberId, Long diaryId) {
+        Diary foundDiary = readById(diaryId);
+        return foundDiary.isOwner(memberId);
+    }
 }

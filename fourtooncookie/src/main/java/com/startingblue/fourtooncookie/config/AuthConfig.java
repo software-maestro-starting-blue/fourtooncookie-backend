@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.config;
 
+import com.startingblue.fourtooncookie.diary.authorization.DiaryOwnerAuthorizationInterceptor;
 import com.startingblue.fourtooncookie.member.authorization.MemberSignUpAuthorizationInterceptor;
 import com.startingblue.fourtooncookie.member.dto.MemberArgumentResolver;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +16,17 @@ import java.util.List;
 public class AuthConfig implements WebMvcConfigurer {
 
     private final MemberSignUpAuthorizationInterceptor memberSignUpAuthorizationInterceptor;
+    private final DiaryOwnerAuthorizationInterceptor diaryOwnerAuthorizationInterceptor;
     private final MemberArgumentResolver memberArgumentResolver;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(memberSignUpAuthorizationInterceptor)
                 .addPathPatterns("/diary/**");
+
+        registry.addInterceptor(diaryOwnerAuthorizationInterceptor)
+                .addPathPatterns("/diary/**")
+                .excludePathPatterns("/diary", "/diary/timeline");
     }
 
     @Override

@@ -4,8 +4,7 @@ import com.startingblue.fourtooncookie.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -15,10 +14,10 @@ import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class MemberSignUpAuthorizationInterceptor implements HandlerInterceptor {
 
     private static final String PATH_VARIABLE_KEY = "memberId";
-    private static final Logger log = LoggerFactory.getLogger(MemberSignUpAuthorizationInterceptor.class);
     private final MemberService memberService;
 
     @Override
