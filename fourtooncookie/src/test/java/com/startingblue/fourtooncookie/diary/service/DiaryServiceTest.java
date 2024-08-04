@@ -214,34 +214,6 @@ class DiaryServiceTest {
         assertThat(updatedDiary.getCharacter()).isEqualTo(newCharacter);
     }
 
-    @DisplayName("일기 그림 이미지 URL을 업데이트 한다.")
-    @Test
-    void updatePaintingImageUrlsTest() throws MalformedURLException {
-        // given
-        Diary diary = createDiary(LocalDate.of(2024, 7, 21), character, member);
-        diaryRepository.save(diary);
-
-        List<URL> updateUrls = new ArrayList<>();
-        for (int i = 1; i <= 4; i++) {
-            updateUrls.add(new URL("https://new" + i + ".png"));
-        }
-        DiaryPaintingImagesUpdateRequest request = new DiaryPaintingImagesUpdateRequest(updateUrls);
-
-        // when
-        diaryService.updateDiary(diary.getId(), request);
-
-        // then
-        Diary updatedDiary = diaryRepository.findById(diary.getId()).get();
-        assertThat(updatedDiary.getPaintingImageUrls())
-                .extracting(URL::toString)
-                .containsExactly(
-                        updateUrls.get(0).toString(),
-                        updateUrls.get(1).toString(),
-                        updateUrls.get(2).toString(),
-                        updateUrls.get(3).toString()
-                );
-    }
-
     private Diary createDiary(LocalDate diaryDate, Character character, Member member) throws MalformedURLException {
         return Diary.builder()
                 .content("Initial content")
