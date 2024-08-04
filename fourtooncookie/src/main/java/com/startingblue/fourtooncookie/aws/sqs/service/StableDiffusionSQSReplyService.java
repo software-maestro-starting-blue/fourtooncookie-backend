@@ -2,8 +2,12 @@ package com.startingblue.fourtooncookie.aws.sqs.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.startingblue.fourtooncookie.aws.sqs.exception.SQSMessageConversionException;
+import com.startingblue.fourtooncookie.aws.sqs.exception.SQSMessageDeletionException;
+import com.startingblue.fourtooncookie.aws.sqs.exception.SQSMessageProcessingException;
 import com.startingblue.fourtooncookie.vision.reply.dto.VisionReplyEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,14 +20,17 @@ import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StableDiffusionSQSReplyService {
 
+    private static final int FIXED_DELAY = 5 * 1000;
+    private static final String CONVERSION_ERROR_MESSAGE = "메시지를 VisionReplyEvent로 변환하는 중 오류가 발생했습니다.";
+    private static final String DELETE_MESSAGE_ERROR_MESSAGE = "메시지를 삭제하는 중 오류가 발생했습니다.";
+
     private final SqsClient sqsClient;
-
     private final ApplicationEventPublisher applicationEventPublisher;
-
     private final ObjectMapper objectMapper;
 
     @Value("${aws.sqs.reply.url}")
@@ -32,15 +39,10 @@ public class StableDiffusionSQSReplyService {
     @Value("${aws.sqs.reply.max-message-count}")
     private Integer maxMessageCount;
 
-    @Scheduled(fixedDelay = 5 * 1000)
+    @Scheduled(fixedDelay = FIXED_DELAY)
     public void handleMessages() {
         List<Message> messages = getMessagesFromSQS();
-
-        messages.forEach(message -> {
-                    VisionReplyEvent visionReplyEvent = convertMessageToVisionReplyEvent(message.body());
-                    applicationEventPublisher.publishEvent(visionReplyEvent);
-                    deleteMessage(message);
-                });
+        processMessages(messages);
     }
 
     private List<Message> getMessagesFromSQS() {
@@ -50,8 +52,19 @@ public class StableDiffusionSQSReplyService {
                 .build();
 
         ReceiveMessageResponse receiveMessageResponse = sqsClient.receiveMessage(receiveMessageRequest);
-
         return receiveMessageResponse.messages();
+    }
+
+    private void processMessages(List<Message> messages) {
+        for (Message message : messages) {
+            try {
+                VisionReplyEvent visionReplyEvent = convertMessageToVisionReplyEvent(message.body());
+                applicationEventPublisher.publishEvent(visionReplyEvent);
+                deleteMessage(message);
+            } catch (Exception e) {
+                throw new SQSMessageProcessingException("Unexpected error occurred while sending message to SQS", e);
+            }
+        }
     }
 
     private VisionReplyEvent convertMessageToVisionReplyEvent(String message) {
@@ -64,18 +77,20 @@ public class StableDiffusionSQSReplyService {
 
             return new VisionReplyEvent(diaryId, image, gridPosition);
         } catch (Exception e) {
-            throw new RuntimeException("메시지를 VisionReplyEvent로 변환하는 중 오류가 발생했습니다.", e);
+            throw new SQSMessageConversionException(CONVERSION_ERROR_MESSAGE, e);
         }
     }
 
     private void deleteMessage(Message message) {
-        DeleteMessageRequest deleteMessageRequest = DeleteMessageRequest.builder()
-                .queueUrl(replyQueueUrl)
-                .receiptHandle(message.receiptHandle())
-                .build();
+        try {
+            DeleteMessageRequest deleteMessageRequest = DeleteMessageRequest.builder()
+                    .queueUrl(replyQueueUrl)
+                    .receiptHandle(message.receiptHandle())
+                    .build();
 
-        sqsClient.deleteMessage(deleteMessageRequest);
+            sqsClient.deleteMessage(deleteMessageRequest);
+        } catch (Exception e) {
+            throw new SQSMessageDeletionException(DELETE_MESSAGE_ERROR_MESSAGE, e);
+        }
     }
-
-
 }
