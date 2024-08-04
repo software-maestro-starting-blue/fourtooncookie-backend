@@ -1,5 +1,9 @@
 package com.startingblue.fourtooncookie.aws.s3.service;
 
+import com.startingblue.fourtooncookie.aws.s3.exception.S3ImageExistenceCheckException;
+import com.startingblue.fourtooncookie.aws.s3.exception.S3ImageNotFoundException;
+import com.startingblue.fourtooncookie.aws.s3.exception.S3PreSignUrlException;
+import com.startingblue.fourtooncookie.aws.s3.exception.S3UploadException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,7 +38,7 @@ public class DiaryImageS3Service {
             PutObjectRequest putObjectRequest = createPutObjectRequest(keyName);
             s3Client.putObject(putObjectRequest, RequestBody.fromBytes(image));
         } catch (Exception e) {
-            throw new RuntimeException(String.format("S3에 이미지 업로드 중 오류가 발생했습니다. Key: %s", keyName), e);
+            throw new S3UploadException(String.format("S3에 이미지 업로드 중 오류가 발생했습니다. Key: %s", keyName), e);
         }
     }
 
@@ -52,7 +56,7 @@ public class DiaryImageS3Service {
 
     public String generatePreSignedImageUrl(Long diaryId, Integer gridPosition) {
         if (!isImageExist(diaryId, gridPosition)) {
-            throw new RuntimeException(String.format("S3에 이미지가 존재하지 않습니다. Key: %s", getKeyName(diaryId, gridPosition)));
+            throw new S3ImageNotFoundException(String.format("S3에 이미지가 존재하지 않습니다. Key: %s", getKeyName(diaryId, gridPosition)));
         }
 
         String keyName = getKeyName(diaryId, gridPosition);
@@ -62,7 +66,7 @@ public class DiaryImageS3Service {
             PresignedGetObjectRequest preSignedRequest = s3Presigner.presignGetObject(getObjectPresignRequest);
             return preSignedRequest.url().toString();
         } catch (Exception e) {
-            throw new RuntimeException(String.format("S3에서 프리사인 URL 생성 중 오류가 발생했습니다. Key: %s", keyName), e);
+            throw new S3PreSignUrlException(String.format("S3에서 프리사인 URL 생성 중 오류가 발생했습니다. Key: %s", keyName), e);
         }
     }
 
@@ -82,7 +86,7 @@ public class DiaryImageS3Service {
         } catch (NoSuchKeyException e) {
             return false;
         } catch (Exception e) {
-            throw new RuntimeException(String.format("S3에 이미지 존재 여부 확인 중 오류가 발생했습니다. Key: %s", keyName), e);
+            throw new S3ImageExistenceCheckException(String.format("S3에 이미지 존재 여부 확인 중 오류가 발생했습니다. Key: %s", keyName), e);
         }
     }
 
@@ -92,5 +96,4 @@ public class DiaryImageS3Service {
                 .key(keyName)
                 .build();
     }
-
 }
