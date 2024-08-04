@@ -1,7 +1,5 @@
 package com.startingblue.fourtooncookie.vision.apply.service;
 
-import com.startingblue.fourtooncookie.character.domain.Character;
-import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.converter.ByteArrayToPngBufferedImageConverter;
 import com.startingblue.fourtooncookie.converter.OneBufferedImageToFourSubImagesConverter;
 import com.startingblue.fourtooncookie.vision.reply.dto.VisionReplyEvent;
@@ -76,10 +74,14 @@ public class DallE3VisionApplyServiceTest {
     @DisplayName("이미지 Base64 JSON을 4개의 이미지로 변환 성공")
     void testConvertImageB64JsonToFourImagesOfByteArray() {
         String imageB64Json = Base64.getEncoder().encodeToString("test-image".getBytes());
+        byte[] imageByteArray = Base64.getDecoder().decode(imageB64Json);
         BufferedImage bufferedImage = mock(BufferedImage.class);
-        when(byteArrayToPngBufferedImageConverter.convertToDatabaseColumn(any())).thenReturn(bufferedImage);
-        when(oneBufferedImageToFourSubImagesConverter.convertToDatabaseColumn(any())).thenReturn(List.of(bufferedImage, bufferedImage, bufferedImage, bufferedImage));
-        when(byteArrayToPngBufferedImageConverter.convertToEntityAttribute(any())).thenReturn("test-image".getBytes());
+
+        when(byteArrayToPngBufferedImageConverter.convertByteArrayToBufferedImage(imageByteArray)).thenReturn(bufferedImage);
+        List<BufferedImage> subImages = List.of(bufferedImage, bufferedImage, bufferedImage, bufferedImage);
+        when(oneBufferedImageToFourSubImagesConverter.splitImageToSubImages(bufferedImage)).thenReturn(subImages);
+        when(byteArrayToPngBufferedImageConverter.convertBufferedImageToByteArray(any(BufferedImage.class)))
+                .thenReturn("test-image".getBytes());
 
         List<byte[]> images = ReflectionTestUtils.invokeMethod(dallE3VisionApplyService, "convertImageB64JsonToFourImagesOfByteArray", imageB64Json);
 
@@ -89,6 +91,7 @@ public class DallE3VisionApplyServiceTest {
             assertArrayEquals("test-image".getBytes(), image);
         }
     }
+
 
     @Test
     @DisplayName("VisionReplyEvent 발행 성공")
