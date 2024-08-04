@@ -12,7 +12,8 @@ import com.startingblue.fourtooncookie.diary.dto.request.DiaryPaintingImagesUpda
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
-import com.startingblue.fourtooncookie.diary.exception.DiaryNoSuchElementException;
+import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponses;
+import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
@@ -80,7 +81,7 @@ class DiaryServiceTest {
         memberRepository.save(member);
     }
 
-    @DisplayName("사용자가 작성한 일기를 저장한다.")
+    @DisplayName("작성한 일기를 저장한다.")
     @Test
     void createDiaryTest() {
         // given
@@ -124,7 +125,7 @@ class DiaryServiceTest {
         diaryRepository.save(diary);
 
         // when
-        Diary foundDiary = diaryService.findById(diary.getId());
+        Diary foundDiary = diaryService.readById(diary.getId());
 
         // then
         assertThat(foundDiary).isEqualTo(diary);
@@ -137,13 +138,13 @@ class DiaryServiceTest {
         Long unsavedDiaryId = -1L;
 
         // when & then
-        assertThatThrownBy(() -> diaryService.findById(unsavedDiaryId))
-                .isInstanceOf(DiaryNoSuchElementException.class);
+        assertThatThrownBy(() -> diaryService.readById(unsavedDiaryId))
+                .isInstanceOf(DiaryNotFoundException.class);
     }
 
     @DisplayName("회원의 일기 목록을 페이지 단위로 읽어온다.")
     @Test
-    void readDiariesByMemberTest() {
+    void readDiariesByMemberIdTest() {
         // given
         for (int i = 1; i <= 10; i++) {
             DiarySaveRequest request = new DiarySaveRequest("Content " + i, LocalDate.of(2024, 7, 21).plusDays(i), List.of((long) i), character.getId());
@@ -151,9 +152,11 @@ class DiaryServiceTest {
         }
 
         // when
-        List<DiarySavedResponse> diariesPage1 = diaryService.readDiariesByMember(member.getId(), 0, 5);
-        List<DiarySavedResponse> diariesPage2 = diaryService.readDiariesByMember(member.getId(), 1, 5);
+        DiarySavedResponses diariesPages1 = DiarySavedResponses.of(diaryService.readDiariesByMemberId(member.getId(), 0, 5));
+        DiarySavedResponses diariesPages2 = DiarySavedResponses.of(diaryService.readDiariesByMemberId(member.getId(), 1, 5));
 
+        List<DiarySavedResponse> diariesPage1 = diariesPages1.diarySavedResponses();
+        List<DiarySavedResponse> diariesPage2 = diariesPages2.diarySavedResponses();
         // then
         assertThat(diariesPage1).hasSize(5);
         assertThat(diariesPage1.get(0).content()).isEqualTo("Content 10");

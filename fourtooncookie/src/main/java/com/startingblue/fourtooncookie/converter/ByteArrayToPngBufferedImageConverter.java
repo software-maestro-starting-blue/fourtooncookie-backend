@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.converter;
 
-import jakarta.persistence.AttributeConverter;
+import com.startingblue.fourtooncookie.converter.exception.ConversionException;
 import jakarta.persistence.Converter;
 import org.springframework.stereotype.Component;
 
@@ -11,27 +11,32 @@ import java.io.ByteArrayOutputStream;
 
 @Converter
 @Component
-public class ByteArrayToPngBufferedImageConverter implements AttributeConverter<byte[], BufferedImage> {
+public class ByteArrayToPngBufferedImageConverter {
 
+    public BufferedImage convertByteArrayToBufferedImage(byte[] attribute) {
+        if (attribute == null) {
+            throw new ConversionException("Byte array attribute is null", null);
+        }
 
-    @Override
-    public BufferedImage convertToDatabaseColumn(byte[] attribute) {
         ByteArrayInputStream bais = new ByteArrayInputStream(attribute);
         try {
             return ImageIO.read(bais);
         } catch (Exception e) {
-            throw new RuntimeException("Error converting byte array to BufferedImage", e);
+            throw new ConversionException("Error converting byte array to BufferedImage", e);
         }
     }
 
-    @Override
-    public byte[] convertToEntityAttribute(BufferedImage dbData) {
+    public byte[] convertBufferedImageToByteArray(BufferedImage dbData) {
+        if (dbData == null) {
+            throw new ConversionException("BufferedImage attribute is null", null);
+        }
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             ImageIO.write(dbData, "png", baos);
             return baos.toByteArray();
         } catch (Exception e) {
-            throw new RuntimeException("Error converting BufferedImage to byte array", e);
+            throw new ConversionException("Error converting BufferedImage to byte array", e);
         }
     }
 }

@@ -2,9 +2,13 @@ package com.startingblue.fourtooncookie.diary.domain;
 
 import com.startingblue.fourtooncookie.config.BaseEntity;
 import com.startingblue.fourtooncookie.character.domain.Character;
-import com.startingblue.fourtooncookie.converter.LongListToStringConverter;
-import com.startingblue.fourtooncookie.converter.UrlListToStringConverter;
+
+import com.startingblue.fourtooncookie.converter.jpa.LongListToStringConverter;
+import com.startingblue.fourtooncookie.converter.jpa.UrlListToStringConverter;
+
+import com.startingblue.fourtooncookie.validator.NotEmptyList;
 import jakarta.persistence.*;
+import jakarta.validation.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -12,10 +16,7 @@ import lombok.*;
 
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Getter
@@ -29,29 +30,39 @@ public final class Diary extends BaseEntity {
     @Column(name = "diary_id")
     private Long id;
 
-    @Size(min = 1, max = 1000)
-    @NotBlank
+    @NotBlank(message = "일기 내용은 필수 입니다.")
+    @Size(min = 1, max = 1000, message = "일기 내용은 1자 이상 1000자 이내여야 합니다.")
     private String content;
 
     private boolean isFavorite;
 
-    @NotNull
+    @NotNull(message = "일기 날짜는 필수 입니다.")
+    @Column(updatable = false)
     private LocalDate diaryDate;
 
+    @NotEmptyList(message = "일기 그림 URL 목록은 최소 1개를 포함해야 합니다.")
+    @Size(min = 1, max = 4, message = "일기 그림 URL 목록은 1개에서 4개 사이여야 합니다.")
     @Convert(converter = UrlListToStringConverter.class)
     @Builder.Default
     private List<URL> paintingImageUrls = new ArrayList<>();
 
+    @NotEmptyList(message = "해시태그 ID 목록은 최소 1개를 포함해야 합니다.")
+    @Size(min = 1, max = 4, message = "해시태그 ID 목록은 1개에서 4개 사이여야 합니다.")
     @Convert(converter = LongListToStringConverter.class)
     @Builder.Default
-    private List<Long> hashtagsIds= new ArrayList<>();
+    private List<Long> hashtagsIds = new ArrayList<>();
 
-    @NotNull
+
+    @NotNull(message = "일기에 그려질 캐릭터는 필수 입니다.")
     @ManyToOne(fetch = FetchType.LAZY)
     private Character character;
 
-    @NotNull
+    @NotNull(message = "멤버 아이디는 필수 입니다.")
     private UUID memberId;
+
+    public static DiaryBuilder builder() {
+        return new CustomDiaryBuilder();
+    }
 
     public void update(String content,
                        List<Long> hashtagIds,
@@ -59,6 +70,11 @@ public final class Diary extends BaseEntity {
         this.content = content;
         this.character = character;
         updateHashtags(hashtagIds);
+        validate();
+    }
+
+    public void updateFavorite(boolean isFavorite) {
+        this.isFavorite = isFavorite;
     }
 
     public void updatePaintingImageUrls(List<URL> paintingImageUrls) {
@@ -71,6 +87,25 @@ public final class Diary extends BaseEntity {
 
     public boolean isOwner(UUID memberId) {
         return this.memberId.equals(memberId);
+    }
+
+    private void validate() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
+        Set<ConstraintViolation<Diary>> violations = validator.validate(this);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+    }
+
+    private static class CustomDiaryBuilder extends DiaryBuilder {
+        @Override
+        public Diary build() {
+            Diary diary = super.build();
+            diary.validate();
+            return diary;
+        }
     }
 
     @Override
