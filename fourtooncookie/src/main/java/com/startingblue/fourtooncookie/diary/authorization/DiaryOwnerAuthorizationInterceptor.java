@@ -25,7 +25,7 @@ public class DiaryOwnerAuthorizationInterceptor implements HandlerInterceptor {
     private final DiaryService diaryService;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String memberIdStr = String.valueOf(request.getAttribute(PATH_VARIABLE_MEMBER_KEY));
 
         if (memberIdStr == null || memberIdStr.isEmpty()) {
