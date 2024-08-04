@@ -67,7 +67,7 @@ public class DiaryService {
     }
 
     @Transactional(readOnly = true)
-    public List<Diary> readDiariesByMember(final UUID memberId, final int pageNumber, final int pageSize) {
+    public List<Diary> readDiariesByMemberId(final UUID memberId, final int pageNumber, final int pageSize) {
         Member foundMember = memberService.findById(memberId);
         Page<Diary> diaries = diaryRepository.findAllByMemberIdOrderByDiaryDateDesc(
                 foundMember.getId(),
@@ -76,40 +76,42 @@ public class DiaryService {
         return diaries.getContent();
     }
 
-    public void toggleFavoriteDiary(Long diaryId, boolean isFavorite) {
-        Diary foundDiary = findById(diaryId);
+    public void updateDiaryFavorite(Long diaryId, boolean isFavorite) {
+        Diary foundDiary = readById(diaryId);
         foundDiary.updateFavorite(isFavorite);
         diaryRepository.save(foundDiary);
     }
 
     public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
-        Diary existedDiary = findById(diaryId);
+        Diary existedDiary = readById(diaryId);
         Character character = characterService.findById(request.characterId());
         existedDiary.update(request.content(), request.hashtagIds(), character);
         diaryRepository.save(existedDiary);
+
+
         // todo vision
     }
 
     // TODO listener 로 코드 이동 예정
     public void updateDiary(Long diaryId, DiaryPaintingImagesUpdateRequest request) {
-        Diary existedDiary = findById(diaryId);
+        Diary existedDiary = readById(diaryId);
         existedDiary.updatePaintingImageUrls(request.paintingImageUrls());
         diaryRepository.save(existedDiary);
     }
 
     public void deleteDiary(Long diaryId) {
-        Diary foundDiary = findById(diaryId);
+        Diary foundDiary = readById(diaryId);
         diaryRepository.delete(foundDiary);
     }
 
     @Transactional(readOnly = true)
-    public Diary findById(final Long id) {
+    public Diary readById(final Long id) {
         return diaryRepository.findById(id)
                 .orElseThrow(DiaryNotFoundException::new);
     }
 
     @Transactional(readOnly = true)
-    private void verifyUniqueDiary(UUID memberId, LocalDate diaryDate) {
+    public void verifyUniqueDiary(UUID memberId, LocalDate diaryDate) {
         if (diaryRepository.existsByMemberIdAndDiaryDate(memberId, diaryDate)) {
             throw new DiaryDuplicateException("이미 " + diaryDate + "에 일기를 작성하셨습니다.");
         }

@@ -13,7 +13,6 @@ import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponses;
-import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
@@ -32,7 +31,6 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -127,7 +125,7 @@ class DiaryServiceTest {
         diaryRepository.save(diary);
 
         // when
-        Diary foundDiary = diaryService.findById(diary.getId());
+        Diary foundDiary = diaryService.readById(diary.getId());
 
         // then
         assertThat(foundDiary).isEqualTo(diary);
@@ -140,13 +138,13 @@ class DiaryServiceTest {
         Long unsavedDiaryId = -1L;
 
         // when & then
-        assertThatThrownBy(() -> diaryService.findById(unsavedDiaryId))
+        assertThatThrownBy(() -> diaryService.readById(unsavedDiaryId))
                 .isInstanceOf(DiaryNotFoundException.class);
     }
 
     @DisplayName("회원의 일기 목록을 페이지 단위로 읽어온다.")
     @Test
-    void readDiariesByMemberTest() {
+    void readDiariesByMemberIdTest() {
         // given
         for (int i = 1; i <= 10; i++) {
             DiarySaveRequest request = new DiarySaveRequest("Content " + i, LocalDate.of(2024, 7, 21).plusDays(i), List.of((long) i), character.getId());
@@ -154,8 +152,8 @@ class DiaryServiceTest {
         }
 
         // when
-        DiarySavedResponses diariesPages1 = DiarySavedResponses.of(diaryService.readDiariesByMember(member.getId(), 0, 5));
-        DiarySavedResponses diariesPages2 = DiarySavedResponses.of(diaryService.readDiariesByMember(member.getId(), 1, 5));
+        DiarySavedResponses diariesPages1 = DiarySavedResponses.of(diaryService.readDiariesByMemberId(member.getId(), 0, 5));
+        DiarySavedResponses diariesPages2 = DiarySavedResponses.of(diaryService.readDiariesByMemberId(member.getId(), 1, 5));
 
         List<DiarySavedResponse> diariesPage1 = diariesPages1.diarySavedResponses();
         List<DiarySavedResponse> diariesPage2 = diariesPages2.diarySavedResponses();

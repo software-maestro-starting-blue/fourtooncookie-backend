@@ -1,6 +1,5 @@
 package com.startingblue.fourtooncookie.diary;
 
-import com.startingblue.fourtooncookie.diary.dto.request.DiaryPaintingImagesUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponses;
@@ -37,9 +36,8 @@ public class DiaryController {
             HttpServletRequest httpRequest,
             @RequestParam(defaultValue = "0") @Min(0) @Max(200) final int pageNumber,
             @RequestParam(defaultValue = "10") @Min(1) @Max(10) final int pageSize) {
-
         UUID memberId = UUID.fromString(httpRequest.getHeader("memberId")); // TODO 현재는 헤더에 넣고, jwt 를 이용코드로 변경 예정
-        DiarySavedResponses responses = DiarySavedResponses.of(diaryService.readDiariesByMember(memberId, pageNumber, pageSize));
+        DiarySavedResponses responses = DiarySavedResponses.of(diaryService.readDiariesByMemberId(memberId, pageNumber, pageSize));
         if (responses.diarySavedResponses().isEmpty()) {
             return noContent().build();
         }
@@ -55,18 +53,9 @@ public class DiaryController {
     }
 
     @PatchMapping("/{diaryId}/favorite")
-    public ResponseEntity<HttpStatus> toggleDiaryFavorite(@PathVariable final Long diaryId,
+    public ResponseEntity<HttpStatus> updateDiaryFavorite(@PathVariable final Long diaryId,
                                                     @RequestBody final boolean isFavorite) {
-
-        diaryService.toggleFavoriteDiary(diaryId, isFavorite);
-        return ok().build();
-    }
-
-    @PatchMapping("/{diaryId}/painting-images")
-    public ResponseEntity<HttpStatus> updateDiaryPaintingImages(@PathVariable final Long diaryId,
-                                            @RequestBody final DiaryPaintingImagesUpdateRequest request) {
-
-        diaryService.updateDiary(diaryId, request);
+        diaryService.updateDiaryFavorite(diaryId, isFavorite);
         return ok().build();
     }
 
