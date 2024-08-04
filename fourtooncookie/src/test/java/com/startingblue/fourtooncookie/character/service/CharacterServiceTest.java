@@ -64,7 +64,7 @@ class CharacterServiceTest {
                 .basePrompt(request.basePrompt())
                 .build();
 
-        when(artworkService.findById(request.artworkId())).thenReturn(artwork);
+        when(artworkService.readById(request.artworkId())).thenReturn(artwork);
         when(characterRepository.save(any(Character.class))).thenReturn(character);
 
         // when
@@ -208,7 +208,7 @@ class CharacterServiceTest {
         CharacterUpdateRequest request = new CharacterUpdateRequest(updateCharacterVisionType, PaymentType.PAID, updateArtworkId, updateCharacterName, updateUrl, updatedBasePrompt);
 
         when(characterRepository.findById(characterId)).thenReturn(Optional.of(character));
-        when(artworkService.findById(request.artworkId())).thenReturn(updateArtwork);
+        when(artworkService.readById(request.artworkId())).thenReturn(updateArtwork);
 
         // when
         characterService.updateCharacter(characterId, request);
