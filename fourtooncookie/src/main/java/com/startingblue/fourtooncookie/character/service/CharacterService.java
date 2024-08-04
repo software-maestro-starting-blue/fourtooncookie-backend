@@ -1,6 +1,7 @@
 package com.startingblue.fourtooncookie.character.service;
 
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
+import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
 import com.startingblue.fourtooncookie.artwork.service.ArtworkService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
@@ -66,7 +67,7 @@ public class CharacterService {
     @Transactional(readOnly = true)
     public Character readById(Long characterId) {
         return characterRepository.findById(characterId)
-                        .orElseThrow(CharacterNotFoundException::new);
+                        .orElseThrow(() -> new CharacterNotFoundException("Character with ID " + characterId + " not found"));
     }
 
     private CharacterVisionType findByCharacterVisionType(CharacterVisionType characterVisionType) {
