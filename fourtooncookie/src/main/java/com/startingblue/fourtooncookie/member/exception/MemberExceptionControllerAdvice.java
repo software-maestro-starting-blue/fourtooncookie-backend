@@ -25,11 +25,4 @@ public class MemberExceptionControllerAdvice {
         log.error(e.getMessage(), e);
         return "Member Exists";
     }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleIllegalArgumentException(IllegalArgumentException e) {
-        log.error(e.getMessage(), e);
-        return "Bad Request";
-    }
 }
