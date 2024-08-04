@@ -1,25 +1,28 @@
 package com.startingblue.fourtooncookie.hashtag.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice("com.startingblue.fourtooncookie.hashtag")
 public class HashtagExceptionControllerAdvice {
 
-    @ExceptionHandler(HashtagNotFoundException.class)
-    public ResponseEntity<?> handleHashtagNotFoundException(HashtagNotFoundException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-    }
+    private static final Logger log = LoggerFactory.getLogger(HashtagExceptionControllerAdvice.class);
 
-    @ExceptionHandler(HashtagTypeNotFoundException.class)
-    public ResponseEntity<?> handleHashtagTypeNotFoundException(HashtagTypeNotFoundException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    @ExceptionHandler(HashtagNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleHashtagNotFoundException(HashtagNotFoundException e) {
+        log.error(e.getMessage());
+        return "Hashtag not found";
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleIllegalArgumentException(IllegalArgumentException e) {
+        log.error(e.getMessage());
+        return "Bad Request";
     }
 }
