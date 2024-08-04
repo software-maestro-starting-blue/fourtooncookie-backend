@@ -2,6 +2,7 @@ package com.startingblue.fourtooncookie.character;
 
 import com.startingblue.fourtooncookie.character.dto.request.CharacterSaveRequest;
 import com.startingblue.fourtooncookie.character.dto.request.CharacterUpdateRequest;
+import com.startingblue.fourtooncookie.character.dto.response.CharacterSavedResponse;
 import com.startingblue.fourtooncookie.character.dto.response.CharacterSavedResponses;
 import com.startingblue.fourtooncookie.character.service.CharacterService;
 import jakarta.validation.Valid;
@@ -30,6 +31,13 @@ public final class CharacterController {
         CharacterSavedResponses responses = CharacterSavedResponses.of(characterService.readAllCharacters());
         return ResponseEntity
                 .ok(responses);
+    }
+
+    @GetMapping("/{characterId}")
+    public ResponseEntity<CharacterSavedResponse> readCharacter(@PathVariable final Long characterId) {
+        CharacterSavedResponse response = CharacterSavedResponse.of(characterService.readCharacterById(characterId));
+        return ResponseEntity
+                .ok(response);
     }
 
     @PutMapping("/{characterId}")

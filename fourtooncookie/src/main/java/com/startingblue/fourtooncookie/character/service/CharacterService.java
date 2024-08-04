@@ -1,7 +1,6 @@
 package com.startingblue.fourtooncookie.character.service;
 
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
-import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
 import com.startingblue.fourtooncookie.artwork.service.ArtworkService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
@@ -39,6 +38,11 @@ public class CharacterService {
                 .selectionThumbnailUrl(request.selectionThumbnailUrl())
                 .basePrompt(request.basePrompt())
                 .build());
+    }
+
+    @Transactional(readOnly = true)
+    public Character readCharacterById(Long characterId) {
+        return readById(characterId);
     }
 
     @Transactional(readOnly = true)
