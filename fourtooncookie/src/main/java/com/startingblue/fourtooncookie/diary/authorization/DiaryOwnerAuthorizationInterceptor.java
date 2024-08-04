@@ -35,13 +35,11 @@ public class DiaryOwnerAuthorizationInterceptor implements HandlerInterceptor {
         }
 
         String diaryIdStr = extractPathVariable(request.getRequestURI());
-        System.out.println(diaryIdStr);
         if (diaryIdStr == null || diaryIdStr.isEmpty()) {
             log.warn("Missing or empty path variable '{}': {}", PATH_VARIABLE_DIARY_KEY, diaryIdStr);
             response.setStatus(SC_FORBIDDEN);
             return false;
         }
-        System.out.println("diaryIdStr: " + diaryIdStr);
 
         UUID memberId;
         long diaryId;
