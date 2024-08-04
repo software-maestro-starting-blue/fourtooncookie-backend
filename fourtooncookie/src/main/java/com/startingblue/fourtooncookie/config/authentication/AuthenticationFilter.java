@@ -26,6 +26,12 @@ public class AuthenticationFilter extends HttpFilter {
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException {
         try {
+            String requestURI = request.getRequestURI();
+            if (requestURI.startsWith("/h2-console")) {
+                chain.doFilter(request, response);
+                return;
+            }
+
             String token = jwtExtractor.resolveToken(request);
             Claims claims = jwtExtractor.parseToken(token);
             UUID memberId = UUID.fromString(claims.getSubject());
@@ -33,6 +39,7 @@ public class AuthenticationFilter extends HttpFilter {
             if (memberService.verifyMemberExists(memberId)) {
                 log.info("login success memberId: {}", memberId);
                 request.setAttribute("memberId", memberId);
+                System.out.println(memberId);
                 chain.doFilter(request, response);
             } else {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, String.format("Member with id %s not found", memberId));
