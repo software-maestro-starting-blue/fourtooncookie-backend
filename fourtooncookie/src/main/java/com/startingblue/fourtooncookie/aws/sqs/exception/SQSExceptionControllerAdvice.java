@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class SQSExceptionControllerAdvice {
 
     @ExceptionHandler(SQSMessageProcessingException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleSQSMessageProcessingException(SQSMessageProcessingException e) {
         log.error(e.getMessage(), e);
         return "SQS message processing failed";
@@ -25,7 +25,7 @@ public class SQSExceptionControllerAdvice {
     }
 
     @ExceptionHandler(SQSMessageDeletionException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleSQSMessageDeletionException(SQSMessageDeletionException e) {
         log.error(e.getMessage(), e);
         return "SQS message deletion failed";

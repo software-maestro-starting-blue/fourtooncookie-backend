@@ -25,10 +25,10 @@ public class S3ExceptionControllerAdvice {
     }
 
     @ExceptionHandler(S3PreSignUrlException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleS3PresignUrlException(S3PreSignUrlException e) {
-        log.error("S3 Presign URL Error: {}", e.getMessage(), e);
-        return "Presign URL Error";
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public String handleS3PreSignUrlException(S3PreSignUrlException e) {
+        log.error("S3 PreSign URL Error: {}", e.getMessage(), e);
+        return "PreSign URL Error";
     }
 
     @ExceptionHandler(S3ImageNotFoundException.class)
@@ -39,7 +39,7 @@ public class S3ExceptionControllerAdvice {
     }
 
     @ExceptionHandler(S3ImageExistenceCheckException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public String handleS3ImageExistenceCheckException(S3ImageExistenceCheckException e) {
         log.error("S3 Image Existence Check Error: {}", e.getMessage(), e);
         return "Image Existence Check Error";
