@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.aws.s3.service;
 
+import com.startingblue.fourtooncookie.aws.s3.exception.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,9 +20,8 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.MalformedURLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,8 +41,6 @@ public class DiaryImageS3ServiceTest {
 
     private final String bucketName = "test-bucket";
     private final int preSignedUrlDurationInMinutes = 60;
-    private static final String IMAGE_FORMAT = ".png";
-    private static final String CONTENT_TYPE = "image/png";
 
     @BeforeEach
     void setUp() {
@@ -52,11 +50,11 @@ public class DiaryImageS3ServiceTest {
 
     @Test
     @DisplayName("이미지 업로드 성공")
-    void testUploadImage() throws IOException {
+    void testUploadImage() throws Exception {
         Long diaryId = 1L;
         byte[] image = "test-image".getBytes();
         Integer gridPosition = 1;
-        String keyName = diaryId + "/" + gridPosition + IMAGE_FORMAT;
+        String keyName = diaryId + "/" + gridPosition + ".png";
 
         diaryImageS3Service.uploadImage(diaryId, image, gridPosition);
 
@@ -69,7 +67,7 @@ public class DiaryImageS3ServiceTest {
         RequestBody capturedBody = requestBodyCaptor.getValue();
 
         assertEquals(bucketName, capturedRequest.bucket());
-        assertEquals(CONTENT_TYPE, capturedRequest.contentType());
+        assertEquals("image/png", capturedRequest.contentType());
         assertEquals(keyName, capturedRequest.key());
         assertArrayEquals(image, capturedBody.contentStreamProvider().newStream().readAllBytes());
     }
@@ -80,13 +78,12 @@ public class DiaryImageS3ServiceTest {
         Long diaryId = 1L;
         byte[] image = "test-image".getBytes();
         Integer gridPosition = 1;
-        String keyName = diaryId + "/" + gridPosition + IMAGE_FORMAT;
+        String keyName = diaryId + "/" + gridPosition + ".png";
 
         doThrow(new RuntimeException("S3 error")).when(s3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            diaryImageS3Service.uploadImage(diaryId, image, gridPosition);
-        });
+        S3UploadException exception = assertThrows(S3UploadException.class, () ->
+                diaryImageS3Service.uploadImage(diaryId, image, gridPosition));
 
         assertEquals("S3에 이미지 업로드 중 오류가 발생했습니다. Key: " + keyName, exception.getMessage());
     }
@@ -129,9 +126,9 @@ public class DiaryImageS3ServiceTest {
         when(s3Client.headObject(any(HeadObjectRequest.class))).thenThrow(NoSuchKeyException.builder().build());
 
         // 예외가 발생하는지 검증
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            diaryImageS3Service.generatePreSignedImageUrl(diaryId, gridPosition);
-        });
+        S3ImageNotFoundException exception = assertThrows(S3ImageNotFoundException.class, () ->
+            diaryImageS3Service.generatePreSignedImageUrl(diaryId, gridPosition)
+        );
 
         assertEquals("S3에 이미지가 존재하지 않습니다. Key: 1/1.png", exception.getMessage());
 
@@ -145,6 +142,7 @@ public class DiaryImageS3ServiceTest {
     void testGeneratePreSignedImageUrl_ExceptionDuringPresign() {
         Long diaryId = 1L;
         Integer gridPosition = 1;
+        String keyName = diaryId + "/" + gridPosition + ".png";
 
         // HeadObjectResponse 모킹
         HeadObjectResponse headObjectResponse = mock(HeadObjectResponse.class);
@@ -157,14 +155,76 @@ public class DiaryImageS3ServiceTest {
                 .thenThrow(new RuntimeException("Presign error"));
 
         // 예외가 발생하는지 검증
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            diaryImageS3Service.generatePreSignedImageUrl(diaryId, gridPosition);
-        });
+        S3PreSignUrlException exception = assertThrows(S3PreSignUrlException.class, () ->
+            diaryImageS3Service.generatePreSignedImageUrl(diaryId, gridPosition)
+        );
 
-        assertEquals("S3에서 프리사인 URL 생성 중 오류가 발생했습니다. Key: 1/1.png", exception.getMessage());
+        assertEquals("S3에서 프리사인 URL 생성 중 오류가 발생했습니다. Key: " + keyName, exception.getMessage());
 
         // 상호작용 검증
         verify(s3Client).headObject(any(HeadObjectRequest.class));
         verify(s3Presigner).presignGetObject(any(GetObjectPresignRequest.class));
+    }
+
+    @Test
+    @DisplayName("이미지 존재 여부 확인 성공")
+    void testIsImageExist_Success() {
+        Long diaryId = 1L;
+        Integer gridPosition = 1;
+
+        // HeadObjectResponse 모킹
+        HeadObjectResponse headObjectResponse = mock(HeadObjectResponse.class);
+
+        // S3Client 응답 모킹
+        when(s3Client.headObject(any(HeadObjectRequest.class))).thenReturn(headObjectResponse);
+
+        // 테스트 대상 메서드 호출
+        boolean exists = diaryImageS3Service.isImageExist(diaryId, gridPosition);
+
+        // 결과 검증
+        assertTrue(exists);
+
+        // 상호작용 검증
+        verify(s3Client).headObject(any(HeadObjectRequest.class));
+    }
+
+    @Test
+    @DisplayName("이미지가 존재하지 않을 때")
+    void testIsImageExist_NotExist() {
+        Long diaryId = 1L;
+        Integer gridPosition = 1;
+
+        // headObject 요청에 대한 NoSuchKeyException 모킹
+        when(s3Client.headObject(any(HeadObjectRequest.class))).thenThrow(NoSuchKeyException.builder().build());
+
+        // 테스트 대상 메서드 호출
+        boolean exists = diaryImageS3Service.isImageExist(diaryId, gridPosition);
+
+        // 결과 검증
+        assertFalse(exists);
+
+        // 상호작용 검증
+        verify(s3Client).headObject(any(HeadObjectRequest.class));
+    }
+
+    @Test
+    @DisplayName("이미지 존재 여부 확인 중 오류 발생 시 예외 발생")
+    void testIsImageExist_ExceptionDuringCheck() {
+        Long diaryId = 1L;
+        Integer gridPosition = 1;
+        String keyName = diaryId + "/" + gridPosition + ".png";
+
+        // headObject 요청에 대한 일반 예외 모킹
+        when(s3Client.headObject(any(HeadObjectRequest.class))).thenThrow(new RuntimeException("Check error"));
+
+        // 예외가 발생하는지 검증
+        S3ImageExistenceCheckException exception = assertThrows(S3ImageExistenceCheckException.class, () ->
+            diaryImageS3Service.isImageExist(diaryId, gridPosition)
+        );
+
+        assertEquals("S3에 이미지 존재 여부 확인 중 오류가 발생했습니다. Key: " + keyName, exception.getMessage());
+
+        // 상호작용 검증
+        verify(s3Client).headObject(any(HeadObjectRequest.class));
     }
 }
