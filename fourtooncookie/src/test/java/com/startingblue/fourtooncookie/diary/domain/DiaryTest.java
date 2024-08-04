@@ -10,10 +10,8 @@ import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
 import com.startingblue.fourtooncookie.member.domain.Role;
-import jakarta.transaction.Transactional;
-import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
-import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,44 +19,40 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@ActiveProfiles("test")
 @SpringBootTest
+@ActiveProfiles("test")
 @Transactional
-class DiaryTest {
+public class DiaryTest {
 
-    @Autowired
-    DiaryRepository diaryRepository;
-
-    @Autowired
-    MemberRepository memberRepository;
-
-    @Autowired
-    CharacterRepository characterRepository;
-
-    private Validator validator;
-    private Artwork artwork;
     private Character character;
     private Member member;
-    private UUID memberUID;
+
     @Autowired
     private ArtworkRepository artworkRepository;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private CharacterRepository characterRepository;
+
+    private URL validUrl;
+    private UUID validMemberId;
+
     @BeforeEach
-    void setUp() {
+    void setUp() throws MalformedURLException {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
 
         member = Member.builder()
                 .name("John Doe")
@@ -68,8 +62,10 @@ class DiaryTest {
                 .role(Role.MEMBER)
                 .build();
         member = memberRepository.save(member);
-        memberUID = member.getId();
+        validUrl = new URL("http://example.com/image.png");
+        validMemberId = member.getId();
 
+        Artwork artwork;
         try {
             artwork = new Artwork("Test Artwork", new URL("https://test.png"));
             artworkRepository.save(artwork);
@@ -88,253 +84,347 @@ class DiaryTest {
         character = characterRepository.save(character);
     }
 
-    @DisplayName("유효한 일기를 생성한다.")
-    @Test
-    void testDiaryCreationValid() {
-        // given
-        String validContent = "This is a valid content.";
-        URL imageUrl1 = createURL("http://example.com/image1");
-        URL imageUrl2 = createURL("http://example.com/image2");
-        List<Long> hashtagsIds = List.of(1L, 2L);
-
-        Diary diary = Diary.builder()
-                .content(validContent)
-                .diaryDate(LocalDate.now())
-                .character(character)
-                .memberId(member.getId())
-                .paintingImageUrls(List.of(imageUrl1, imageUrl2))
-                .hashtagsIds(hashtagsIds)
-                .isFavorite(true)
-                .build();
-
-        // when
-        Set<ConstraintViolation<Diary>> violations = validator.validate(diary);
-
-        // then
-        assertTrue(violations.isEmpty());
-    }
-
-    @DisplayName("일기 내용이 빈 경우 일기를 생성하지 못한다.")
-    @Test
-    void testDiaryCreationInvalidContent() {
-        // given
-        String emptyContent = "";
-
-        Diary diary = Diary.builder()
-                .content(emptyContent)
-                .diaryDate(LocalDate.now())
-                .character(character)
-                .memberId(member.getId())
-                .build();
-
-        // when
-        Set<ConstraintViolation<Diary>> violations = validator.validate(diary);
-
-        // then
-        assertFalse(violations.isEmpty());
-    }
-
-    @DisplayName("일기 날짜가 없는 경우 일기를 생성하지 못한다.")
-    @Test
-    void testDiaryCreationNullDate() {
-        // given
-        String validContent = "Valid content";
-
-        Diary diary = Diary.builder()
-                .content(validContent)
-                .diaryDate(null)
-                .character(character)
-                .memberId(member.getId())
-                .build();
-
-        // when
-        Set<ConstraintViolation<Diary>> violations = validator.validate(diary);
-
-        // then
-        assertFalse(violations.isEmpty());
-    }
-
-    @DisplayName("일기 캐릭터가 없는 경우 일기를 생성하지 못한다.")
-    @Test
-    void testDiaryCreationNullCharacter() {
-        // given
-        String validContent = "Valid content";
-
-        Diary diary = Diary.builder()
-                .content(validContent)
-                .diaryDate(LocalDate.now())
-                .character(null)
-                .memberId(member.getId())
-                .build();
-
-        // when
-        Set<ConstraintViolation<Diary>> violations = validator.validate(diary);
-
-        // then
-        assertFalse(violations.isEmpty());
-    }
-
-    @DisplayName("일기 멤버가 없는 경우 일기를 생성하지 못한다.")
-    @Test
-    void testDiaryCreationNullMember() {
-        // given
-        String validContent = "Valid content";
-
-        Diary diary = Diary.builder()
-                .content(validContent)
-                .diaryDate(LocalDate.now())
-                .character(character)
-                .memberId(null)
-                .build();
-
-        // when
-        Set<ConstraintViolation<Diary>> violations = validator.validate(diary);
-
-        // then
-        assertFalse(violations.isEmpty());
-    }
-
-    @DisplayName("일기 소유자를 확인 한다.")
-    @Test
-    void testIsOwner() {
-        // given
-        String validContent = "Content";
-
-        Diary diary = Diary.builder()
-                .content(validContent)
-                .diaryDate(LocalDate.now())
-                .character(character)
-                .memberId(member.getId())
-                .build();
-
-        // then
-        assertTrue(diary.isOwner(memberUID));
-        UUID notExistUID = UUID.nameUUIDFromBytes("notExistUID".getBytes());
-        assertFalse(diary.isOwner(notExistUID));
-    }
-
-    @DisplayName("일기 내용, 해시태그, 캐릭터 업데이트")
-    @Test
-    void update() {
-        // given
-        String initialCharacterName = "멍멍이";
-        String initialCharacterUrl = "http://멍멍이.png";
-        Character initialCharacter = Character.builder()
-                .characterVisionType(CharacterVisionType.DALL_E_3)
-                .paymentType(PaymentType.FREE)
-                .artwork(artwork)
-                .name(initialCharacterName)
-                .selectionThumbnailUrl(createURL(initialCharacterUrl))
-                .basePrompt("basePrompt")
-                .build();
-        characterRepository.save(initialCharacter);
-
-        String otherMemberName = "민서";
-        LocalDate otherMemberBirthDate = LocalDate.of(2000, 5, 31);
-        Member otherMember = Member.builder()
-                .name(otherMemberName)
-                .birth(otherMemberBirthDate)
-                .email("minseo@example.com")
-                .gender(Gender.MALE)
-                .role(Role.MEMBER)
-                .build();
-        memberRepository.save(otherMember);
-
-        LocalDate diaryDate = LocalDate.of(2024, 7, 21);
-        Diary saveDiary = createDiary(diaryDate, initialCharacter, otherMember);
-        diaryRepository.save(saveDiary);
-
-        Diary savedDiary = diaryRepository.findById(saveDiary.getId()).get();
-
-        String newCharacterName = "오동이";
-        String newCharacterUrl = "http://오동이.png";
-        Character newCharacter = Character.builder()
-                .characterVisionType(CharacterVisionType.DALL_E_3)
-                .paymentType(PaymentType.FREE)
-                .artwork(artwork)
-                .name(newCharacterName)
-                .selectionThumbnailUrl(createURL(newCharacterUrl))
-                .basePrompt("new Base Prompt")
-                .build();
-        characterRepository.save(newCharacter);
-
-        // when
-        String updatedContent = "새로운 일기 내용";
-        List<Long> updatedHashtags = List.of(1L);
-        savedDiary.update(updatedContent, updatedHashtags, newCharacter);
-
-        // then
-        assertThat(savedDiary.getContent()).isEqualTo(updatedContent);
-        assertThat(savedDiary.getHashtagsIds()).isEqualTo(updatedHashtags);
-        assertThat(savedDiary.getCharacter()).isEqualTo(newCharacter);
-        assertThat(savedDiary.getCharacter().getName()).isEqualTo(newCharacterName);
-        assertThat(savedDiary.getCharacter().getSelectionThumbnailUrl()).isEqualTo(createURL(newCharacterUrl));
-        assertThat(savedDiary.getCharacter().getBasePrompt()).isEqualTo("new Base Prompt");
-    }
-
-    @DisplayName("일기 그림 이미지 URL 업데이트")
-    @Test
-    void updatePaintingImageUrls() {
-        // given
-        characterRepository.save(character);
-
-        String otherMemberName = "민서";
-        LocalDate otherMemberBirthDate = LocalDate.of(2000, 5, 31);
-        Member otherMember = Member.builder()
-                .name(otherMemberName)
-                .birth(otherMemberBirthDate)
-                .email("minseo@example.com")
-                .gender(Gender.MALE)
-                .role(Role.MEMBER)
-                .build();
-        memberRepository.save(otherMember);
-
-        LocalDate diaryDate = LocalDate.of(2024, 7, 21);
-        Diary saveDiary = createDiary(diaryDate, character, otherMember);
-        diaryRepository.save(saveDiary);
-
-        String url1 = "http://new1.png";
-        String url2 = "http://new2.png";
-        String url3 = "http://new3.png";
-        String url4 = "http://new4.png";
-        List<URL> updatePaintingImageUrls = List.of(
-                createURL(url1),
-                createURL(url2),
-                createURL(url3),
-                createURL(url4)
-        );
-
-        // when
-        saveDiary.updatePaintingImageUrls(updatePaintingImageUrls);
-
-        // then
-        assertThat(saveDiary.getPaintingImageUrls())
-                .extracting(URL::toString)
-                .containsExactlyInAnyOrder(
-                        url1,
-                        url2,
-                        url3,
-                        url4
-                );
-    }
-
-    private Diary createDiary(LocalDate diaryDate, Character character, Member member) {
-        return Diary.builder()
-                .content("Initial content")
-                .diaryDate(diaryDate)
-                .isFavorite(false)
-                .paintingImageUrls(List.of(createURL("http://defaultImage.png")))
-                .hashtagsIds(List.of(1L, 2L))
-                .character(character)
-                .memberId(member.getId())
-                .build();
-    }
-
     private URL createURL(String urlString) {
         try {
             return new URL(urlString);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Test
+    @DisplayName("유효한 Diary 객체 생성")
+    public void validDiaryCreation() {
+        Diary diary = Diary.builder()
+                .content("Valid content")
+                .diaryDate(LocalDate.now())
+                .paintingImageUrls(List.of(validUrl))
+                .hashtagsIds(List.of(1L))
+                .character(character)
+                .memberId(validMemberId)
+                .build();
+
+        assertThat(diary).isNotNull();
+        assertThat(diary.getContent()).isEqualTo("Valid content");
+        assertThat(diary.getDiaryDate()).isEqualTo(LocalDate.now());
+        assertThat(diary.getPaintingImageUrls()).containsExactly(validUrl);
+        assertThat(diary.getHashtagsIds()).containsExactly(1L);
+        assertThat(diary.getCharacter()).isEqualTo(character);
+        assertThat(diary.getMemberId()).isEqualTo(validMemberId);
+    }
+
+    @Test
+    @DisplayName("내용이 빈 문자열일 때 Diary 객체 생성 시 ConstraintViolationException")
+    public void testInvalidDiaryCreation_ContentBlank() {
+        assertThatThrownBy(() -> {
+            Diary.builder()
+                    .content("")
+                    .diaryDate(LocalDate.now())
+                    .paintingImageUrls(List.of(validUrl))
+                    .hashtagsIds(List.of(1L))
+                    .character(character)
+                    .memberId(validMemberId)
+                    .build();
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("일기 내용은 필수 입니다.");
+    }
+
+    @Test
+    @DisplayName("날짜가 null일 때 Diary 객체 생성 시 ConstraintViolationException")
+    public void testInvalidDiaryCreation_DateNull() {
+        assertThatThrownBy(() -> {
+            Diary.builder()
+                    .content("Valid content")
+                    .diaryDate(null)
+                    .paintingImageUrls(List.of(validUrl))
+                    .hashtagsIds(List.of(1L))
+                    .character(character)
+                    .memberId(validMemberId)
+                    .build();
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("일기 날짜는 필수 입니다.");
+    }
+
+    @Test
+    @DisplayName("일기 그림 URL 목록이 비어 있을 때 Diary 객체 생성 시 ConstraintViolationException")
+    public void testInvalidDiaryCreation_PaintingImageUrlsEmpty() {
+        assertThatThrownBy(() -> {
+            Diary.builder()
+                    .content("Valid content")
+                    .diaryDate(LocalDate.now())
+                    .paintingImageUrls(List.of())
+                    .hashtagsIds(List.of(1L))
+                    .character(character)
+                    .memberId(validMemberId)
+                    .build();
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("일기 그림 URL 목록은 최소 1개를 포함해야 합니다.");
+    }
+
+    @Test
+    @DisplayName("해시태그 ID 목록이 비어 있을 때 Diary 객체 생성 시 ConstraintViolationException")
+    public void testInvalidDiaryCreation_HashtagsIdsEmpty() {
+        assertThatThrownBy(() -> {
+            Diary.builder()
+                    .content("Valid content")
+                    .diaryDate(LocalDate.now())
+                    .paintingImageUrls(List.of(validUrl))
+                    .hashtagsIds(List.of())
+                    .character(character)
+                    .memberId(validMemberId)
+                    .build();
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("해시태그 ID 목록은 최소 1개를 포함해야 합니다.");
+    }
+
+    @Test
+    @DisplayName("캐릭터가 null일 때 Diary 객체 생성 시 ConstraintViolationException")
+    public void testInvalidDiaryCreation_CharacterNull() {
+        assertThatThrownBy(() -> {
+            Diary.builder()
+                    .content("Valid content")
+                    .diaryDate(LocalDate.now())
+                    .paintingImageUrls(List.of(validUrl))
+                    .hashtagsIds(List.of(1L))
+                    .character(null)
+                    .memberId(validMemberId)
+                    .build();
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("일기에 그려질 캐릭터는 필수 입니다.");
+    }
+
+    @Test
+    @DisplayName("멤버 아이디가 null일 때 Diary 객체 생성 시 ConstraintViolationException")
+    public void testInvalidDiaryCreation_MemberIdNull() {
+        assertThatThrownBy(() -> {
+            Diary.builder()
+                    .content("Valid content")
+                    .diaryDate(LocalDate.now())
+                    .paintingImageUrls(List.of(validUrl))
+                    .hashtagsIds(List.of(1L))
+                    .character(character)
+                    .memberId(null)
+                    .build();
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("멤버 아이디는 필수 입니다.");
+    }
+
+    @Test
+    @DisplayName("Diary 객체 업데이트 성공")
+    public void testUpdateDiary() {
+        Diary diary = Diary.builder()
+                .content("Old content")
+                .diaryDate(LocalDate.now())
+                .paintingImageUrls(List.of(validUrl))
+                .hashtagsIds(List.of(1L))
+                .character(character)
+                .memberId(validMemberId)
+                .build();
+
+        String newContent = "New content";
+        List<Long> newHashtagsIds = List.of(2L);
+        diary.update(newContent, newHashtagsIds, character);
+
+        assertThat(diary.getContent()).isEqualTo(newContent);
+        assertThat(diary.getHashtagsIds()).containsExactlyElementsOf(newHashtagsIds);
+        assertThat(diary.getCharacter()).isEqualTo(character);
+    }
+
+    @Test
+    @DisplayName("Diary 업데이트 시 내용이 빈 문자열일 때 ConstraintViolationException")
+    public void testUpdateDiary_InvalidContent() {
+        Diary diary = Diary.builder()
+                .content("Valid content")
+                .diaryDate(LocalDate.now())
+                .paintingImageUrls(List.of(validUrl))
+                .hashtagsIds(List.of(1L))
+                .character(character)
+                .memberId(validMemberId)
+                .build();
+
+        assertThatThrownBy(() -> {
+            diary.update("", List.of(2L), character);
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("일기 내용은 필수 입니다.");
+    }
+
+    @Test
+    @DisplayName("Diary 업데이트 시 해시태그 ID 목록이 비어 있을 때 ConstraintViolationException")
+    public void testUpdateDiary_InvalidHashtagsIds() {
+        Diary diary = Diary.builder()
+                .content("Valid content")
+                .diaryDate(LocalDate.now())
+                .paintingImageUrls(List.of(validUrl))
+                .hashtagsIds(List.of(1L))
+                .character(character)
+                .memberId(validMemberId)
+                .build();
+
+        assertThatThrownBy(() -> {
+            diary.update("Updated content", List.of(), character);
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("해시태그 ID 목록은 최소 1개를 포함해야 합니다.");
+    }
+
+    @Test
+    @DisplayName("Diary 업데이트 시 캐릭터가 null일 때 ConstraintViolationException")
+    public void testUpdateDiary_InvalidCharacter() {
+        Diary diary = Diary.builder()
+                .content("Valid content")
+                .diaryDate(LocalDate.now())
+                .paintingImageUrls(List.of(validUrl))
+                .hashtagsIds(List.of(1L))
+                .character(character)
+                .memberId(validMemberId)
+                .build();
+
+        assertThatThrownBy(() -> {
+            diary.update("Updated content", List.of(2L), null);
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("일기에 그려질 캐릭터는 필수 입니다.");
+    }
+
+    @Test
+    @DisplayName("일기 내용이 1000자를 초과할 때 Diary 객체 생성 시 ConstraintViolationException")
+    public void testInvalidDiaryCreation_ContentTooLong() {
+        String longContent = "a".repeat(1001);
+
+        assertThatThrownBy(() -> {
+            Diary.builder()
+                    .content(longContent)
+                    .diaryDate(LocalDate.now())
+                    .paintingImageUrls(List.of(validUrl))
+                    .hashtagsIds(List.of(1L))
+                    .character(character)
+                    .memberId(validMemberId)
+                    .build();
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("일기 내용은 1자 이상 1000자 이내여야 합니다.");
+    }
+
+    @Test
+    @DisplayName("일기 그림 URL 목록 업데이트 테스트")
+    public void testUpdatePaintingImageUrls() throws MalformedURLException {
+        Diary diary = Diary.builder()
+                .content("Valid content")
+                .diaryDate(LocalDate.now())
+                .paintingImageUrls(List.of(validUrl))
+                .hashtagsIds(List.of(1L))
+                .character(character)
+                .memberId(validMemberId)
+                .build();
+
+        URL newUrl1 = new URL("http://example.com/newimage1.png");
+        URL newUrl2 = new URL("http://example.com/newimage2.png");
+
+        diary.updatePaintingImageUrls(List.of(newUrl1, newUrl2));
+
+        assertThat(diary.getPaintingImageUrls()).containsExactly(newUrl1, newUrl2);
+    }
+
+
+    @Test
+    @DisplayName("일기 그림 URL 목록이 5개일 때 Diary 객체 생성 시 ConstraintViolationException")
+    public void testInvalidDiaryCreation_PaintingImageUrlsTooMany() {
+        assertThatThrownBy(() -> {
+            Diary.builder()
+                    .content("Valid content")
+                    .diaryDate(LocalDate.now())
+                    .paintingImageUrls(List.of(validUrl, validUrl, validUrl, validUrl, validUrl))
+                    .hashtagsIds(List.of(1L))
+                    .character(character)
+                    .memberId(validMemberId)
+                    .build();
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("일기 그림 URL 목록은 1개에서 4개 사이여야 합니다.");
+    }
+
+    @Test
+    @DisplayName("해시태그 ID 목록 업데이트 테스트")
+    public void testUpdateHashtags() {
+        Diary diary = Diary.builder()
+                .content("Valid content")
+                .diaryDate(LocalDate.now())
+                .paintingImageUrls(List.of(validUrl))
+                .hashtagsIds(List.of(1L))
+                .character(character)
+                .memberId(validMemberId)
+                .build();
+
+        List<Long> newHashtagsIds = List.of(2L, 3L);
+
+        diary.updateHashtags(newHashtagsIds);
+
+        assertThat(diary.getHashtagsIds()).containsExactlyElementsOf(newHashtagsIds);
+    }
+
+    @Test
+    @DisplayName("해시태그 ID 목록이 5개일 때 Diary 객체 생성 시 ConstraintViolationException")
+    public void testInvalidDiaryCreation_HashtagsIdsTooMany() {
+        assertThatThrownBy(() -> {
+            Diary.builder()
+                    .content("Valid content")
+                    .diaryDate(LocalDate.now())
+                    .paintingImageUrls(List.of(validUrl))
+                    .hashtagsIds(List.of(1L, 2L, 3L, 4L, 5L))
+                    .character(character)
+                    .memberId(validMemberId)
+                    .build();
+        }).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("해시태그 ID 목록은 1개에서 4개 사이여야 합니다.");
+    }
+
+    @Test
+    @DisplayName("일기 즐겨찾기 업데이트 테스트")
+    public void testUpdateFavorite() {
+        Diary diary = Diary.builder()
+                .content("Valid content")
+                .diaryDate(LocalDate.now())
+                .paintingImageUrls(List.of(validUrl))
+                .hashtagsIds(List.of(1L))
+                .character(character)
+                .memberId(validMemberId)
+                .build();
+
+        diary.updateFavorite(true);
+
+        assertThat(diary.isFavorite()).isTrue();
+
+        diary.updateFavorite(false);
+
+        assertThat(diary.isFavorite()).isFalse();
+    }
+
+
+    @Test
+    @DisplayName("멤버가 소유자일 때 테스트")
+    public void testIsOwner_ValidOwner() {
+        Diary diary = Diary.builder()
+                .content("Valid content")
+                .diaryDate(LocalDate.now())
+                .paintingImageUrls(List.of(validUrl))
+                .hashtagsIds(List.of(1L))
+                .character(character)
+                .memberId(validMemberId)
+                .build();
+
+        assertThat(diary.isOwner(validMemberId)).isTrue();
+    }
+
+    @Test
+    @DisplayName("멤버가 소유자가 아닐 때 테스트")
+    public void testIsOwner_InvalidOwner() {
+        Diary diary = Diary.builder()
+                .content("Valid content")
+                .diaryDate(LocalDate.now())
+                .paintingImageUrls(List.of(validUrl))
+                .hashtagsIds(List.of(1L))
+                .character(character)
+                .memberId(validMemberId)
+                .build();
+
+        UUID invalidMemberId = UUID.randomUUID();
+        assertThat(diary.getId()).isNull();
+        assertThat(diary.isOwner(invalidMemberId)).isFalse();
     }
 }

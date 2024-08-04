@@ -70,10 +70,11 @@ public class DallE3VisionApplyService implements VisionApplyService {
 
     private List<byte[]> convertImageB64JsonToFourImagesOfByteArray(String imageB64Json) {
         byte[] decodedBytes = Base64.getDecoder().decode(imageB64Json);
-        BufferedImage image = byteArrayToPngBufferedImageConverter.convertToDatabaseColumn(decodedBytes);
-        List<BufferedImage> subImages = oneBufferedImageToFourSubImagesConverter.convertToDatabaseColumn(image);
+        BufferedImage image = byteArrayToPngBufferedImageConverter.convertByteArrayToBufferedImage(decodedBytes);
+        List<BufferedImage> subImages = oneBufferedImageToFourSubImagesConverter.splitImageToSubImages(image);
+
         return subImages.stream()
-                .map(byteArrayToPngBufferedImageConverter::convertToEntityAttribute)
+                .map(byteArrayToPngBufferedImageConverter::convertBufferedImageToByteArray)
                 .collect(Collectors.toList());
     }
 

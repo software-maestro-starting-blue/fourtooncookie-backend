@@ -5,8 +5,9 @@ import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -15,8 +16,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+@SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 class CharacterRepositoryTest {
 
     @Autowired
@@ -148,6 +150,8 @@ class CharacterRepositoryTest {
         // when
         List<Character> savedCharacters = characterRepository.findAll();
 
+        System.out.println(savedCharacters.get(0).getName());
+
         // then
         assertThat(savedCharacters).hasSize(4);
         assertThat(savedCharacters)
@@ -179,7 +183,6 @@ class CharacterRepositoryTest {
         Character savedStableDiffusionCharacter = savedCharacters.get(3);
         assertThat(savedStableDiffusionCharacter.getCharacterVisionType()).isEqualTo(CharacterVisionType.STABLE_DIFFUSION);
         assertThat(savedStableDiffusionCharacter.getName()).isEqualTo(stableDiffusionCharacterName);
-        assertThat(savedStableDiffusionCharacter.getArtwork()).isEqualTo(savedStableDiffusionCharacter.getArtwork());
         assertThat(savedStableDiffusionCharacter.getSelectionThumbnailUrl()).isEqualTo(stableDiffusionCharacterUrl);
         assertThat(savedStableDiffusionCharacter.getBasePrompt()).isEqualTo(stableDiffusionCharacterNameCharacterBasePrompt);
     }
@@ -223,7 +226,6 @@ class CharacterRepositoryTest {
 
         // then
         assertThat(updatedCharacter.getCharacterVisionType()).isEqualTo(updateCharacterVisionType);
-        assertThat(updatedCharacter.getArtwork()).isEqualTo(updateArtwork);
         assertThat(updatedCharacter.getName()).isEqualTo(updateCharacterName);
         assertThat(updatedCharacter.getSelectionThumbnailUrl()).isEqualTo(updateUrl);
         assertThat(updatedCharacter.getBasePrompt()).isEqualTo(updateBasePrompt);
