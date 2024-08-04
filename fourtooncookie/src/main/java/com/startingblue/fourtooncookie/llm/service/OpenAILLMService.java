@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.llm.service;
 
+import com.startingblue.fourtooncookie.llm.exception.LLMException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -24,8 +25,7 @@ abstract public class OpenAILLMService implements LLMService {
             ChatResponse response = openAiChatModel.call(new Prompt(List.of(new SystemMessage(systemPrompt), new UserMessage(userPrompt)), option));
             return response.getResults().get(0).getOutput().getContent();
         } catch (Exception e) {
-            log.error("Exception occurred while calling OpenAI API: {}", e.getMessage());
-            return "잠시 후 다시 시도해 주세요.";
+            throw new LLMException("Exception occurred while calling OpenAI API: {}", e);
         }
     }
 
