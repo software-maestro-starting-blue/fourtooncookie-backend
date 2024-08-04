@@ -47,7 +47,7 @@ public class OneBufferedImageToFourSubImagesConverter {
             BufferedImage reconstructedImage = new BufferedImage(originalWidth, originalHeight, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2d = reconstructedImage.createGraphics();
 
-            drawSubImages(reconstructedImage, g2d, subImages, subImageWidth, subImageHeight);
+            drawSubImages(g2d, subImages, subImageWidth, subImageHeight);
             g2d.dispose();
             return reconstructedImage;
         } catch (Exception e) {
@@ -55,7 +55,7 @@ public class OneBufferedImageToFourSubImagesConverter {
         }
     }
 
-    private void drawSubImages(BufferedImage reconstructedImage, Graphics2D g2d, List<BufferedImage> subImages, int subImageWidth, int subImageHeight) {
+    private void drawSubImages(Graphics2D g2d, List<BufferedImage> subImages, int subImageWidth, int subImageHeight) {
         g2d.drawImage(subImages.get(0), 0, 0, null);                     // Top-left
         g2d.drawImage(subImages.get(1), subImageWidth, 0, null);         // Top-right
         g2d.drawImage(subImages.get(2), 0, subImageHeight, null);        // Bottom-left
