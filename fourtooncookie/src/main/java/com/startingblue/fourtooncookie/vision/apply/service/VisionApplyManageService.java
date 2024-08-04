@@ -4,6 +4,7 @@ import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.llm.service.LLMService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class VisionApplyManageService {
 
     private static final String RESULT_SPLIT_REGEX = "\\.";
@@ -36,7 +38,12 @@ public class VisionApplyManageService {
         return visionApplyServices.stream()
                 .filter(service -> service.getVisionType().equals(visionType))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No Vision Service Found for Vision Type: " + visionType));
+                .orElseThrow(
+                        () -> {
+                            log.error("No Vision Service Found for Vision Type: " + visionType);
+                            return new IllegalStateException("No Vision Service Found for Vision Type: " + visionType);
+                        }
+                );
     }
 
     private List<String> splitContentIntoParts(String content) {
