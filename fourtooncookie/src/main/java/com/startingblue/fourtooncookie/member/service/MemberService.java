@@ -50,7 +50,7 @@ public class MemberService {
 
     public boolean isMemberSignUpAuthorized(UUID memberId) {
         Member member = readById(memberId);
-        return member != null && member.getName() != null || !member.getName().isEmpty();
+        return member != null && member.getName() != null && !member.getName().isEmpty();
     }
 
 }
