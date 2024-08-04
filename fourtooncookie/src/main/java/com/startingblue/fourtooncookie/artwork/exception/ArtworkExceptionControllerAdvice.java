@@ -17,35 +17,35 @@ public class ArtworkExceptionControllerAdvice {
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleConstraintViolationException(ConstraintViolationException e) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(), e);
         return "Artwork Constraint Violation";
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleEntityNotFoundException(EntityNotFoundException e) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(), e);
         return "Artwork not found";
     }
 
     @ExceptionHandler(ArtworkNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleArtworkNotFoundException(ArtworkNotFoundException e) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(), e);
         return "Artwork not found";
     }
 
     @ExceptionHandler(ArtworkDuplicateException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public String handleArtworkDuplicateException(ArtworkDuplicateException e) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(), e);
         return "Artwork duplicate";
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleException(Exception e) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(), e);
         return "Server Error";
     }
 
