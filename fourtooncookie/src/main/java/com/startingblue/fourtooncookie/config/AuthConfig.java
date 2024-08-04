@@ -24,14 +24,14 @@ public class AuthConfig implements WebMvcConfigurer {
     @Bean
     public FilterRegistrationBean<AuthenticationFilter> memberAuthenticationFilter() {
         FilterRegistrationBean<AuthenticationFilter> registrationBean = new FilterRegistrationBean<>(authenticationFilter);
-        registrationBean.addUrlPatterns("/*");
+        registrationBean.addUrlPatterns("/**");
         return registrationBean;
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(memberSignUpAuthorizationInterceptor)
-                .addPathPatterns("/diary/*");
+                .addPathPatterns("/diary/**");
     }
 
     @Override
