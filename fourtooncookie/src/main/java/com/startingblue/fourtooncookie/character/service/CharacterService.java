@@ -26,7 +26,7 @@ public class CharacterService {
 
     public void createCharacter(final CharacterSaveRequest request) {
         CharacterVisionType visionType = findByCharacterVisionType(request.characterVisionType());
-        Artwork artwork = artworkService.findById(request.artworkId());
+        Artwork artwork = artworkService.readById(request.artworkId());
 
         verifyUniqueCharacter(request.name(), artwork, request.paymentType(), visionType);
 
@@ -47,7 +47,7 @@ public class CharacterService {
 
     public void updateCharacter(final Long characterId, final CharacterUpdateRequest request) {
         Character character = readById(characterId);
-        Artwork artwork = artworkService.findById(request.artworkId());
+        Artwork artwork = artworkService.readById(request.artworkId());
 
         character.update(request.characterVisionType(),
                 request.paymentType(),
