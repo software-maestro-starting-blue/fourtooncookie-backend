@@ -2,10 +2,8 @@ package com.startingblue.fourtooncookie.member.service;
 
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
-import com.startingblue.fourtooncookie.member.dto.response.MemberSavedResponse;
 import com.startingblue.fourtooncookie.member.dto.request.MemberUpdateRequest;
 import com.startingblue.fourtooncookie.member.exception.MemberNotFoundException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
