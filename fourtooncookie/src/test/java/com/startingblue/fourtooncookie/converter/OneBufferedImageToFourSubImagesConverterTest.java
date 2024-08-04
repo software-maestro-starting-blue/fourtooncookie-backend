@@ -108,6 +108,7 @@ class OneBufferedImageToFourSubImagesConverterTest {
      * 아래 주석은 실제로 보기 위한 테스트, 원할한 테스트를 위해 우선 주석
      * 추 후 컨버터 적용 내용을 눈으로 확인하는 용도로 사용 예정
      */
+
 //
 //    @Test
 //    @DisplayName("하나의 이미지가 4개로 잘 나뉘는 가를 확인")

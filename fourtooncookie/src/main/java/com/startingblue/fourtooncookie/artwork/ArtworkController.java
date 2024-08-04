@@ -19,14 +19,13 @@ public class ArtworkController {
 
     @GetMapping
     public ResponseEntity<ArtworkSavedResponses> showArtwork() {
-        ArtworkSavedResponses artworkSavedResponses = artworkService.getSavedArtworkResponses();
         return ResponseEntity
-                .ok(artworkSavedResponses);
+                .ok(ArtworkSavedResponses.of(artworkService.readAllArtworks()));
     }
 
     @PostMapping
     public ResponseEntity<HttpStatus> createArtwork(@Valid @RequestBody final ArtworkSaveRequest request) {
-        artworkService.saveArtwork(request);
+        artworkService.createArtwork(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .build();

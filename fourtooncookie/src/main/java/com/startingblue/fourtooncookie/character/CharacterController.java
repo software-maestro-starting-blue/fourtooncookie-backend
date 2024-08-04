@@ -1,9 +1,10 @@
 package com.startingblue.fourtooncookie.character;
 
-import com.startingblue.fourtooncookie.character.dto.request.AddCharacterRequest;
-import com.startingblue.fourtooncookie.character.dto.request.ModifyCharacterRequest;
-import com.startingblue.fourtooncookie.character.dto.response.CharacterResponses;
+import com.startingblue.fourtooncookie.character.dto.request.CharacterSaveRequest;
+import com.startingblue.fourtooncookie.character.dto.request.CharacterUpdateRequest;
+import com.startingblue.fourtooncookie.character.dto.response.CharacterSavedResponses;
 import com.startingblue.fourtooncookie.character.service.CharacterService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,39 +12,38 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/character")
 public final class CharacterController {
 
     private final CharacterService characterService;
 
-    @GetMapping("/character")
-    public ResponseEntity<CharacterResponses> showCharacters() {
-        final CharacterResponses characterResponses = characterService.showCharacters();
-
-        return ResponseEntity.ok(characterResponses);
-    }
-
-    @PostMapping("/character")
-    public ResponseEntity<HttpStatus> addCharacter(@RequestBody final AddCharacterRequest request) {
-        characterService.addCharacter(request);
-
+    @PostMapping
+    public ResponseEntity<HttpStatus> createCharacter(@Valid @RequestBody final CharacterSaveRequest request) {
+        characterService.createCharacter(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .build();
     }
 
-    @PutMapping("/character/{characterId}")
-    public ResponseEntity<HttpStatus> modifyCharacter(@RequestBody final ModifyCharacterRequest request, @PathVariable final Long characterId) {
-        characterService.modifyCharacter(characterId, request);
+    @GetMapping
+    public ResponseEntity<CharacterSavedResponses> readAllCharacters() {
+        CharacterSavedResponses responses = CharacterSavedResponses.of(characterService.readAllCharacters());
+        return ResponseEntity
+                .ok(responses);
+    }
 
+    @PutMapping("/{characterId}")
+    public ResponseEntity<HttpStatus> updateCharacter(@PathVariable final Long characterId,
+                                                        @Valid @RequestBody final CharacterUpdateRequest request) {
+        characterService.updateCharacter(characterId, request);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();
     }
 
-    @DeleteMapping("/character/{characterId}")
+    @DeleteMapping("/{characterId}")
     public ResponseEntity<HttpStatus> deleteCharacter(@PathVariable final Long characterId) {
         characterService.deleteCharacter(characterId);
-
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();

@@ -2,11 +2,10 @@ package com.startingblue.fourtooncookie.character.domain;
 
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.net.MalformedURLException;
@@ -16,9 +15,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DataJpaTest
 @ActiveProfiles("test")
-@SpringBootTest
-@Transactional
 class CharacterRepositoryTest {
 
     @Autowired
@@ -35,8 +33,12 @@ class CharacterRepositoryTest {
         Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
         URL characterUrl = new URL("https://멍멍이-dalle3.png");
         String basePrompt = "This is a base prompt.";
+
+        artworkRepository.save(artwork);
+
         Character character = Character.builder()
                 .characterVisionType(CharacterVisionType.DALL_E_3)
+                .paymentType(PaymentType.FREE)
                 .artwork(artwork)
                 .name(characterName)
                 .selectionThumbnailUrl(characterUrl)
@@ -60,6 +62,8 @@ class CharacterRepositoryTest {
     void findById() throws MalformedURLException {
         // given
         Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
+        artworkRepository.save(artwork);
+
         String characterName = "멍멍이";
         URL characterUrl = new URL("https://test.png");
         String basePrompt = "This is a base prompt.";
@@ -184,10 +188,13 @@ class CharacterRepositoryTest {
     @Test
     void update() throws MalformedURLException {
         // given
+        Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
+        artworkRepository.save(artwork);
+
         Character character = Character.builder()
                 .characterVisionType(CharacterVisionType.DALL_E_3)
                 .paymentType(PaymentType.FREE)
-                .artwork(new Artwork("Test Artwork", new URL("https://test.png")))
+                .artwork(artwork)
                 .name("멍멍이")
                 .selectionThumbnailUrl(new URL("https://멍멍이-dalle3.png"))
                 .basePrompt("This is a base prompt")
@@ -196,11 +203,12 @@ class CharacterRepositoryTest {
 
         CharacterVisionType updateCharacterVisionType = CharacterVisionType.STABLE_DIFFUSION;
         Artwork updateArtwork = new Artwork("updateById Artwork", new URL("https://updateArtwork.png"));
+        artworkRepository.save(updateArtwork);
+
         String updateCharacterName = "바뀐멍멍이";
         URL updateUrl = new URL("https://test.png");
         String updateBasePrompt = "Updated base prompt.";
 
-        // when
         Character updatedCharacter = savedCharacter.update(
                 updateCharacterVisionType,
                 PaymentType.FREE,
@@ -209,6 +217,8 @@ class CharacterRepositoryTest {
                 updateUrl,
                 updateBasePrompt
         );
+
+        // when
         updatedCharacter = characterRepository.save(updatedCharacter);
 
         // then
@@ -224,6 +234,8 @@ class CharacterRepositoryTest {
     void delete() throws MalformedURLException {
         // given
         Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
+        artworkRepository.save(artwork);
+
         String basePrompt = "This is a base prompt.";
         Character character = Character.builder()
                 .characterVisionType(CharacterVisionType.DALL_E_3)
