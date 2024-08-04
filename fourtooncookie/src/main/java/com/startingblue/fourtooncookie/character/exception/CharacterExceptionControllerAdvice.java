@@ -40,6 +40,13 @@ public class CharacterExceptionControllerAdvice {
         return "Character Vision Type not found";
     }
 
+    @ExceptionHandler(CharacterDuplicateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleCharacterDuplicateException(CharacterDuplicateException e) {
+        log.error(e.getMessage(), e);
+        return "Bad Request";
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleIllegalArgumentException(IllegalArgumentException e) {
