@@ -3,14 +3,23 @@ package com.startingblue.fourtooncookie.diary.domain;
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
 import com.startingblue.fourtooncookie.character.domain.Character;
+import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
+import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
+import com.startingblue.fourtooncookie.character.domain.PaymentType;
+import com.startingblue.fourtooncookie.member.domain.Gender;
+import com.startingblue.fourtooncookie.member.domain.Member;
+import com.startingblue.fourtooncookie.member.domain.MemberRepository;
+import com.startingblue.fourtooncookie.member.domain.Role;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,22 +30,29 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 public class DiaryTest {
 
-    @Mock
     private Character character;
-
     private Member member;
-    private UUID memberUID;
+
     @Autowired
     private ArtworkRepository artworkRepository;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private CharacterRepository characterRepository;
+
+    private URL validUrl;
+    private UUID validMemberId;
+
     @BeforeEach
-    void setUp() {
+    void setUp() throws MalformedURLException {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
 
         member = Member.builder()
                 .name("John Doe")
@@ -46,8 +62,10 @@ public class DiaryTest {
                 .role(Role.MEMBER)
                 .build();
         member = memberRepository.save(member);
-        memberUID = member.getId();
+        validUrl = new URL("http://example.com/image.png");
+        validMemberId = member.getId();
 
+        Artwork artwork;
         try {
             artwork = new Artwork("Test Artwork", new URL("https://test.png"));
             artworkRepository.save(artwork);
@@ -64,6 +82,14 @@ public class DiaryTest {
                 .basePrompt("basePrompt")
                 .build();
         character = characterRepository.save(character);
+    }
+
+    private URL createURL(String urlString) {
+        try {
+            return new URL(urlString);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
