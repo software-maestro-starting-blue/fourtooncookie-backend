@@ -41,11 +41,6 @@ public class CharacterService {
     }
 
     @Transactional(readOnly = true)
-    public Character readCharacterById(Long characterId) {
-        return readById(characterId);
-    }
-
-    @Transactional(readOnly = true)
     public List<Character> readAllCharacters() {
         return characterRepository.findAll();
     }

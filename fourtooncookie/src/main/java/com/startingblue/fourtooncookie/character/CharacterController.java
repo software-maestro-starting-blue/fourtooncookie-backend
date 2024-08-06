@@ -35,7 +35,7 @@ public final class CharacterController {
 
     @GetMapping("/{characterId}")
     public ResponseEntity<CharacterSavedResponse> readCharacter(@PathVariable final Long characterId) {
-        CharacterSavedResponse response = CharacterSavedResponse.of(characterService.readCharacterById(characterId));
+        CharacterSavedResponse response = CharacterSavedResponse.of(characterService.readById(characterId));
         return ResponseEntity
                 .ok(response);
     }
