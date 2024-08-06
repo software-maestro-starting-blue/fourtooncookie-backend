@@ -27,44 +27,55 @@ public class DiaryOwnerAuthorizationInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String memberIdStr = String.valueOf(request.getAttribute(PATH_VARIABLE_MEMBER_KEY));
-
-        if (memberIdStr == null || memberIdStr.isEmpty()) {
-            log.warn("Missing or empty path variable '{}': {}", PATH_VARIABLE_MEMBER_KEY, memberIdStr);
-            response.setStatus(SC_FORBIDDEN);
+        if (!isValidMemberId(memberIdStr, response)) {
             return false;
         }
 
         String diaryIdStr = extractPathVariable(request.getRequestURI());
-        if (diaryIdStr == null || diaryIdStr.isEmpty()) {
-            log.warn("Missing or empty path variable '{}': {}", PATH_VARIABLE_DIARY_KEY, diaryIdStr);
-            response.setStatus(SC_FORBIDDEN);
+        if (!isValidDiaryId(diaryIdStr, response)) {
             return false;
         }
 
-        UUID memberId;
-        long diaryId;
         try {
-            memberId = UUID.fromString(memberIdStr);
-            diaryId = Long.parseLong(diaryIdStr);
-            if (isAuthorized(memberId, diaryId)) {
-                log.info("Member with id {} is authorized", memberId);
-                return true;
-            }
-        } catch (NumberFormatException e) {
-            log.warn("Invalid UUID format for diaryId: {}", diaryIdStr);
-            response.setStatus(SC_FORBIDDEN);
+            UUID memberId = UUID.fromString(memberIdStr);
+            long diaryId = Long.parseLong(diaryIdStr);
+            return handleAuthorization(memberId, diaryId, response);
         } catch (IllegalArgumentException e) {
             log.warn("Invalid UUID format for memberId: {}", memberIdStr);
             response.setStatus(SC_FORBIDDEN);
             return false;
         }
+    }
 
-        log.warn("Member with id {} is not authorized for diary {}", memberIdStr, diaryIdStr);
+    private boolean isValidMemberId(String memberIdStr, HttpServletResponse response) {
+        if (memberIdStr == null || memberIdStr.isEmpty()) {
+            log.warn("Missing or empty path variable '{}': {}", PATH_VARIABLE_MEMBER_KEY, memberIdStr);
+            response.setStatus(SC_FORBIDDEN);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isValidDiaryId(String diaryIdStr, HttpServletResponse response) {
+        if (diaryIdStr == null || diaryIdStr.isEmpty()) {
+            log.warn("Missing or empty path variable '{}': {}", PATH_VARIABLE_DIARY_KEY, diaryIdStr);
+            response.setStatus(SC_FORBIDDEN);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean handleAuthorization(UUID memberId, long diaryId, HttpServletResponse response) {
+        if (isAuthorized(memberId, diaryId)) {
+            log.info("Member with id {} is authorized", memberId);
+            return true;
+        }
+        log.warn("Member with id {} is not authorized for diary {}", memberId, diaryId);
         response.setStatus(SC_FORBIDDEN);
         return false;
     }
 
-    private boolean isAuthorized(UUID memberId, Long diaryId) {
+    private boolean isAuthorized(UUID memberId, long diaryId) {
         return diaryService.verifyDiaryOwner(memberId, diaryId);
     }
 
