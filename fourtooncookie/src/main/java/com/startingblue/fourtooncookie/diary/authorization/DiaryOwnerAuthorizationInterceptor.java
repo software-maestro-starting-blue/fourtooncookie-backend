@@ -46,7 +46,6 @@ public class DiaryOwnerAuthorizationInterceptor implements HandlerInterceptor {
         try {
             memberId = UUID.fromString(memberIdStr);
             diaryId = Long.parseLong(diaryIdStr);
-            System.out.println(diaryId);
             if (isAuthorized(memberId, diaryId)) {
                 log.info("Member with id {} is authorized", memberId);
                 return true;
