@@ -45,4 +45,19 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: BackendApplicationJar
-          path: backend/build/libs/*.jar
+          path: fourtooncookie/build/libs/*.jar
+          
+  deploy:
+    needs: [build-backend]
+    runs-on: self-hosted
+
+    steps:
+      # - name: Remove previous version BACK jar
+      #   working-directory: backend/prod/
+      #   run: rm -f *.jar
+
+      - name: Download BACK jar file from artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: BackendApplicationJar
+          path: backend/prod/
