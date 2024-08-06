@@ -8,7 +8,6 @@ import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.character.domain.PaymentType;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
-import com.startingblue.fourtooncookie.diary.dto.request.DiaryPaintingImagesUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
@@ -146,8 +145,10 @@ class DiaryServiceTest {
     @Test
     void readDiariesByMemberIdTest() {
         // given
-        for (int i = 1; i <= 10; i++) {
-            DiarySaveRequest request = new DiarySaveRequest("Content " + i, LocalDate.of(2024, 7, 21).plusDays(i), List.of((long) i), character.getId());
+        List<Long> hashtagIds = new ArrayList<>();
+        for (int i = 1; i <= 9; i++) {
+            hashtagIds.add(Long.valueOf(i));
+            DiarySaveRequest request = new DiarySaveRequest("Content " + i, LocalDate.of(2024, 7, 21).plusDays(i), hashtagIds, character.getId());
             diaryService.createDiary(request, member.getId());
         }
 
@@ -159,12 +160,12 @@ class DiaryServiceTest {
         List<DiarySavedResponse> diariesPage2 = diariesPages2.diarySavedResponses();
         // then
         assertThat(diariesPage1).hasSize(5);
-        assertThat(diariesPage1.get(0).content()).isEqualTo("Content 10");
-        assertThat(diariesPage1.get(4).content()).isEqualTo("Content 6");
+        assertThat(diariesPage1.get(0).content()).isEqualTo("Content 9");
+        assertThat(diariesPage1.get(4).content()).isEqualTo("Content 5");
 
-        assertThat(diariesPage2).hasSize(5);
-        assertThat(diariesPage2.get(0).content()).isEqualTo("Content 5");
-        assertThat(diariesPage2.get(4).content()).isEqualTo("Content 1");
+        assertThat(diariesPage2).hasSize(4);
+        assertThat(diariesPage2.get(0).content()).isEqualTo("Content 4");
+        assertThat(diariesPage2.get(3).content()).isEqualTo("Content 1");
     }
 
     @DisplayName("존재하지 않는 일기는 삭제하지 못한다.")

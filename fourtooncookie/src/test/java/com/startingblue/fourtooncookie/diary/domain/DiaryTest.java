@@ -359,19 +359,19 @@ public class DiaryTest {
     }
 
     @Test
-    @DisplayName("해시태그 ID 목록이 5개일 때 Diary 객체 생성 시 ConstraintViolationException")
+    @DisplayName("해시태그 ID 목록이 0개일 때 Diary 객체 생성 시 ConstraintViolationException")
     public void testInvalidDiaryCreation_HashtagsIdsTooMany() {
         assertThatThrownBy(() -> {
             Diary.builder()
                     .content("Valid content")
                     .diaryDate(LocalDate.now())
                     .paintingImageUrls(List.of(validUrl))
-                    .hashtagsIds(List.of(1L, 2L, 3L, 4L, 5L))
+                    .hashtagsIds(List.of())
                     .character(character)
                     .memberId(validMemberId)
                     .build();
         }).isInstanceOf(ConstraintViolationException.class)
-                .hasMessageContaining("해시태그 ID 목록은 1개에서 4개 사이여야 합니다.");
+                .hasMessageContaining("해시태그 ID 목록은 최소 1개를 포함해야 합니다.");
     }
 
     @Test

@@ -20,13 +20,13 @@ class HashtagTest {
         List<Long> ids = Arrays.asList(1L, 100L, 200L);
 
         // When
-        Set<Hashtag> hashtags = Hashtag.findHashtagsByIds(ids);
+        Set<Long> hashtagIds = Hashtag.findHashtagIdsByIds(ids);
 
         // Then
-        assertEquals(3, hashtags.size());
-        assertTrue(hashtags.contains(Hashtag.CLEAR));
-        assertTrue(hashtags.contains(Hashtag.EXCITED));
-        assertTrue(hashtags.contains(Hashtag.FRIEND));
+        assertEquals(3, hashtagIds.size());
+        assertTrue(hashtagIds.contains(Hashtag.CLEAR.getId()));
+        assertTrue(hashtagIds.contains(Hashtag.EXCITED.getId()));
+        assertTrue(hashtagIds.contains(Hashtag.FRIEND.getId()));
     }
 
     @Test
@@ -36,7 +36,7 @@ class HashtagTest {
         List<Long> ids = Arrays.asList(1L, 2L, -1L);
 
         // When & Then
-        assertThatThrownBy(() -> Hashtag.findHashtagsByIds(ids))
+        assertThatThrownBy(() -> Hashtag.findHashtagIdsByIds(ids))
                 .isInstanceOf(HashtagNotFoundException.class)
                 .hasMessage("Hashtag not found");
     }

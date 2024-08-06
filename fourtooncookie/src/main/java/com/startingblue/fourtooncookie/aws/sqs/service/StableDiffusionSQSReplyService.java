@@ -25,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StableDiffusionSQSReplyService {
 
-    private static final int FIXED_DELAY = 5 * 1000;
+    private static final int FIXED_DELAY = 30 * 60 * 1000;
     private static final String CONVERSION_ERROR_MESSAGE = "메시지를 VisionReplyEvent로 변환하는 중 오류가 발생했습니다.";
     private static final String DELETE_MESSAGE_ERROR_MESSAGE = "메시지를 삭제하는 중 오류가 발생했습니다.";
 

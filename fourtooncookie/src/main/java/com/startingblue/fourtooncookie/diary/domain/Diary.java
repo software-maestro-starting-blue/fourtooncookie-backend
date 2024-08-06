@@ -1,11 +1,9 @@
 package com.startingblue.fourtooncookie.diary.domain;
 
-import com.startingblue.fourtooncookie.config.BaseEntity;
 import com.startingblue.fourtooncookie.character.domain.Character;
-
+import com.startingblue.fourtooncookie.config.BaseEntity;
 import com.startingblue.fourtooncookie.converter.jpa.LongListToStringConverter;
 import com.startingblue.fourtooncookie.converter.jpa.UrlListToStringConverter;
-
 import com.startingblue.fourtooncookie.validator.NotEmptyList;
 import jakarta.persistence.*;
 import jakarta.validation.*;
@@ -47,7 +45,7 @@ public final class Diary extends BaseEntity {
     private List<URL> paintingImageUrls = new ArrayList<>();
 
     @NotEmptyList(message = "해시태그 ID 목록은 최소 1개를 포함해야 합니다.")
-    @Size(min = 1, max = 4, message = "해시태그 ID 목록은 1개에서 4개 사이여야 합니다.")
+    @Size(min = 1, message = "해시태그 ID 목록은 최소 1개를 포함해야 합니다.")
     @Convert(converter = LongListToStringConverter.class)
     @Builder.Default
     private List<Long> hashtagsIds = new ArrayList<>();

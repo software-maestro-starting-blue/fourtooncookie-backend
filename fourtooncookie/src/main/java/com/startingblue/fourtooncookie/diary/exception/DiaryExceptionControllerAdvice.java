@@ -40,11 +40,4 @@ public class DiaryExceptionControllerAdvice {
         return "Diary duplicate";
     }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleException(Exception e) {
-        log.error(e.getMessage(), e);
-        return "Server Error";
-    }
-
 }

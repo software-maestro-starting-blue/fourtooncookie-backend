@@ -66,7 +66,7 @@ public class CharacterService {
     @Transactional(readOnly = true)
     public Character readById(Long characterId) {
         return characterRepository.findById(characterId)
-                        .orElseThrow(CharacterNotFoundException::new);
+                        .orElseThrow(() -> new CharacterNotFoundException("Character with ID " + characterId + " not found"));
     }
 
     private CharacterVisionType findByCharacterVisionType(CharacterVisionType characterVisionType) {

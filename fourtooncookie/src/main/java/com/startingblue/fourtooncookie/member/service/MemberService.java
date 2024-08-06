@@ -51,4 +51,9 @@ public class MemberService {
         return member != null && member.getName() != null && !member.getName().isEmpty();
     }
 
+    public boolean verifyMemberAdmin(UUID memberId) {
+        Member member = readById(memberId);
+        return member.isAdmin();
+    }
+
 }

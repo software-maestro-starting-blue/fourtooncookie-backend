@@ -28,7 +28,7 @@ public class CharacterExceptionControllerAdvice {
 
     @ExceptionHandler(CharacterNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleCharacterNoSuchElementException(CharacterNotFoundException e) {
+    public String handleCharacterNotFoundException(Exception e) {
         log.error(e.getMessage(), e);
         return "Character Not Found";
     }
@@ -40,17 +40,10 @@ public class CharacterExceptionControllerAdvice {
         return "Character Vision Type not found";
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler(CharacterDuplicateException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleIllegalArgumentException(IllegalArgumentException e) {
+    public String handleCharacterDuplicateException(CharacterDuplicateException e) {
         log.error(e.getMessage(), e);
         return "Bad Request";
-    }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleException(Exception e) {
-        log.error(e.getMessage(), e);
-        return "Character Server Error";
     }
 }

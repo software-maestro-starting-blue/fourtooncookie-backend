@@ -13,7 +13,7 @@ public record DiaryUpdateRequest(
         String content,
 
         @NotEmptyList(message = "해시태그 ID 목록은 최소 1개를 포함해야 합니다.")
-        @Size(min = 1, max = 4, message = "해시태그 ID 목록은 1개에서 4개 사이여야 합니다.")
+        @Size(min = 1, message = "해시태그 ID 목록은 최소 1개를 포함해야 합니다.")
         List<Long> hashtagIds,
 
         @NotNull(message = "일기에 그려질 캐릭터 ID는 필수 입니다.") Long characterId) {

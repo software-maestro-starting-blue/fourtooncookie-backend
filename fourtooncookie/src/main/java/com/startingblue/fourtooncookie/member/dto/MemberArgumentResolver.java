@@ -2,7 +2,6 @@ package com.startingblue.fourtooncookie.member.dto;
 
 import com.startingblue.fourtooncookie.config.authentication.AuthenticationException;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -14,7 +13,6 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import java.util.UUID;
 
 @Component
-@RequiredArgsConstructor
 public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override

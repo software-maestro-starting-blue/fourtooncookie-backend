@@ -18,7 +18,7 @@ public class ArtworkController {
     private final ArtworkService artworkService;
 
     @GetMapping
-    public ResponseEntity<ArtworkSavedResponses> showArtwork() {
+    public ResponseEntity<ArtworkSavedResponses> readAllArtwork() {
         return ResponseEntity
                 .ok(ArtworkSavedResponses.of(artworkService.readAllArtworks()));
     }
@@ -32,7 +32,7 @@ public class ArtworkController {
     }
 
     @PutMapping("/{artworkId}")
-    public ResponseEntity<HttpStatus> modifyArtwork(@PathVariable final Long artworkId, @Valid @RequestBody final ArtworkUpdateRequest request) {
+    public ResponseEntity<HttpStatus> updateArtwork(@PathVariable final Long artworkId, @Valid @RequestBody final ArtworkUpdateRequest request) {
         artworkService.updateArtwork(artworkId, request);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
