@@ -5,6 +5,7 @@ import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.llm.service.LLMService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +18,9 @@ public class StableDiffusionVisionApplyService implements VisionApplyService {
 
     private final LLMService llmService;
 
+    @Value("${stablediffusion.prompt.refine}")
+    private String REFINE_SYSTEM_PROMPT;
+
 
     @Override
     public void processVisionApply(Long diaryId, List<String> contents, Character character) {
@@ -28,6 +32,7 @@ public class StableDiffusionVisionApplyService implements VisionApplyService {
     }
 
     private String getRefinedPrompt(String content, Character character) {
+        String refinedContent = llmService.getLLMResult(REFINE_SYSTEM_PROMPT, content);
         return null; //TODO: 프롬프트를 LLM을 통해 정제하고 캐릭터의 특성을 넣는 로직
     }
 
