@@ -32,11 +32,6 @@ public class AuthenticationFilter extends HttpFilter {
             return;
         }
 
-        if (requestURI.startsWith("/health")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
         String token = jwtExtractor.resolveToken(request);
         Claims claims = jwtExtractor.parseToken(token);
         UUID memberId = UUID.fromString(claims.getSubject());
