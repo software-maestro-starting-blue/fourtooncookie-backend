@@ -26,12 +26,6 @@ public class AuthenticationFilter extends HttpFilter {
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
                                                                         throws IOException, ServletException {
-        String requestURI = request.getRequestURI();
-        if (requestURI.startsWith("/h2-console")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
         String token = jwtExtractor.resolveToken(request);
         Claims claims = jwtExtractor.parseToken(token);
         UUID memberId = UUID.fromString(claims.getSubject());
