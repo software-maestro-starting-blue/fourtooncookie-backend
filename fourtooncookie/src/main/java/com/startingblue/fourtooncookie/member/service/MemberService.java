@@ -22,7 +22,6 @@ public class MemberService {
     public void save(final UUID memberId, final MemberSaveRequest memberSaveRequest) {
         Member member = Member.builder()
                 .id(memberId)
-                .email(memberSaveRequest.email())
                 .name(memberSaveRequest.name())
                 .birth(memberSaveRequest.birth())
                 .gender(memberSaveRequest.gender())
