@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.member;
 
-import com.startingblue.fourtooncookie.member.dto.request.MemberUpdateRequest;
+import com.startingblue.fourtooncookie.member.dto.request.MemberSaveRequest;
 import com.startingblue.fourtooncookie.member.dto.response.MemberSavedResponse;
 import com.startingblue.fourtooncookie.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +22,10 @@ public final class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/member")
-    public ResponseEntity<HttpStatus> updateMember(UUID memberId, @RequestBody MemberUpdateRequest memberUpdateRequest) {
-        memberService.updateById(memberId, memberUpdateRequest);
-        return ResponseEntity
-                .noContent()
-                .build();
+    @PostMapping("/member")
+    public ResponseEntity<HttpStatus> saveMember(UUID memberId, @RequestBody MemberSaveRequest memberSaveRequest) {
+        memberService.save(memberId, memberSaveRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/member")
