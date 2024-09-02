@@ -1,7 +1,6 @@
 package com.startingblue.fourtooncookie.converter;
 
 import com.startingblue.fourtooncookie.converter.exception.ConversionException;
-import jakarta.persistence.Converter;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
@@ -9,7 +8,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-@Converter
 @Component
 public class OneBufferedImageToFourSubImagesConverter {
 

@@ -1,7 +1,6 @@
 package com.startingblue.fourtooncookie.converter;
 
 import com.startingblue.fourtooncookie.converter.exception.ConversionException;
-import jakarta.persistence.Converter;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
@@ -9,7 +8,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-@Converter
 @Component
 public class ByteArrayToPngBufferedImageConverter {
 
