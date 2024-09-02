@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-@Converter
 @Component
 public class OneBufferedImageToFourSubImagesConverter {
 
