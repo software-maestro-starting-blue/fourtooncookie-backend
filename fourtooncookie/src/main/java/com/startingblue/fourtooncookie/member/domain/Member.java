@@ -40,7 +40,7 @@ public class Member extends BaseEntity {
     @Column(name = "role")
     private Role role;
 
-    @Column(name = "deleted_at")
+    @Column(name = "deleted_date_time")
     private LocalDateTime deletedDateTime;
 
     public void update(String name, LocalDate birth, Gender gender) {
