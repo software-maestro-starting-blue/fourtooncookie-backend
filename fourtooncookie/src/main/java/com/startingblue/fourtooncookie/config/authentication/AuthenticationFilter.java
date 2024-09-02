@@ -25,28 +25,71 @@ public class AuthenticationFilter extends HttpFilter {
 
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-                                                                        throws IOException, ServletException {
+            throws IOException, ServletException {
+
         String requestURI = request.getRequestURI();
-        if (requestURI.startsWith("/h2-console")) {
+
+        if (shouldBypass(requestURI)) {
             chain.doFilter(request, response);
             return;
         }
 
-        if (requestURI.startsWith("/health")) {
-            chain.doFilter(request, response);
+        UUID memberId = extractMemberId(request);
+
+        if (memberId == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token.");
             return;
         }
 
+        if (isSignupRequest(requestURI, request.getMethod())) {
+            handleSignup(request, response, chain, memberId);
+        } else {
+            handleLogin(request, response, chain, memberId);
+        }
+    }
+
+    private boolean shouldBypass(String requestURI) {
+        return requestURI.startsWith("/h2-console") || requestURI.startsWith("/health");
+    }
+
+    private UUID extractMemberId(HttpServletRequest request) {
         String token = jwtExtractor.resolveToken(request);
+        if (token == null) {
+            log.warn("Token not found in request");
+            return null;
+        }
+
         Claims claims = jwtExtractor.parseToken(token);
-        UUID memberId = UUID.fromString(claims.getSubject());
-        log.info("login attempt memberId: {}", memberId);
+        return UUID.fromString(claims.getSubject());
+    }
+
+    private boolean isSignupRequest(String requestURI, String method) {
+        return requestURI.startsWith("/member") && "POST".equalsIgnoreCase(method);
+    }
+
+    private void handleSignup(HttpServletRequest request, HttpServletResponse response, FilterChain chain, UUID memberId)
+            throws IOException, ServletException {
         if (memberService.verifyMemberExists(memberId)) {
-            log.info("login success memberId: {}", memberId);
+            log.error("[{}] Signup attempt failed: Account already exists", memberId);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Account already exists.");
+            return;
+        }
+
+        log.info("[{}] Signup request received", memberId);
+        request.setAttribute("memberId", memberId);
+        chain.doFilter(request, response);
+    }
+
+    private void handleLogin(HttpServletRequest request, HttpServletResponse response, FilterChain chain, UUID memberId)
+            throws IOException, ServletException {
+        log.info("[{}] Login attempt", memberId);
+        if (memberService.verifyMemberExists(memberId)) {
+            log.info("[{}] Login success", memberId);
             request.setAttribute("memberId", memberId);
             chain.doFilter(request, response);
         } else {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, String.format("Member with id %s not found", memberId));
+            response.sendError(HttpServletResponse.SC_NOT_FOUND,
+                    String.format("Member with id %s not found", memberId));
         }
     }
 }
