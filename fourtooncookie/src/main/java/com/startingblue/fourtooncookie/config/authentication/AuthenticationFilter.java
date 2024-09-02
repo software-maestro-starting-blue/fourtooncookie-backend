@@ -29,7 +29,7 @@ public class AuthenticationFilter extends HttpFilter {
 
         String requestURI = request.getRequestURI();
 
-        if (shouldBypass(requestURI)) {
+        if (isBypassAvailable(requestURI)) {
             chain.doFilter(request, response);
             return;
         }
@@ -48,7 +48,7 @@ public class AuthenticationFilter extends HttpFilter {
         }
     }
 
-    private boolean shouldBypass(String requestURI) {
+    private boolean isBypassAvailable(String requestURI) {
         return requestURI.startsWith("/h2-console") || requestURI.startsWith("/health");
     }
 
