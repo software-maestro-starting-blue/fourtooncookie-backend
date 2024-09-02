@@ -26,12 +26,15 @@ public class Member extends BaseEntity {
     @Column(name = "email")
     private String email;
 
+    @NotNull
     @Column(name = "name")
     private String name;
 
+    @NotNull
     @Column(name = "birth")
     private LocalDate birth;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")
     private Gender gender;
