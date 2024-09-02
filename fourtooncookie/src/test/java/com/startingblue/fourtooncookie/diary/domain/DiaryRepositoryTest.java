@@ -174,6 +174,7 @@ class DiaryRepositoryTest {
 
     private Member createMember() {
         Member member = Member.builder()
+                .id(UUID.randomUUID())
                 .name("testUser")
                 .email("test@email.com")
                 .birth(LocalDate.of(2024, 7, 23))
