@@ -32,7 +32,7 @@ public class MemberService {
     }
 
     public Member readById(final UUID memberId) {
-        return  memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("member not found"));
+        return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("member not found"));
     }
 
     public void softDeleteById(UUID memberId) {
