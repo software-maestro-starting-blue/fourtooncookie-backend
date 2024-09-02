@@ -22,7 +22,6 @@ public class Member extends BaseEntity {
     @Column(name = "member_id")
     private UUID id;
 
-    @NotNull
     @Column(name = "email")
     private String email;
 
