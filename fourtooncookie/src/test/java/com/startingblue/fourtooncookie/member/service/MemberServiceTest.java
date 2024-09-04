@@ -43,7 +43,6 @@ public class MemberServiceTest {
 
         Member member = Member.builder()
                 .id(memberId)
-                .email(email)
                 .name(name)
                 .birth(birth)
                 .gender(gender)
@@ -55,7 +54,6 @@ public class MemberServiceTest {
         // then
         MemberSavedResponse memberSavedResponse = MemberSavedResponse.of(memberService.readById(memberId));
         assertThat(memberSavedResponse).isNotNull();
-        assertThat(memberSavedResponse.email()).isEqualTo(email);
         assertThat(memberSavedResponse.name()).isEqualTo(name);
         assertThat(memberSavedResponse.birth()).isEqualTo(birth);
         assertThat(memberSavedResponse.gender()).isEqualTo(gender);
@@ -65,14 +63,12 @@ public class MemberServiceTest {
     @DisplayName("supabase에 있는 멤버 정보를 수정한다.")
     void updateById() {
         UUID memberId = UUID.randomUUID();
-        String oldEmail = "oldemail@example.com";
         String oldName = "Old Name";
         LocalDate oldBirth = LocalDate.of(1990, 1, 1);
         Gender oldGender = Gender.MALE;
 
         Member member = Member.builder()
                 .id(memberId)
-                .email(oldEmail)
                 .name(oldName)
                 .birth(oldBirth)
                 .gender(oldGender)
@@ -92,7 +88,6 @@ public class MemberServiceTest {
 
         // then
         assertThat(updatedMember).isNotNull();
-        assertThat(updatedMember.getEmail()).isEqualTo(oldEmail); // Email is not updated in the updateById method
         assertThat(updatedMember.getName()).isEqualTo(newName);
         assertThat(updatedMember.getBirth()).isEqualTo(newBirth);
         assertThat(updatedMember.getGender()).isEqualTo(newGender);
@@ -109,7 +104,6 @@ public class MemberServiceTest {
 
         Member member = Member.builder()
                 .id(memberId)
-                .email(email)
                 .name(name)
                 .birth(birth)
                 .gender(gender)
@@ -136,7 +130,6 @@ public class MemberServiceTest {
 
         Member member = Member.builder()
                 .id(memberId)
-                .email(email)
                 .name(name)
                 .birth(birth)
                 .gender(gender)
@@ -162,7 +155,6 @@ public class MemberServiceTest {
 
         Member member = Member.builder()
                 .id(memberId)
-                .email(email)
                 .name(name)
                 .birth(birth)
                 .gender(gender)
@@ -189,7 +181,6 @@ public class MemberServiceTest {
 
         Member member = Member.builder()
                 .id(memberId)
-                .email(email)
                 .name(name)
                 .birth(birth)
                 .gender(gender)

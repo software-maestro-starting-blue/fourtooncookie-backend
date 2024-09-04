@@ -22,10 +22,6 @@ public class Member {
     @Column(name = "member_id")
     private UUID id;
 
-    @NotNull
-    @Column(name = "email")
-    private String email;
-
     @Column(name = "name")
     private String name;
 

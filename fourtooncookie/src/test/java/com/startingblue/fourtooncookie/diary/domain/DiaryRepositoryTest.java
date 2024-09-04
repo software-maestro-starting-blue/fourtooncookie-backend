@@ -175,7 +175,6 @@ class DiaryRepositoryTest {
     private Member createMember() {
         Member member = Member.builder()
                 .name("testUser")
-                .email("test@email.com")
                 .birth(LocalDate.of(2024, 7, 23))
                 .gender(Gender.OTHER)
                 .role(Role.MEMBER)
