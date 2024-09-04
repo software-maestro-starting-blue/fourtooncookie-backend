@@ -36,8 +36,8 @@ public class Member {
     @Column(name = "role")
     private Role role;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
+    @Column(name = "deleted_date_time")
+    private LocalDateTime deletedDateTime;
 
     public void update(String name, LocalDate birth, Gender gender) {
         this.name = name;
@@ -52,10 +52,10 @@ public class Member {
         if (current.isAfter(LocalDateTime.now())) {
             throw new IllegalArgumentException("Current time cannot be after current time");
         }
-        if (deletedAt != null && current.isAfter(deletedAt)) {
+        if (deletedDateTime != null && current.isAfter(deletedDateTime)) {
             throw new IllegalArgumentException("Cannot delete at a time after the current deletedAt timestamp");
         }
-        deletedAt = current;
+        deletedDateTime = current;
     }
 
     public boolean isAdmin() {
