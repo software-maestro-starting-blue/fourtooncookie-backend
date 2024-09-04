@@ -122,7 +122,7 @@ public class MemberServiceTest {
 
         Member deletedMember = memberRepository.findById(memberId).orElse(null);
         assertThat(deletedMember).isNotNull();
-        assertThat(deletedMember.getDeletedAt()).isEqualTo(current);
+        assertThat(deletedMember.getDeletedDateTime()).isEqualTo(current);
     }
 
     @Test
@@ -175,7 +175,7 @@ public class MemberServiceTest {
 
         Member deletedMember = memberRepository.findById(memberId).orElse(null);
         assertThat(deletedMember).isNotNull();
-        assertThat(deletedMember.getDeletedAt()).isEqualTo(past);
+        assertThat(deletedMember.getDeletedDateTime()).isEqualTo(past);
     }
 
     @Test
