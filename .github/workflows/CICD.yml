@@ -64,4 +64,4 @@ jobs:
           
       - name: Deploy BACK to production server
         working-directory: backend/prod/
-        run: sudo RUNNER_TRACKING_ID="" sh deploy.sh
+        run: RUNNER_TRACKING_ID="" sh deploy.sh
