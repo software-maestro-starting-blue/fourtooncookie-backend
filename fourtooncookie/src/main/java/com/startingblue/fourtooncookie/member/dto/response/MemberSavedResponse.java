@@ -5,9 +5,9 @@ import com.startingblue.fourtooncookie.member.domain.Member;
 
 import java.time.LocalDate;
 
-public record MemberSavedResponse(String email, String name, Gender gender, LocalDate birth) {
+public record MemberSavedResponse(String name, Gender gender, LocalDate birth) {
 
     public static MemberSavedResponse of(Member member) {
-        return new MemberSavedResponse(member.getEmail(), member.getName(), member.getGender(), member.getBirth());
+        return new MemberSavedResponse(member.getName(), member.getGender(), member.getBirth());
     }
 }
