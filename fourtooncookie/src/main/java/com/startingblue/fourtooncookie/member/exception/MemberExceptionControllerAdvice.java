@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class MemberExceptionControllerAdvice {
 
-    @ExceptionHandler(EntityNotFoundException.class)
+    @ExceptionHandler({ EntityNotFoundException.class, MemberNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleEntityNotFoundExceptionException(EntityNotFoundException e) {
         log.error(e.getMessage(), e);

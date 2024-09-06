@@ -231,7 +231,6 @@ class DiaryServiceTest {
         return Member.builder()
                 .name(name)
                 .birth(birthDate)
-                .email("temp@gmail.com")
                 .gender(gender)
                 .role(Role.MEMBER)
                 .build();

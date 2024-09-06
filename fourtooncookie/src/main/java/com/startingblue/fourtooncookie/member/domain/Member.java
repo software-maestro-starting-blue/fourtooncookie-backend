@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.member.domain;
 
+import com.startingblue.fourtooncookie.config.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -15,16 +16,12 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "member_id")
     private UUID id;
-
-    @NotNull
-    @Column(name = "email")
-    private String email;
 
     @Column(name = "name")
     private String name;
@@ -40,8 +37,8 @@ public class Member {
     @Column(name = "role")
     private Role role;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
+    @Column(name = "deleted_date_time")
+    private LocalDateTime deletedDateTime;
 
     public void update(String name, LocalDate birth, Gender gender) {
         this.name = name;
@@ -56,10 +53,10 @@ public class Member {
         if (current.isAfter(LocalDateTime.now())) {
             throw new IllegalArgumentException("Current time cannot be after current time");
         }
-        if (deletedAt != null && current.isAfter(deletedAt)) {
+        if (deletedDateTime != null && current.isAfter(deletedDateTime)) {
             throw new IllegalArgumentException("Cannot delete at a time after the current deletedAt timestamp");
         }
-        deletedAt = current;
+        deletedDateTime = current;
     }
 
     public boolean isAdmin() {

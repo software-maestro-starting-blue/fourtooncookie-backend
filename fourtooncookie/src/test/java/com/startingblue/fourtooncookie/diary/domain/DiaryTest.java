@@ -57,7 +57,6 @@ public class DiaryTest {
         member = Member.builder()
                 .name("John Doe")
                 .birth(LocalDate.of(1990, 1, 1))
-                .email("john.doe@example.com")
                 .gender(Gender.MALE)
                 .role(Role.MEMBER)
                 .build();
