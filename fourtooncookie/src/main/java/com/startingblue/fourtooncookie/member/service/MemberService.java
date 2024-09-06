@@ -4,7 +4,9 @@ import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
 import com.startingblue.fourtooncookie.member.domain.Role;
 import com.startingblue.fourtooncookie.member.dto.request.MemberSaveRequest;
+import com.startingblue.fourtooncookie.member.exception.MemberDuplicateException;
 import com.startingblue.fourtooncookie.member.exception.MemberNotFoundException;
+import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,10 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     public void save(UUID memberId, MemberSaveRequest memberSaveRequest) {
+        if (verifyMemberExists(memberId)) {
+            throw new MemberDuplicateException("Member with id " + memberId + " already exists");
+        };
+
         Member member = Member.builder()
                 .id(memberId)
                 .name(memberSaveRequest.name())
