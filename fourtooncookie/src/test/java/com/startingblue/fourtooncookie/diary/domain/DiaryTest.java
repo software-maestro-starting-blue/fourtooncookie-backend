@@ -55,6 +55,7 @@ public class DiaryTest {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 
         member = Member.builder()
+                .id(UUID.randomUUID())
                 .name("John Doe")
                 .birth(LocalDate.of(1990, 1, 1))
                 .gender(Gender.MALE)

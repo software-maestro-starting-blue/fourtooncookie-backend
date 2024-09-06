@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -174,6 +175,7 @@ class DiaryRepositoryTest {
 
     private Member createMember() {
         Member member = Member.builder()
+                .id(UUID.randomUUID())
                 .name("testUser")
                 .birth(LocalDate.of(2024, 7, 23))
                 .gender(Gender.OTHER)
