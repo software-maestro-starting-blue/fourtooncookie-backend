@@ -19,9 +19,9 @@ public class MemberExceptionControllerAdvice {
         return "Member Not Found";
     }
 
-    @ExceptionHandler(EntityExistsException.class)
+    @ExceptionHandler(MemberDuplicateException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public String handleEntityExistsExceptionException(EntityExistsException e) {
+    public String handleMemberDuplicateException(MemberDuplicateException e) {
         log.error(e.getMessage(), e);
         return "Member Exists";
     }
