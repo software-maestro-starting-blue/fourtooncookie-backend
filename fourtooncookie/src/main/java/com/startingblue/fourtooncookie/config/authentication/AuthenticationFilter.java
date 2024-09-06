@@ -41,15 +41,16 @@ public class AuthenticationFilter extends HttpFilter {
             if (isSignupRequest(memberId, requestURI, request.getMethod())) {
                 request.setAttribute("memberId", memberId);
                 chain.doFilter(request, response);
+                return;
+            }
+
+            if (isExistsMember(memberId)) {
+                log.info("login success memberId: {}", memberId);
+                request.setAttribute("memberId", memberId);
+                chain.doFilter(request, response);
             } else {
-                if (isExistsMember(memberId)) {
-                    log.info("login success memberId: {}", memberId);
-                    request.setAttribute("memberId", memberId);
-                    chain.doFilter(request, response);
-                } else {
-                    log.error("Member with id {} not found", memberId);
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND, String.format("Member with id %s not found", memberId));
-                }
+                log.error("Member with id {} not found", memberId);
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, String.format("Member with id %s not found", memberId));
             }
         } catch (AuthenticationException e) {
             log.error("Authentication failed: {}", e.getMessage());
