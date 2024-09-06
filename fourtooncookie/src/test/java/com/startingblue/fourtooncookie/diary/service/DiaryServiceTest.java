@@ -30,6 +30,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -229,6 +230,7 @@ class DiaryServiceTest {
 
     private Member createMember(String name, LocalDate birthDate, Gender gender) {
         return Member.builder()
+                .id(UUID.randomUUID())
                 .name(name)
                 .birth(birthDate)
                 .gender(gender)
