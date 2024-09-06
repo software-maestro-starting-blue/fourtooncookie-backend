@@ -38,18 +38,18 @@ public class AuthenticationFilter extends HttpFilter {
             UUID memberId = UUID.fromString(claims.getSubject());
             log.info("login attempt memberId: {}", memberId);
 
-            if (memberService.verifyMemberExists(memberId)) {
-                log.info("login success memberId: {}", memberId);
+            if (isSignupRequest(memberId, requestURI, request.getMethod())) {
                 request.setAttribute("memberId", memberId);
                 chain.doFilter(request, response);
             } else {
-                if (isSignupRequest(requestURI, request.getMethod())) {
+                if (isExistsMember(memberId)) {
+                    log.info("login success memberId: {}", memberId);
                     request.setAttribute("memberId", memberId);
                     chain.doFilter(request, response);
-                    return;
+                } else {
+                    log.error("Member with id {} not found", memberId);
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, String.format("Member with id %s not found", memberId));
                 }
-                log.error("Member with id {} not found", memberId);
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, String.format("Member with id %s not found", memberId));
             }
         } catch (AuthenticationException e) {
             log.error("Authentication failed: {}", e.getMessage());
@@ -57,7 +57,11 @@ public class AuthenticationFilter extends HttpFilter {
         }
     }
 
-    private boolean isSignupRequest(String requestURI, String method) {
-        return requestURI.equalsIgnoreCase("/member") && "POST".equalsIgnoreCase(method);
+    private boolean isSignupRequest(UUID memberId, String requestURI, String method) {
+        return !memberService.verifyMemberExists(memberId) && "/member".equalsIgnoreCase(requestURI) && "POST".equalsIgnoreCase(method);
+    }
+
+    private boolean isExistsMember(UUID memberId) {
+        return memberService.verifyMemberExists(memberId);
     }
 }
