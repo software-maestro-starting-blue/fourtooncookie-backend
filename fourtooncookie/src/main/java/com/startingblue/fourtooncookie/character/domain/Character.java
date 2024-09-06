@@ -15,6 +15,7 @@ import java.util.Set;
 
 @Entity
 @Slf4j
+@Table(name = "`character`")
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
