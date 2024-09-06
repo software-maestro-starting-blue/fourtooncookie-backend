@@ -38,7 +38,7 @@ public class AuthenticationFilter extends HttpFilter {
             UUID memberId = UUID.fromString(claims.getSubject());
             log.info("login attempt memberId: {}", memberId);
 
-            if (isSignupRequest(memberId, requestURI, request.getMethod())) {
+            if (isSignupRequest(requestURI, request.getMethod())) {
                 request.setAttribute("memberId", memberId);
                 chain.doFilter(request, response);
                 return;
@@ -58,8 +58,8 @@ public class AuthenticationFilter extends HttpFilter {
         }
     }
 
-    private boolean isSignupRequest(UUID memberId, String requestURI, String method) {
-        return !memberService.verifyMemberExists(memberId) && "/member".equalsIgnoreCase(requestURI) && "POST".equalsIgnoreCase(method);
+    private boolean isSignupRequest(String requestURI, String method) {
+        return "/member".equalsIgnoreCase(requestURI) && "POST".equalsIgnoreCase(method);
     }
 
     private boolean isExistsMember(UUID memberId) {
