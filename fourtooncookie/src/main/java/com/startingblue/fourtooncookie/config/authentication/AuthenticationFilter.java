@@ -43,6 +43,11 @@ public class AuthenticationFilter extends HttpFilter {
                 request.setAttribute("memberId", memberId);
                 chain.doFilter(request, response);
             } else {
+                if (isSignupRequest(requestURI, request.getMethod())) {
+                    request.setAttribute("memberId", memberId);
+                    chain.doFilter(request, response);
+                    return;
+                }
                 log.error("Member with id {} not found", memberId);
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, String.format("Member with id %s not found", memberId));
             }
@@ -50,5 +55,9 @@ public class AuthenticationFilter extends HttpFilter {
             log.error("Authentication failed: {}", e.getMessage());
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed: " + e.getMessage());
         }
+    }
+
+    private boolean isSignupRequest(String requestURI, String method) {
+        return requestURI.equalsIgnoreCase("/member") && "POST".equalsIgnoreCase(method);
     }
 }
