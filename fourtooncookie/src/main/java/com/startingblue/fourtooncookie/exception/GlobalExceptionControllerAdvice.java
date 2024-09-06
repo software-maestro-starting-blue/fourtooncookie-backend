@@ -74,19 +74,4 @@ public class GlobalExceptionControllerAdvice {
         log.error(e.getMessage(), e);
         return "Not Found";
     }
-
-    @ExceptionHandler(RuntimeException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleRuntimeException(RuntimeException e) {
-        log.error("Runtime error: ", e);
-        return "Server Error";
-    }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleException(Exception e) {
-        log.error("Unexpected error: ", e);
-        return "Server Error";
-    }
-
 }
