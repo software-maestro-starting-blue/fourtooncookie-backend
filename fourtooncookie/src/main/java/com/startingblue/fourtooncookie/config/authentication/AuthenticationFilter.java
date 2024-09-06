@@ -38,7 +38,13 @@ public class AuthenticationFilter extends HttpFilter {
             UUID memberId = UUID.fromString(claims.getSubject());
             log.info("login attempt memberId: {}", memberId);
 
-            if (memberService.verifyMemberExists(memberId)) {
+            if (isSignupRequest(requestURI, request.getMethod())) {
+                request.setAttribute("memberId", memberId);
+                chain.doFilter(request, response);
+                return;
+            }
+
+            if (isExistsMember(memberId)) {
                 log.info("login success memberId: {}", memberId);
                 request.setAttribute("memberId", memberId);
                 chain.doFilter(request, response);
@@ -50,5 +56,13 @@ public class AuthenticationFilter extends HttpFilter {
             log.error("Authentication failed: {}", e.getMessage());
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed: " + e.getMessage());
         }
+    }
+
+    private boolean isSignupRequest(String requestURI, String method) {
+        return "/member".equalsIgnoreCase(requestURI) && "POST".equalsIgnoreCase(method);
+    }
+
+    private boolean isExistsMember(UUID memberId) {
+        return memberService.verifyMemberExists(memberId);
     }
 }
