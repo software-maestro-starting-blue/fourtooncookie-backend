@@ -13,12 +13,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 @Component
 @Slf4j
 public class AuthenticationFilter extends HttpFilter {
+
+    private static final List<String> BYPASS_URI_LIST = Arrays.asList(
+            "/h2-console",
+            "/health"
+    );
 
     private final JwtExtractor jwtExtractor;
     private final MemberService memberService;
@@ -27,28 +35,76 @@ public class AuthenticationFilter extends HttpFilter {
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         String requestURI = request.getRequestURI();
-        try {
-            if (requestURI.startsWith("/h2-console") || requestURI.startsWith("/health")) {
-                chain.doFilter(request, response);
-                return;
-            }
+        if (isBypassAvailable(requestURI)) {
+            chain.doFilter(request, response);
+            return;
+        }
+        System.out.println(extractMemberId(request));
+        extractMemberId(request).ifPresentOrElse(
+                memberId -> {
+                    log.info("login attempt memberId: {}", memberId);
+                    try {
+                        if (isSignupRequest(requestURI, request.getMethod())) {
+                            handleSignup(request, response, chain, memberId);
+                        } else {
+                            handleLogin(request, response, chain, memberId);
+                        }
+                    } catch (IOException | ServletException e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                () -> {
+                    try {
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token.");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
+    }
 
-            String token = jwtExtractor.resolveToken(request);
-            Claims claims = jwtExtractor.parseToken(token);
-            UUID memberId = UUID.fromString(claims.getSubject());
-            log.info("login attempt memberId: {}", memberId);
+    private boolean isBypassAvailable(String requestURI) {
+        return BYPASS_URI_LIST.stream()
+                .anyMatch(requestURI::startsWith);
+    }
 
-            if (memberService.verifyMemberExists(memberId)) {
-                log.info("login success memberId: {}", memberId);
-                request.setAttribute("memberId", memberId);
-                chain.doFilter(request, response);
-            } else {
-                log.error("Member with id {} not found", memberId);
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, String.format("Member with id %s not found", memberId));
-            }
-        } catch (AuthenticationException e) {
-            log.error("Authentication failed: {}", e.getMessage());
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed: " + e.getMessage());
+    private Optional<UUID> extractMemberId(HttpServletRequest request) {
+        String token = jwtExtractor.resolveToken(request);
+        if (token == null) {
+            log.warn("Token not found in request");
+            return Optional.empty();
+        }
+        Claims claims = jwtExtractor.parseToken(token);
+        return Optional.of(UUID.fromString(claims.getSubject()));
+    }
+
+    private boolean isSignupRequest(String requestURI, String method) {
+        return requestURI.startsWith("/member") && "POST".equalsIgnoreCase(method);
+    }
+
+    private void handleSignup(HttpServletRequest request, HttpServletResponse response, FilterChain chain, UUID memberId)
+            throws IOException, ServletException {
+        if (memberService.verifyMemberExists(memberId)) {
+            log.warn("[{}] Signup attempt failed: Account already exists", memberId);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Account already exists.");
+            return;
+        }
+
+        log.info("[{}] Signup request received", memberId);
+        request.setAttribute("memberId", memberId);
+        chain.doFilter(request, response);
+    }
+
+    private void handleLogin(HttpServletRequest request, HttpServletResponse response, FilterChain chain, UUID memberId)
+            throws IOException, ServletException {
+        log.info("[{}] Login attempt", memberId);
+        if (memberService.verifyMemberExists(memberId)) {
+            log.info("[{}] Login success", memberId);
+            request.setAttribute("memberId", memberId);
+            chain.doFilter(request, response);
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND,
+                    String.format("Member with id %s not found", memberId));
         }
     }
 }
