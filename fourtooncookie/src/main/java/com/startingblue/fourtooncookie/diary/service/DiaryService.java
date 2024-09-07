@@ -45,9 +45,8 @@ public class DiaryService {
         verifyUniqueDiary(memberId, request.diaryDate());
 
         Diary diary = buildDiary(request, member, character);
-        invokeImageGenerateLambdaAsync(diary, character);
-
         diaryRepository.save(diary);
+        invokeImageGenerateLambdaAsync(diary, character);
     }
 
     private Diary buildDiary(DiarySaveRequest request, Member member, Character character) {
@@ -91,16 +90,14 @@ public class DiaryService {
     public void updateDiaryFavorite(Long diaryId, boolean isFavorite) {
         Diary foundDiary = readById(diaryId);
         foundDiary.updateFavorite(isFavorite);
-        diaryRepository.save(foundDiary);
     }
 
     public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
         Diary existedDiary = readById(diaryId);
         Character character = characterService.readById(request.characterId());
-
         existedDiary.update(request.content(), character);
         diaryRepository.save(existedDiary);
-        // todo vision
+        invokeImageGenerateLambdaAsync(existedDiary, character);
     }
 
     public void deleteDiary(Long diaryId) {
