@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice("com.startingblue.fourtooncookie.diary")
+@RestControllerAdvice
 @Slf4j
 public class DiaryExceptionControllerAdvice {
 
@@ -40,4 +40,10 @@ public class DiaryExceptionControllerAdvice {
         return "Diary duplicate";
     }
 
+    @ExceptionHandler(DiaryLambdaInvocationException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleDiaryLambdaInvocationException(DiaryLambdaInvocationException e) {
+        log.error(e.getMessage(), e);
+        return "Lambda 호출 중 오류가 발생했습니다.";
+    }
 }
