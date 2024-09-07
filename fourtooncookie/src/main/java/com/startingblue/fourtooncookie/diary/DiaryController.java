@@ -54,8 +54,8 @@ public class DiaryController {
 
     @PatchMapping("/{diaryId}/favorite")
     public ResponseEntity<HttpStatus> updateDiaryFavorite(@PathVariable final Long diaryId,
-                                                    @RequestBody final DiaryFavoriteRequest isFavorite) {
-        diaryService.updateDiaryFavorite(diaryId, isFavorite.isFavorite());
+                                                    @RequestBody final DiaryFavoriteRequest diaryFavoriteRequest) {
+        diaryService.updateDiaryFavorite(diaryId, diaryFavoriteRequest.isFavorite());
         return ok().build();
     }
 
