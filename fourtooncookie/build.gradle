@@ -35,6 +35,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
 	implementation "net.dv8tion:JDA:5.0.1"
+	implementation 'software.amazon.awssdk:lambda:2.20.0' // 최신 버전을 사용하세요.
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'com.mysql:mysql-connector-j'
