@@ -16,7 +16,6 @@ public class SQSConfig {
     public SqsClient sqsClient() {
         return SqsClient.builder()
                 .region(region)
-                .credentialsProvider(ProfileCredentialsProvider.create())
                 .build();
     }
 }

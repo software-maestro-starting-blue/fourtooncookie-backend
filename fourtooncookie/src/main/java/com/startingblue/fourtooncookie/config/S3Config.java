@@ -16,7 +16,6 @@ public class S3Config {
     public S3Client s3Client() {
         return S3Client.builder()
                 .region(region)
-                .credentialsProvider(ProfileCredentialsProvider.create())
                 .build();
     }
 
@@ -24,7 +23,6 @@ public class S3Config {
     public S3Presigner s3Presigner() {
         return S3Presigner.builder()
                 .region(region)
-                .credentialsProvider(ProfileCredentialsProvider.create())
                 .build();
     }
 
