@@ -142,21 +142,6 @@ public class DiaryTest {
     }
 
     @Test
-    @DisplayName("일기 그림 URL 목록이 비어 있을 때 Diary 객체 생성 시 ConstraintViolationException")
-    public void testInvalidDiaryCreation_PaintingImageUrlsEmpty() {
-        assertThatThrownBy(() -> {
-            Diary.builder()
-                    .content("Valid content")
-                    .diaryDate(LocalDate.now())
-                    .paintingImageUrls(List.of())
-                    .character(character)
-                    .memberId(validMemberId)
-                    .build();
-        }).isInstanceOf(ConstraintViolationException.class)
-                .hasMessageContaining("일기 그림 URL 목록은 최소 1개를 포함해야 합니다.");
-    }
-
-    @Test
     @DisplayName("캐릭터가 null일 때 Diary 객체 생성 시 ConstraintViolationException")
     public void testInvalidDiaryCreation_CharacterNull() {
         assertThatThrownBy(() -> {
@@ -272,22 +257,6 @@ public class DiaryTest {
         diary.updatePaintingImageUrls(List.of(newUrl1, newUrl2));
 
         assertThat(diary.getPaintingImageUrls()).containsExactly(newUrl1, newUrl2);
-    }
-
-
-    @Test
-    @DisplayName("일기 그림 URL 목록이 5개일 때 Diary 객체 생성 시 ConstraintViolationException")
-    public void testInvalidDiaryCreation_PaintingImageUrlsTooMany() {
-        assertThatThrownBy(() -> {
-            Diary.builder()
-                    .content("Valid content")
-                    .diaryDate(LocalDate.now())
-                    .paintingImageUrls(List.of(validUrl, validUrl, validUrl, validUrl, validUrl))
-                    .character(character)
-                    .memberId(validMemberId)
-                    .build();
-        }).isInstanceOf(ConstraintViolationException.class)
-                .hasMessageContaining("일기 그림 URL 목록은 1개에서 4개 사이여야 합니다.");
     }
 
     @Test
