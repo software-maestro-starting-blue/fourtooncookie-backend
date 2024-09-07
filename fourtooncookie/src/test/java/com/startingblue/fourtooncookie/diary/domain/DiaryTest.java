@@ -198,8 +198,7 @@ public class DiaryTest {
                 .build();
 
         String newContent = "New content";
-        List<Long> newHashtagsIds = List.of(2L);
-        diary.update(newContent, newHashtagsIds, character);
+        diary.update(newContent, character);
 
         assertThat(diary.getContent()).isEqualTo(newContent);
         assertThat(diary.getCharacter()).isEqualTo(character);
@@ -217,7 +216,7 @@ public class DiaryTest {
                 .build();
 
         assertThatThrownBy(() -> {
-            diary.update("", List.of(2L), character);
+            diary.update("", character);
         }).isInstanceOf(ConstraintViolationException.class)
                 .hasMessageContaining("일기 내용은 필수 입니다.");
     }
@@ -234,7 +233,7 @@ public class DiaryTest {
                 .build();
 
         assertThatThrownBy(() -> {
-            diary.update("Updated content", List.of(2L), null);
+            diary.update("Updated content", null);
         }).isInstanceOf(ConstraintViolationException.class)
                 .hasMessageContaining("일기에 그려질 캐릭터는 필수 입니다.");
     }

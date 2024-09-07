@@ -84,7 +84,7 @@ public class DiaryService {
         Diary existedDiary = readById(diaryId);
         Character character = characterService.readById(request.characterId());
 
-        existedDiary.update(request.content(), request.hashtagIds(), character);
+        existedDiary.update(request.content(), character);
         diaryRepository.save(existedDiary);
         // todo vision
     }

@@ -55,7 +55,6 @@ public final class Diary extends BaseEntity {
     }
 
     public void update(String content,
-                       List<Long> hashtagIds,
                        Character character) {
         this.content = content;
         this.character = character;

@@ -65,7 +65,6 @@ class DiaryRepositoryTest {
         String diaryContent = "Test Content";
         LocalDate diaryDate = LocalDate.now();
         URL paintingImageUrl = new URL("https://example.com/image.png");
-        List<Long> hashtagsIds = List.of(1L, 2L, 3L);
 
         Diary diary = Diary.builder()
                 .content(diaryContent)
@@ -96,9 +95,9 @@ class DiaryRepositoryTest {
         Member member = createMember();
         Character character = createCharacter();
 
-        createDiary(member, character, "Test Content 1", LocalDate.of(2024, 7, 23), "https://example.com/image1.png", List.of(1L));
-        createDiary(member, character, "Test Content 2", LocalDate.of(2024, 7, 24), "https://example.com/image2.png", List.of(2L));
-        createDiary(member, character, "Test Content 3", LocalDate.of(2024, 7, 25), "https://example.com/image3.png", List.of(3L));
+        createDiary(member, character, "Test Content 1", LocalDate.of(2024, 7, 23), "https://example.com/image1.png");
+        createDiary(member, character, "Test Content 2", LocalDate.of(2024, 7, 24), "https://example.com/image2.png");
+        createDiary(member, character, "Test Content 3", LocalDate.of(2024, 7, 25), "https://example.com/image3.png");
 
         Pageable pageable = PageRequest.of(0, 2);
 
@@ -121,7 +120,7 @@ class DiaryRepositoryTest {
         Character character = createCharacter();
 
         LocalDate diaryDate = LocalDate.now();
-        createDiary(member, character, "Test Content", diaryDate, "https://example.com/image.png", List.of(1L));
+        createDiary(member, character, "Test Content", diaryDate, "https://example.com/image.png");
 
         // when
         boolean exists = diaryRepository.existsByMemberIdAndDiaryDate(member.getId(), diaryDate);
@@ -151,7 +150,7 @@ class DiaryRepositoryTest {
         Member member = createMember();
         Character character = createCharacter();
 
-        Diary diary = createDiary(member, character, "Test Content", LocalDate.now(), "https://example.com/image.png", List.of(1L));
+        Diary diary = createDiary(member, character, "Test Content", LocalDate.now(), "https://example.com/image.png");
 
         // when
         diary.updateFavorite(true);
@@ -193,7 +192,7 @@ class DiaryRepositoryTest {
         return characterRepository.save(character);
     }
 
-    private Diary createDiary(Member member, Character character, String content, LocalDate date, String imageUrl, List<Long> hashtags) throws MalformedURLException {
+    private Diary createDiary(Member member, Character character, String content, LocalDate date, String imageUrl) throws MalformedURLException {
         Diary diary = Diary.builder()
                 .content(content)
                 .isFavorite(false)

@@ -85,7 +85,7 @@ class DiaryServiceTest {
     @Test
     void createDiaryTest() {
         // given
-        DiarySaveRequest request = new DiarySaveRequest("Initial content", LocalDate.of(2024, 7, 21), List.of(1L, 2L), character.getId());
+        DiarySaveRequest request = new DiarySaveRequest("Initial content", LocalDate.of(2024, 7, 21), character.getId());
 
         // when
         diaryService.createDiary(request, member.getId());
@@ -145,10 +145,8 @@ class DiaryServiceTest {
     @Test
     void readDiariesByMemberIdTest() {
         // given
-        List<Long> hashtagIds = new ArrayList<>();
         for (int i = 1; i <= 9; i++) {
-            hashtagIds.add(Long.valueOf(i));
-            DiarySaveRequest request = new DiarySaveRequest("Content " + i, LocalDate.of(2024, 7, 21).plusDays(i), hashtagIds, character.getId());
+            DiarySaveRequest request = new DiarySaveRequest("Content " + i, LocalDate.of(2024, 7, 21).plusDays(i), character.getId());
             diaryService.createDiary(request, member.getId());
         }
 
@@ -203,7 +201,7 @@ class DiaryServiceTest {
 
         characterRepository.save(newCharacter);
 
-        DiaryUpdateRequest request = new DiaryUpdateRequest("새로운 일기 내용", List.of(1L), newCharacter.getId());
+        DiaryUpdateRequest request = new DiaryUpdateRequest("새로운 일기 내용", newCharacter.getId());
 
         // when
         diaryService.updateDiary(diary.getId(), request);
