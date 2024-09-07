@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.aws.lambda;
+package com.startingblue.fourtooncookie.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
