@@ -37,7 +37,7 @@ public class DiaryService {
     private final DiaryRepository diaryRepository;
     private final MemberService memberService;
     private final CharacterService characterService;
-    private final LambdaClient lambdaClient;
+    private final LambdaInvoker lambdaInvoker;
 
     public void createDiary(final DiarySaveRequest request, final UUID memberId) {
         Member member = memberService.readById(memberId);
@@ -64,7 +64,7 @@ public class DiaryService {
     private void invokeImageGenerateLambdaAsync(Diary diary, Character character) {
         String payload = buildLambdaPayload(diary, character);
         try {
-            LambdaInvoker.invokeLambda(lambdaClient, IMAGE_GENERATE_LAMBDA_FUNCTION_NAME, payload);
+            lambdaInvoker.invokeLambda(IMAGE_GENERATE_LAMBDA_FUNCTION_NAME, payload);
         } catch (Exception e) {
             log.error("Lambda 호출 중 오류 발생: {}", e.getMessage(), e);
             throw new DiaryLambdaInvocationException("Lambda 호출 중 오류가 발생했습니다.", e);
