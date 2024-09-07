@@ -15,7 +15,6 @@ public class LambdaConfig {
     public LambdaClient lambdaClient() {
         return LambdaClient.builder()
                 .region(region)
-                .credentialsProvider(ProfileCredentialsProvider.create())
                 .build();
     }
 }
