@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.diary;
 
+import com.startingblue.fourtooncookie.diary.dto.request.DiaryFavoriteRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponses;
@@ -53,8 +54,8 @@ public class DiaryController {
 
     @PatchMapping("/{diaryId}/favorite")
     public ResponseEntity<HttpStatus> updateDiaryFavorite(@PathVariable final Long diaryId,
-                                                    @RequestBody final boolean isFavorite) {
-        diaryService.updateDiaryFavorite(diaryId, isFavorite);
+                                                    @RequestBody final DiaryFavoriteRequest diaryFavoriteRequest) {
+        diaryService.updateDiaryFavorite(diaryId, diaryFavoriteRequest.isFavorite());
         return ok().build();
     }
 
