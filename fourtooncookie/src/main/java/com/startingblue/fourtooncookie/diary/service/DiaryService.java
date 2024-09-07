@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +29,18 @@ import java.util.UUID;
 @Slf4j
 @Transactional
 public class DiaryService {
+
+    private static final URL DIARY_DEFAULT_IMAGE_URL; // TODO s3 기본 이미지로 수정
+    private static final List<URL> DIARY_DEFAULT_IMAGE_URLS;
+
+    static {
+        try {
+            DIARY_DEFAULT_IMAGE_URL = new URL("http://s3/defaultImage.png"); // todo, URL 수정
+            DIARY_DEFAULT_IMAGE_URLS = List.of(DIARY_DEFAULT_IMAGE_URL, DIARY_DEFAULT_IMAGE_URL, DIARY_DEFAULT_IMAGE_URL, DIARY_DEFAULT_IMAGE_URL);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Invalid URL");
+        }
+    }
 
     private final DiaryRepository diaryRepository;
     private final MemberService memberService;
@@ -44,7 +55,7 @@ public class DiaryService {
                 .content(request.content())
                 .isFavorite(false)
                 .diaryDate(request.diaryDate())
-                .paintingImageUrls(Collections.emptyList())
+                .paintingImageUrls(DIARY_DEFAULT_IMAGE_URLS)
                 .character(character)
                 .memberId(member.getId())
                 .build();
