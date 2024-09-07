@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -73,7 +72,6 @@ class DiaryRepositoryTest {
                 .isFavorite(false)
                 .diaryDate(diaryDate)
                 .paintingImageUrls(List.of(paintingImageUrl))
-                .hashtagsIds(hashtagsIds)
                 .character(character)
                 .memberId(member.getId())
                 .build();
@@ -87,7 +85,6 @@ class DiaryRepositoryTest {
         assertThat(savedDiary.isFavorite()).isFalse();
         assertThat(savedDiary.getDiaryDate()).isEqualTo(diaryDate);
         assertThat(savedDiary.getPaintingImageUrls()).containsExactly(paintingImageUrl);
-        assertThat(savedDiary.getHashtagsIds()).containsExactlyElementsOf(hashtagsIds);
         assertThat(savedDiary.getCharacter()).isEqualTo(character);
         assertThat(savedDiary.getMemberId()).isEqualTo(member.getId());
     }
@@ -202,7 +199,6 @@ class DiaryRepositoryTest {
                 .isFavorite(false)
                 .diaryDate(date)
                 .paintingImageUrls(List.of(new URL(imageUrl)))
-                .hashtagsIds(hashtags)
                 .character(character)
                 .memberId(member.getId())
                 .build();

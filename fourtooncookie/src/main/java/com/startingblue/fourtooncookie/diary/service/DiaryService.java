@@ -8,7 +8,6 @@ import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
-import com.startingblue.fourtooncookie.hashtag.domain.Hashtag;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -50,17 +49,12 @@ public class DiaryService {
     public void createDiary(final DiarySaveRequest request, final UUID memberId) {
         Member member = memberService.readById(memberId);
         Character character = characterService.readById(request.characterId());
-        List<Long> hashtagIds = Hashtag.findHashtagIdsByIds(request.hashtagIds())
-                .stream()
-                .toList();
-
         verifyUniqueDiary(memberId, request.diaryDate());
 
         Diary diary = Diary.builder()
                 .content(request.content())
                 .isFavorite(false)
                 .diaryDate(request.diaryDate())
-                .hashtagsIds(hashtagIds)
                 .paintingImageUrls(DIARY_DEFAULT_IMAGE_URLS)
                 .character(character)
                 .memberId(member.getId())

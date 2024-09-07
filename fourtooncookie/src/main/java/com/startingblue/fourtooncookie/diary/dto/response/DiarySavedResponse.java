@@ -13,7 +13,6 @@ public record DiarySavedResponse(
         boolean isFavorite,
         LocalDate diaryDate,
         List<String> paintingImageUrls,
-        List<Long> hashtagIds,
         Long characterId
 ) {
     public static DiarySavedResponse of(Diary diary) {
@@ -26,7 +25,6 @@ public record DiarySavedResponse(
                         .stream()
                         .map(String::valueOf)
                         .toList())
-                .hashtagIds(diary.getHashtagsIds())
                 .characterId(diary.getCharacter().getId())
                 .build();
     }

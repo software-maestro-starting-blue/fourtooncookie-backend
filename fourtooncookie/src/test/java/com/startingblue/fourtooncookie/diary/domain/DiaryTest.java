@@ -99,7 +99,6 @@ public class DiaryTest {
                 .content("Valid content")
                 .diaryDate(LocalDate.now())
                 .paintingImageUrls(List.of(validUrl))
-                .hashtagsIds(List.of(1L))
                 .character(character)
                 .memberId(validMemberId)
                 .build();
@@ -108,7 +107,6 @@ public class DiaryTest {
         assertThat(diary.getContent()).isEqualTo("Valid content");
         assertThat(diary.getDiaryDate()).isEqualTo(LocalDate.now());
         assertThat(diary.getPaintingImageUrls()).containsExactly(validUrl);
-        assertThat(diary.getHashtagsIds()).containsExactly(1L);
         assertThat(diary.getCharacter()).isEqualTo(character);
         assertThat(diary.getMemberId()).isEqualTo(validMemberId);
     }
@@ -121,7 +119,6 @@ public class DiaryTest {
                     .content("")
                     .diaryDate(LocalDate.now())
                     .paintingImageUrls(List.of(validUrl))
-                    .hashtagsIds(List.of(1L))
                     .character(character)
                     .memberId(validMemberId)
                     .build();
@@ -137,7 +134,6 @@ public class DiaryTest {
                     .content("Valid content")
                     .diaryDate(null)
                     .paintingImageUrls(List.of(validUrl))
-                    .hashtagsIds(List.of(1L))
                     .character(character)
                     .memberId(validMemberId)
                     .build();
@@ -153,28 +149,11 @@ public class DiaryTest {
                     .content("Valid content")
                     .diaryDate(LocalDate.now())
                     .paintingImageUrls(List.of())
-                    .hashtagsIds(List.of(1L))
                     .character(character)
                     .memberId(validMemberId)
                     .build();
         }).isInstanceOf(ConstraintViolationException.class)
                 .hasMessageContaining("일기 그림 URL 목록은 최소 1개를 포함해야 합니다.");
-    }
-
-    @Test
-    @DisplayName("해시태그 ID 목록이 비어 있을 때 Diary 객체 생성 시 ConstraintViolationException")
-    public void testInvalidDiaryCreation_HashtagsIdsEmpty() {
-        assertThatThrownBy(() -> {
-            Diary.builder()
-                    .content("Valid content")
-                    .diaryDate(LocalDate.now())
-                    .paintingImageUrls(List.of(validUrl))
-                    .hashtagsIds(List.of())
-                    .character(character)
-                    .memberId(validMemberId)
-                    .build();
-        }).isInstanceOf(ConstraintViolationException.class)
-                .hasMessageContaining("해시태그 ID 목록은 최소 1개를 포함해야 합니다.");
     }
 
     @Test
@@ -185,7 +164,6 @@ public class DiaryTest {
                     .content("Valid content")
                     .diaryDate(LocalDate.now())
                     .paintingImageUrls(List.of(validUrl))
-                    .hashtagsIds(List.of(1L))
                     .character(null)
                     .memberId(validMemberId)
                     .build();
@@ -201,7 +179,6 @@ public class DiaryTest {
                     .content("Valid content")
                     .diaryDate(LocalDate.now())
                     .paintingImageUrls(List.of(validUrl))
-                    .hashtagsIds(List.of(1L))
                     .character(character)
                     .memberId(null)
                     .build();
@@ -216,7 +193,6 @@ public class DiaryTest {
                 .content("Old content")
                 .diaryDate(LocalDate.now())
                 .paintingImageUrls(List.of(validUrl))
-                .hashtagsIds(List.of(1L))
                 .character(character)
                 .memberId(validMemberId)
                 .build();
@@ -226,7 +202,6 @@ public class DiaryTest {
         diary.update(newContent, newHashtagsIds, character);
 
         assertThat(diary.getContent()).isEqualTo(newContent);
-        assertThat(diary.getHashtagsIds()).containsExactlyElementsOf(newHashtagsIds);
         assertThat(diary.getCharacter()).isEqualTo(character);
     }
 
@@ -237,7 +212,6 @@ public class DiaryTest {
                 .content("Valid content")
                 .diaryDate(LocalDate.now())
                 .paintingImageUrls(List.of(validUrl))
-                .hashtagsIds(List.of(1L))
                 .character(character)
                 .memberId(validMemberId)
                 .build();
@@ -249,31 +223,12 @@ public class DiaryTest {
     }
 
     @Test
-    @DisplayName("Diary 업데이트 시 해시태그 ID 목록이 비어 있을 때 ConstraintViolationException")
-    public void testUpdateDiary_InvalidHashtagsIds() {
-        Diary diary = Diary.builder()
-                .content("Valid content")
-                .diaryDate(LocalDate.now())
-                .paintingImageUrls(List.of(validUrl))
-                .hashtagsIds(List.of(1L))
-                .character(character)
-                .memberId(validMemberId)
-                .build();
-
-        assertThatThrownBy(() -> {
-            diary.update("Updated content", List.of(), character);
-        }).isInstanceOf(ConstraintViolationException.class)
-                .hasMessageContaining("해시태그 ID 목록은 최소 1개를 포함해야 합니다.");
-    }
-
-    @Test
     @DisplayName("Diary 업데이트 시 캐릭터가 null일 때 ConstraintViolationException")
     public void testUpdateDiary_InvalidCharacter() {
         Diary diary = Diary.builder()
                 .content("Valid content")
                 .diaryDate(LocalDate.now())
                 .paintingImageUrls(List.of(validUrl))
-                .hashtagsIds(List.of(1L))
                 .character(character)
                 .memberId(validMemberId)
                 .build();
@@ -294,7 +249,6 @@ public class DiaryTest {
                     .content(longContent)
                     .diaryDate(LocalDate.now())
                     .paintingImageUrls(List.of(validUrl))
-                    .hashtagsIds(List.of(1L))
                     .character(character)
                     .memberId(validMemberId)
                     .build();
@@ -309,7 +263,6 @@ public class DiaryTest {
                 .content("Valid content")
                 .diaryDate(LocalDate.now())
                 .paintingImageUrls(List.of(validUrl))
-                .hashtagsIds(List.of(1L))
                 .character(character)
                 .memberId(validMemberId)
                 .build();
@@ -331,47 +284,11 @@ public class DiaryTest {
                     .content("Valid content")
                     .diaryDate(LocalDate.now())
                     .paintingImageUrls(List.of(validUrl, validUrl, validUrl, validUrl, validUrl))
-                    .hashtagsIds(List.of(1L))
                     .character(character)
                     .memberId(validMemberId)
                     .build();
         }).isInstanceOf(ConstraintViolationException.class)
                 .hasMessageContaining("일기 그림 URL 목록은 1개에서 4개 사이여야 합니다.");
-    }
-
-    @Test
-    @DisplayName("해시태그 ID 목록 업데이트 테스트")
-    public void testUpdateHashtags() {
-        Diary diary = Diary.builder()
-                .content("Valid content")
-                .diaryDate(LocalDate.now())
-                .paintingImageUrls(List.of(validUrl))
-                .hashtagsIds(List.of(1L))
-                .character(character)
-                .memberId(validMemberId)
-                .build();
-
-        List<Long> newHashtagsIds = List.of(2L, 3L);
-
-        diary.updateHashtags(newHashtagsIds);
-
-        assertThat(diary.getHashtagsIds()).containsExactlyElementsOf(newHashtagsIds);
-    }
-
-    @Test
-    @DisplayName("해시태그 ID 목록이 0개일 때 Diary 객체 생성 시 ConstraintViolationException")
-    public void testInvalidDiaryCreation_HashtagsIdsTooMany() {
-        assertThatThrownBy(() -> {
-            Diary.builder()
-                    .content("Valid content")
-                    .diaryDate(LocalDate.now())
-                    .paintingImageUrls(List.of(validUrl))
-                    .hashtagsIds(List.of())
-                    .character(character)
-                    .memberId(validMemberId)
-                    .build();
-        }).isInstanceOf(ConstraintViolationException.class)
-                .hasMessageContaining("해시태그 ID 목록은 최소 1개를 포함해야 합니다.");
     }
 
     @Test
@@ -381,7 +298,6 @@ public class DiaryTest {
                 .content("Valid content")
                 .diaryDate(LocalDate.now())
                 .paintingImageUrls(List.of(validUrl))
-                .hashtagsIds(List.of(1L))
                 .character(character)
                 .memberId(validMemberId)
                 .build();
@@ -403,7 +319,6 @@ public class DiaryTest {
                 .content("Valid content")
                 .diaryDate(LocalDate.now())
                 .paintingImageUrls(List.of(validUrl))
-                .hashtagsIds(List.of(1L))
                 .character(character)
                 .memberId(validMemberId)
                 .build();
@@ -418,7 +333,6 @@ public class DiaryTest {
                 .content("Valid content")
                 .diaryDate(LocalDate.now())
                 .paintingImageUrls(List.of(validUrl))
-                .hashtagsIds(List.of(1L))
                 .character(character)
                 .memberId(validMemberId)
                 .build();
