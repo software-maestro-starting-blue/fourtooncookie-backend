@@ -46,7 +46,7 @@ public class DiaryController {
 
     @GetMapping("/timeline")
     public ResponseEntity<DiarySavedResponses> readDiariesByMember (
-            @RequestParam UUID memberId,
+            UUID memberId,
             @RequestParam(defaultValue = "0") @Min(0) @Max(200) final int pageNumber,
             @RequestParam(defaultValue = "10") @Min(1) @Max(10) final int pageSize) {
 
