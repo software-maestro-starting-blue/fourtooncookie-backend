@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.springframework.http.ResponseEntity.*;
 
@@ -41,34 +43,30 @@ public class DiaryController {
 
     @GetMapping("/timeline")
     public ResponseEntity<DiarySavedResponses> readDiariesByMember (
-            UUID memberId,
+            @RequestParam UUID memberId,
             @RequestParam(defaultValue = "0") @Min(0) @Max(200) final int pageNumber,
             @RequestParam(defaultValue = "10") @Min(1) @Max(10) final int pageSize) {
 
-        List<Diary> diaries = diaryService.readDiariesByMemberId(memberId, pageNumber, pageSize);
+        DiarySavedResponses responses = DiarySavedResponses.of(diaryService.readDiariesByMemberId(memberId, pageNumber, pageSize));
 
-        if (diaries.isEmpty()) {
+        if (responses.diarySavedResponses().isEmpty()) {
             return noContent().build();
         }
 
-        DiarySavedResponses responses = DiarySavedResponses.of(diaries);
+        List<DiarySavedResponse> diaryResponsesWithPreSignedUrls = responses.diarySavedResponses().stream().map(savedDiary -> {
+            List<String> preSignedUrls = IntStream.rangeClosed(1, 4)
+                    .mapToObj(imageGridPosition -> {
+                        try {
+                            return diaryImageS3Service.generatePreSignedImageUrl(savedDiary.diaryId(), imageGridPosition);
+                        } catch (Exception e) {
+                            log.error("Failed to generate pre-signed image url", e);
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
 
-        List<DiarySavedResponse> diaryResponsesWithPreSignedUrls = new ArrayList<>();
-        for (DiarySavedResponse savedDiary : responses.diarySavedResponses()) {
-            List<String> preSignedUrls = new ArrayList<>();
-
-            for (int imageGridPosition = 1; imageGridPosition <= 4; imageGridPosition++) {
-                try {
-                    String preSignedUrl = diaryImageS3Service.generatePreSignedImageUrl(savedDiary.diaryId(), imageGridPosition);
-                    preSignedUrls.add(preSignedUrl);
-                } catch (Exception e) {
-                    log.error("Failed to generate pre-signed image url", e);
-                }
-            }
-
-            preSignedUrls.removeIf(Objects::isNull);
-
-            DiarySavedResponse updatedDiary = new DiarySavedResponse(
+            return new DiarySavedResponse(
                     savedDiary.diaryId(),
                     savedDiary.content(),
                     savedDiary.isFavorite(),
@@ -76,14 +74,12 @@ public class DiaryController {
                     preSignedUrls,
                     savedDiary.characterId()
             );
+        }).collect(Collectors.toList());
 
-            diaryResponsesWithPreSignedUrls.add(updatedDiary);
-        }
-
-        DiarySavedResponses updatedResponses = new DiarySavedResponses(diaryResponsesWithPreSignedUrls);
-        return ok(updatedResponses);
+        return ok(new DiarySavedResponses(diaryResponsesWithPreSignedUrls));
     }
-    
+
+
     @PutMapping("/{diaryId}")
     public ResponseEntity<HttpStatus> updateDiary(@PathVariable final Long diaryId,
                                             @RequestBody final DiaryUpdateRequest request) {
