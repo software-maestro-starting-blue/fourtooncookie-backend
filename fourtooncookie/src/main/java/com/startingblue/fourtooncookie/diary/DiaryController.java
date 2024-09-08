@@ -31,8 +31,8 @@ import static org.springframework.http.ResponseEntity.*;
 @Slf4j
 public class DiaryController {
 
-    private static final int MIN_PAINTING_IMAGE_SIZE = 1;
-    private static final int MAX_PAINTING_IMAGE_SIZE = 4;
+    private static final int MIN_PAINTING_IMAGE_POSITION = 1;
+    private static final int MAX_PAINTING_IMAGE_POSITION = 4;
 
     private final DiaryService diaryService;
     private final DiaryImageS3Service diaryImageS3Service;
@@ -57,7 +57,7 @@ public class DiaryController {
         }
 
         List<DiarySavedResponse> diaryResponsesWithPreSignedUrls = responses.diarySavedResponses().stream().map(savedDiary -> {
-            List<String> preSignedUrls = IntStream.rangeClosed(MIN_PAINTING_IMAGE_SIZE, MAX_PAINTING_IMAGE_SIZE)
+            List<String> preSignedUrls = IntStream.rangeClosed(MIN_PAINTING_IMAGE_POSITION, MAX_PAINTING_IMAGE_POSITION)
                     .mapToObj(imageGridPosition -> {
                         try {
                             return diaryImageS3Service.generatePreSignedImageUrl(savedDiary.diaryId(), imageGridPosition);
