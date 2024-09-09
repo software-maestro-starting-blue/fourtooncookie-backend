@@ -4,6 +4,7 @@ import com.startingblue.fourtooncookie.aws.lambda.LambdaInvoker;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.service.DiaryService;
 import com.startingblue.fourtooncookie.event.domain.DiaryLambdaCallEvent;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -20,6 +21,7 @@ public class DiaryLambdaCallEventListener {
 
     @Async
     @EventListener
+    @Transactional
     public void handleDiaryLambdaCallEvent(DiaryLambdaCallEvent event) {
         try {
             lambdaInvoker.invokeImageGenerateLambdaAsync(event.diary(), event.character());
