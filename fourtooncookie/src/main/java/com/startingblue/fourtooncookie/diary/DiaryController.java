@@ -31,9 +31,6 @@ import static org.springframework.http.ResponseEntity.*;
 @Slf4j
 public class DiaryController {
 
-    private static final int MIN_PAINTING_IMAGE_POSITION = 1;
-    private static final int MAX_PAINTING_IMAGE_POSITION = 4;
-
     private final DiaryService diaryService;
     private final DiaryImageS3Service diaryImageS3Service;
 
@@ -55,31 +52,7 @@ public class DiaryController {
         if (responses.diarySavedResponses().isEmpty()) {
             return noContent().build();
         }
-
-        List<DiarySavedResponse> diaryResponsesWithPreSignedUrls = responses.diarySavedResponses().stream().map(savedDiary -> {
-            List<String> preSignedUrls = IntStream.rangeClosed(MIN_PAINTING_IMAGE_POSITION, MAX_PAINTING_IMAGE_POSITION)
-                    .mapToObj(imageGridPosition -> {
-                        try {
-                            return diaryImageS3Service.generatePreSignedImageUrl(savedDiary.diaryId(), imageGridPosition);
-                        } catch (Exception e) {
-                            log.error("Failed to generate pre-signed image url", e);
-                            return null;
-                        }
-                    })
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-
-            return new DiarySavedResponse(
-                    savedDiary.diaryId(),
-                    savedDiary.content(),
-                    savedDiary.isFavorite(),
-                    savedDiary.diaryDate(),
-                    preSignedUrls,
-                    savedDiary.characterId()
-            );
-        }).collect(Collectors.toList());
-
-        return ok(new DiarySavedResponses(diaryResponsesWithPreSignedUrls));
+        return ok(responses);
     }
 
 
