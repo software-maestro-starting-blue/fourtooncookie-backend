@@ -1,6 +1,7 @@
 package com.startingblue.fourtooncookie.aws.lambda;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.lambda.LambdaClient;
 import software.amazon.awssdk.services.lambda.model.InvocationType;
@@ -9,17 +10,25 @@ import software.amazon.awssdk.core.SdkBytes;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LambdaInvoker {
 
     private final LambdaClient lambdaClient;
 
     public void invokeLambda(String functionName, String payload) {
-        InvokeRequest invokeRequest = InvokeRequest.builder()
-                .functionName(functionName)
-                .payload(SdkBytes.fromUtf8String(payload))
-                .invocationType(InvocationType.EVENT)
-                .build();
+        try {
+            InvokeRequest invokeRequest = InvokeRequest.builder()
+                    .functionName(functionName)
+                    .payload(SdkBytes.fromUtf8String(payload))
+                    .invocationType(InvocationType.REQUEST_RESPONSE)
+                    .build();
 
-        lambdaClient.invoke(invokeRequest);
+            var response = lambdaClient.invoke(invokeRequest);
+            log.info("Lambda invoked: {}", response.payload().asUtf8String());
+        } catch (Exception e) {
+            log.error("Lambda invocation failed: {}", e.getMessage());
+            throw new RuntimeException("Lambda 호출 실패", e);
+        }
     }
+
 }
