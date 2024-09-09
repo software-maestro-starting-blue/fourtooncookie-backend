@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface DiaryRepository extends JpaRepository<Diary, Long> {
     Page<Diary> findAllByMemberIdOrderByDiaryDateDesc(UUID memberId, Pageable pageable);
     boolean existsByMemberIdAndDiaryDate(UUID memberId, LocalDate diaryDate);
+    void deleteByMemberId(UUID memberId);
 }
