@@ -22,15 +22,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -73,13 +71,14 @@ public class DiaryService {
                 .build();
     }
 
-    private void invokeImageGenerateLambdaAsync(Diary diary, Character character) {
+    @Async
+    public void invokeImageGenerateLambdaAsync(Diary diary, Character character) {
         String payload = buildLambdaPayload(diary, character);
         try {
             lambdaInvoker.invokeLambda(IMAGE_GENERATE_LAMBDA_FUNCTION_NAME, payload);
+            log.info("Lambda 호출 성공: 일기 ID - {}", diary.getId());
         } catch (Exception e) {
-            log.error("Lambda 호출 중 오류 발생: {}", e.getMessage(), e);
-            throw new DiaryLambdaInvocationException("Lambda 호출 중 오류가 발생했습니다.", e);
+            handleLambdaInvocationFailure(diary, e);
         }
     }
 
@@ -168,5 +167,11 @@ public class DiaryService {
 
     public void deleteDiaryByMemberId(UUID memberId) {
         diaryRepository.deleteByMemberId(memberId);
+    }
+
+    private void handleLambdaInvocationFailure(Diary diary, Throwable ex) {
+        log.error("Lambda 호출 중 오류 발생, 저장된 일기 삭제: {}", ex.getMessage());
+        Diary foundDiary = readById(diary.getId()); // todo 트랜잭션 변경으로 영속성 컨텍스트가 변경 될 것 같아 우선 다시 가져옴. 테스트 필요
+        foundDiary.update("일기 생성 중 오류가 발생했습니다. 일기를 삭제 후 다시 생성해 주세요.", diary.getCharacter());
     }
 }
