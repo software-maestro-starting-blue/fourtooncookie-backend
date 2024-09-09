@@ -31,7 +31,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -60,7 +59,7 @@ public class DiaryService {
 
         Diary diary = buildDiary(request, member, character);
         diaryRepository.save(diary);
-        CompletableFuture.runAsync(() -> invokeImageGenerateLambdaAsync(diary, character));
+        invokeImageGenerateLambdaAsync(diary, character);
     }
 
     private Diary buildDiary(DiarySaveRequest request, Member member, Character character) {
@@ -140,7 +139,7 @@ public class DiaryService {
         Character character = characterService.readById(request.characterId());
         existedDiary.update(request.content(), character);
         diaryRepository.save(existedDiary);
-        CompletableFuture.runAsync(() -> invokeImageGenerateLambdaAsync(existedDiary, character));
+        invokeImageGenerateLambdaAsync(existedDiary, character);
     }
 
     public void deleteDiary(Long diaryId) {
