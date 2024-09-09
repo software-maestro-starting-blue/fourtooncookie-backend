@@ -6,7 +6,6 @@ import com.startingblue.fourtooncookie.member.domain.Role;
 import com.startingblue.fourtooncookie.member.dto.request.MemberSaveRequest;
 import com.startingblue.fourtooncookie.member.exception.MemberDuplicateException;
 import com.startingblue.fourtooncookie.member.exception.MemberNotFoundException;
-import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +37,10 @@ public class MemberService {
 
     public Member readById(UUID memberId) {
         return  memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("member not found"));
+    }
+
+    public void hardDeleteById(UUID memberId) {
+        memberRepository.deleteById(memberId);
     }
 
     public void softDeleteById(UUID memberId) {

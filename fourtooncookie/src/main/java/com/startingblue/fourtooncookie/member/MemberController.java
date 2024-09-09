@@ -30,7 +30,7 @@ public final class MemberController {
 
     @DeleteMapping("/member")
     public ResponseEntity<HttpStatus> softDeleteMember(UUID memberId) {
-        memberService.softDeleteById(memberId);
+        memberService.hardDeleteById(memberId);
         return ResponseEntity
                 .noContent()
                 .build();
