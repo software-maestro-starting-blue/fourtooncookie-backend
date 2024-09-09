@@ -1,6 +1,10 @@
 package com.startingblue.fourtooncookie.diary.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.startingblue.fourtooncookie.aws.lambda.LambdaInvoker;
+import com.startingblue.fourtooncookie.aws.lambda.diaryImageGenerationPayload.DiaryImageGenerationCharacterResponse;
+import com.startingblue.fourtooncookie.aws.lambda.diaryImageGenerationPayload.DiaryImageGenerationLambdaPayload;
 import com.startingblue.fourtooncookie.aws.s3.service.DiaryImageS3Service;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.service.CharacterService;
@@ -8,7 +12,6 @@ import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
-import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
 import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryLambdaInvocationException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
@@ -48,6 +51,7 @@ public class DiaryService {
     private final CharacterService characterService;
     private final LambdaInvoker lambdaInvoker;
     private final DiaryImageS3Service diaryImageS3Service;
+    private final ObjectMapper objectMapper;
 
     public void createDiary(final DiarySaveRequest request, final UUID memberId) {
         Member member = memberService.readById(memberId);
@@ -81,10 +85,23 @@ public class DiaryService {
     }
 
     private String buildLambdaPayload(Diary diary, Character character) {
-        return String.format(
-                "{\"diaryId\":\"%s\", \"content\":\"%s\", \"character\": {\"id\": \"%s\", \"name\": \"%s\", \"visionType\": \"%s\", \"basePrompt\": \"%s\"}}",
-                diary.getId(), diary.getContent(), character.getId(), character.getName(), character.getCharacterVisionType(), character.getBasePrompt()
+        DiaryImageGenerationCharacterResponse characterResponse = new DiaryImageGenerationCharacterResponse(
+                character.getId(),
+                character.getName(),
+                character.getCharacterVisionType().name(),
+                character.getBasePrompt()
         );
+
+        DiaryImageGenerationLambdaPayload payload = new DiaryImageGenerationLambdaPayload(
+                diary.getId(),
+                diary.getContent(),
+                characterResponse
+        );
+        try {
+            return objectMapper.writeValueAsString(payload);
+        } catch (JsonProcessingException e) {
+            throw new DiaryLambdaInvocationException("Lambda payload 직렬화 중 오류가 발생했습니다.", e);
+        }
     }
 
     @Transactional(readOnly = true)
