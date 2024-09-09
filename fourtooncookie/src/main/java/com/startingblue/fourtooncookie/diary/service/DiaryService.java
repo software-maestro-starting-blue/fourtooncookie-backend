@@ -148,4 +148,8 @@ public class DiaryService {
         Diary foundDiary = readById(diaryId);
         return foundDiary.isOwner(memberId);
     }
+
+    public void deleteDiaryByMemberId(UUID memberId) {
+        diaryRepository.deleteByMemberId(memberId);
+    }
 }
