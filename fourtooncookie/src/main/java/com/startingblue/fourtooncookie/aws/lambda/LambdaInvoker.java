@@ -16,18 +16,15 @@ public class LambdaInvoker {
     private final LambdaClient lambdaClient;
 
     public void invokeLambda(String functionName, String payload) {
-        try {
-            InvokeRequest invokeRequest = InvokeRequest.builder()
-                    .functionName(functionName)
-                    .payload(SdkBytes.fromUtf8String(payload))
-                    .invocationType(InvocationType.REQUEST_RESPONSE)
-                    .build();
+        InvokeRequest invokeRequest = InvokeRequest.builder()
+                .functionName(functionName)
+                .payload(SdkBytes.fromUtf8String(payload))
+                .invocationType(InvocationType.REQUEST_RESPONSE)
+                .build();
 
-            var response = lambdaClient.invoke(invokeRequest);
-            log.info("Lambda invoked: {}", response.payload().asUtf8String());
-        } catch (Exception e) {
-            log.error("Lambda invocation failed: {}", e.getMessage());
-            throw new RuntimeException("Lambda 호출 실패", e);
+        var response = lambdaClient.invoke(invokeRequest);
+        if (response.payload().asUtf8String().equals("false")) {
+            throw new RuntimeException("Lambda invocation failed");
         }
     }
 
