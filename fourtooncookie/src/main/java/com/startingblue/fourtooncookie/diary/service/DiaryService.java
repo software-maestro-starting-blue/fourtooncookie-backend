@@ -3,7 +3,7 @@ package com.startingblue.fourtooncookie.diary.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.startingblue.fourtooncookie.aws.lambda.LambdaInvoker;
-import com.startingblue.fourtooncookie.aws.lambda.diaryImageGenerationPayload.DiaryImageGenerationCharacterResponse;
+import com.startingblue.fourtooncookie.aws.lambda.diaryImageGenerationPayload.DiaryImageGenerationCharacterPayload;
 import com.startingblue.fourtooncookie.aws.lambda.diaryImageGenerationPayload.DiaryImageGenerationLambdaPayload;
 import com.startingblue.fourtooncookie.aws.s3.service.DiaryImageS3Service;
 import com.startingblue.fourtooncookie.character.domain.Character;
@@ -85,7 +85,7 @@ public class DiaryService {
     }
 
     private String buildLambdaPayload(Diary diary, Character character) {
-        DiaryImageGenerationCharacterResponse characterResponse = new DiaryImageGenerationCharacterResponse(
+        DiaryImageGenerationCharacterPayload characterResponse = new DiaryImageGenerationCharacterPayload(
                 character.getId(),
                 character.getName(),
                 character.getCharacterVisionType().name(),
