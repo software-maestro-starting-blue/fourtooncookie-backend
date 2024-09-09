@@ -25,17 +25,11 @@ repositories {
 	maven { url 'https://repo.spring.io/snapshot' }
 }
 
-ext {
-	set('springAiVersion', "1.0.0-M1")
-}
-
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
-	implementation "net.dv8tion:JDA:5.0.1"
-	implementation 'software.amazon.awssdk:lambda:2.20.0' // 최신 버전을 사용하세요.
+	implementation 'software.amazon.awssdk:lambda'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'com.mysql:mysql-connector-j'
@@ -48,8 +42,6 @@ dependencies {
 	// AWS SDK for S3
 	implementation 'software.amazon.awssdk:s3'
 
-	implementation 'software.amazon.awssdk:sqs:2.26.25'
-
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
 	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
@@ -57,12 +49,6 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.2'
 
-}
-
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
-	}
 }
 
 tasks.named('test') {

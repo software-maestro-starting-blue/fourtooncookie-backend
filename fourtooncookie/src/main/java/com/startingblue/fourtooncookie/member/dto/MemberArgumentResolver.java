@@ -2,7 +2,7 @@ package com.startingblue.fourtooncookie.member.dto;
 
 import com.startingblue.fourtooncookie.config.authentication.AuthenticationException;
 import jakarta.servlet.http.HttpServletRequest;
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
