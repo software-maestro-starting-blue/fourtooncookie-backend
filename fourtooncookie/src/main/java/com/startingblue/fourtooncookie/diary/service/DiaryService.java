@@ -123,7 +123,7 @@ public class DiaryService {
         Character character = characterService.readById(request.characterId());
         existedDiary.update(request.content(), character);
         diaryRepository.save(existedDiary);
-        invokeImageGenerateLambdaAsync(existedDiary, character);
+        CompletableFuture.runAsync(() -> invokeImageGenerateLambdaAsync(existedDiary, character));
     }
 
     public void deleteDiary(Long diaryId) {
