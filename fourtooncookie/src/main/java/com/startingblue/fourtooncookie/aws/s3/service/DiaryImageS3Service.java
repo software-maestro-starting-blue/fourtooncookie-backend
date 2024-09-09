@@ -16,6 +16,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
+import java.net.URL;
 import java.time.Duration;
 
 @RequiredArgsConstructor
@@ -56,7 +57,7 @@ public class DiaryImageS3Service {
                 .build();
     }
 
-    public String generatePreSignedImageUrl(Long diaryId, Integer gridPosition) {
+    public URL generatePreSignedImageUrl(Long diaryId, Integer gridPosition) {
         if (!isImageExist(diaryId, gridPosition)) {
             throw new S3ImageNotFoundException(String.format("S3에 이미지가 존재하지 않습니다. Key: %s", getKeyName(diaryId, gridPosition)));
         }
@@ -66,7 +67,7 @@ public class DiaryImageS3Service {
         try {
             GetObjectPresignRequest getObjectPresignRequest = createGetObjectPresignRequest(keyName);
             PresignedGetObjectRequest preSignedRequest = s3Presigner.presignGetObject(getObjectPresignRequest);
-            return preSignedRequest.url().toString();
+            return preSignedRequest.url();
         } catch (Exception e) {
             throw new S3PreSignUrlException(String.format("S3에서 프리사인 URL 생성 중 오류가 발생했습니다. Key: %s", keyName), e);
         }
