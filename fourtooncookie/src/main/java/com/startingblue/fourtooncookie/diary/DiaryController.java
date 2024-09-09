@@ -1,11 +1,8 @@
 package com.startingblue.fourtooncookie.diary;
 
-import com.startingblue.fourtooncookie.aws.s3.service.DiaryImageS3Service;
-import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryFavoriteRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
-import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponses;
 import com.startingblue.fourtooncookie.diary.service.DiaryService;
 import jakarta.validation.constraints.Max;
@@ -16,12 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.springframework.http.ResponseEntity.*;
 
@@ -32,7 +24,6 @@ import static org.springframework.http.ResponseEntity.*;
 public class DiaryController {
 
     private final DiaryService diaryService;
-    private final DiaryImageS3Service diaryImageS3Service;
 
     @PostMapping
     public ResponseEntity<HttpStatus> createDiary(UUID memberId,
