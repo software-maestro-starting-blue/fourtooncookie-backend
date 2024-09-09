@@ -1,12 +1,14 @@
 package com.startingblue.fourtooncookie.diary.service;
 
 import com.startingblue.fourtooncookie.aws.lambda.LambdaInvoker;
+import com.startingblue.fourtooncookie.aws.s3.service.DiaryImageS3Service;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.service.CharacterService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
+import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
 import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryLambdaInvocationException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
@@ -19,12 +21,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import software.amazon.awssdk.services.lambda.LambdaClient;
 
+import java.net.URL;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -34,10 +39,14 @@ public class DiaryService {
 
     private static final String IMAGE_GENERATE_LAMBDA_FUNCTION_NAME = "fourtooncookie-diaryimage-ai-apply-lambda";
 
+    private static final int MIN_PAINTING_IMAGE_POSITION = 1;
+    private static final int MAX_PAINTING_IMAGE_POSITION = 4;
+
     private final DiaryRepository diaryRepository;
     private final MemberService memberService;
     private final CharacterService characterService;
     private final LambdaInvoker lambdaInvoker;
+    private final DiaryImageS3Service diaryImageS3Service;
 
     public void createDiary(final DiarySaveRequest request, final UUID memberId) {
         Member member = memberService.readById(memberId);
@@ -84,7 +93,23 @@ public class DiaryService {
                 foundMember.getId(),
                 PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "diaryDate"))
         );
-        return diaries.getContent();
+
+        return diaries.getContent().stream().map(savedDiary -> {
+            List<URL> preSignedUrls = IntStream.rangeClosed(MIN_PAINTING_IMAGE_POSITION, MAX_PAINTING_IMAGE_POSITION)
+                    .mapToObj(imageGridPosition -> {
+                        try {
+                             return diaryImageS3Service.generatePreSignedImageUrl(savedDiary.getId(), imageGridPosition);
+                        } catch (Exception e) {
+                            log.error("Failed to generate pre-signed image url", e);
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .toList();
+
+            savedDiary.updatePaintingImageUrls(preSignedUrls);
+            return savedDiary;
+        }).collect(Collectors.toList());
     }
 
     public void updateDiaryFavorite(Long diaryId, boolean isFavorite) {

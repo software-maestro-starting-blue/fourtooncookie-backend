@@ -22,6 +22,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 
 import java.net.URI;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -106,10 +107,10 @@ public class DiaryImageS3ServiceTest {
         when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class))).thenReturn(presignedGetObjectRequest);
 
         // 테스트 대상 메서드 호출
-        String url = diaryImageS3Service.generatePreSignedImageUrl(diaryId, gridPosition);
+        URL url = diaryImageS3Service.generatePreSignedImageUrl(diaryId, gridPosition);
 
         // 결과 검증
-        assertEquals("http://example.com", url);
+        assertEquals(new URL("http://example.com"), url);
 
         // 상호작용 검증
         verify(s3Client).headObject(any(HeadObjectRequest.class));

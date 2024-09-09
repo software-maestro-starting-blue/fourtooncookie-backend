@@ -37,6 +37,7 @@ public class DiaryController {
             UUID memberId,
             @RequestParam(defaultValue = "0") @Min(0) @Max(200) final int pageNumber,
             @RequestParam(defaultValue = "10") @Min(1) @Max(10) final int pageSize) {
+
         DiarySavedResponses responses = DiarySavedResponses.of(diaryService.readDiariesByMemberId(memberId, pageNumber, pageSize));
 
         if (responses.diarySavedResponses().isEmpty()) {
@@ -44,6 +45,7 @@ public class DiaryController {
         }
         return ok(responses);
     }
+
 
     @PutMapping("/{diaryId}")
     public ResponseEntity<HttpStatus> updateDiary(@PathVariable final Long diaryId,
