@@ -40,8 +40,8 @@ public class DiaryService {
 
     private static final String IMAGE_GENERATE_LAMBDA_FUNCTION_NAME = "fourtooncookie-diaryimage-ai-apply-lambda";
 
-    private static final int MIN_PAINTING_IMAGE_POSITION = 1;
-    private static final int MAX_PAINTING_IMAGE_POSITION = 4;
+    private static final int MIN_PAINTING_IMAGE_POSITION = 0;
+    private static final int MAX_PAINTING_IMAGE_POSITION = 3;
 
     private final DiaryRepository diaryRepository;
     private final MemberService memberService;
@@ -123,7 +123,7 @@ public class DiaryService {
         Character character = characterService.readById(request.characterId());
         existedDiary.update(request.content(), character);
         diaryRepository.save(existedDiary);
-        invokeImageGenerateLambdaAsync(existedDiary, character);
+        CompletableFuture.runAsync(() -> invokeImageGenerateLambdaAsync(existedDiary, character));
     }
 
     public void deleteDiary(Long diaryId) {
