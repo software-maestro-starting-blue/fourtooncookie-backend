@@ -44,7 +44,7 @@ public class DiaryService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final DiaryImageS3Service diaryImageS3Service;
 
-    public void createDiary(final DiarySaveRequest request, final UUID memberId) {
+    public Long createDiary(final DiarySaveRequest request, final UUID memberId) {
         Member member = memberService.readById(memberId);
         Character character = characterService.readById(request.characterId());
         verifyUniqueDiary(memberId, request.diaryDate());
@@ -52,6 +52,7 @@ public class DiaryService {
         Diary diary = buildDiary(request, member, character);
         diaryRepository.save(diary);
         applicationEventPublisher.publishEvent(new DiaryLambdaCallEvent(diary, character));
+        return diary.getId();
     }
 
     private Diary buildDiary(DiarySaveRequest request, Member member, Character character) {

@@ -3,6 +3,7 @@ package com.startingblue.fourtooncookie.diary;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryFavoriteRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
+import com.startingblue.fourtooncookie.diary.dto.response.DiaryCreatedResponse;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponses;
 import com.startingblue.fourtooncookie.diary.service.DiaryService;
 import jakarta.validation.constraints.Max;
@@ -26,10 +27,10 @@ public class DiaryController {
     private final DiaryService diaryService;
 
     @PostMapping
-    public ResponseEntity<HttpStatus> createDiary(UUID memberId,
-                                                  @RequestBody final DiarySaveRequest request) {
-        diaryService.createDiary(request, memberId);
-        return status(HttpStatus.CREATED).build();
+    public ResponseEntity<DiaryCreatedResponse> createDiary(UUID memberId,
+                                                            @RequestBody final DiarySaveRequest request) {
+        DiaryCreatedResponse createdDiaryId = new DiaryCreatedResponse(diaryService.createDiary(request, memberId));
+        return ResponseEntity.ok(createdDiaryId);
     }
 
     @GetMapping("/timeline")
