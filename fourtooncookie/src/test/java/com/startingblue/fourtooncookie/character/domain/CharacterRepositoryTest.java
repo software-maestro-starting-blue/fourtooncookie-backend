@@ -121,18 +121,6 @@ class CharacterRepositoryTest {
                 .basePrompt(catDalle3CharacterBasePrompt)
                 .build();
 
-        String midjourneyCharacterName = "미드나비";
-        URL midjourneyCharacterUrl = new URL("https://midjourney.png");
-        String midjourneyCharacterNameCharacterBasePrompt = "This is a base prompt mid cat.";
-        Character dogMidjourney = Character.builder()
-                .characterVisionType(CharacterVisionType.MIDJOURNEY)
-                .paymentType(PaymentType.PAID)
-                .artwork(artwork)
-                .name(midjourneyCharacterName)
-                .selectionThumbnailUrl(midjourneyCharacterUrl)
-                .basePrompt(midjourneyCharacterNameCharacterBasePrompt)
-                .build();
-
         String stableDiffusionCharacterName = "스테이블디퓨전";
         URL stableDiffusionCharacterUrl = new URL("https://stable-diffusion.png");
         String stableDiffusionCharacterNameCharacterBasePrompt = "This is a base prompt stable diffusion.";
@@ -145,7 +133,7 @@ class CharacterRepositoryTest {
                 .basePrompt(stableDiffusionCharacterNameCharacterBasePrompt)
                 .build();
 
-        characterRepository.saveAll(List.of(dogDalle3Character, catDalle3Character, dogMidjourney, catStableDiffusionCharacter));
+        characterRepository.saveAll(List.of(dogDalle3Character, catDalle3Character, catStableDiffusionCharacter));
 
         // when
         List<Character> savedCharacters = characterRepository.findAll();
@@ -153,34 +141,18 @@ class CharacterRepositoryTest {
         System.out.println(savedCharacters.get(0).getName());
 
         // then
-        assertThat(savedCharacters).hasSize(4);
+        assertThat(savedCharacters).hasSize(3);
         assertThat(savedCharacters)
                 .extracting(Character::getCharacterVisionType)
-                .containsExactly(CharacterVisionType.DALL_E_3, CharacterVisionType.DALL_E_3, CharacterVisionType.MIDJOURNEY, CharacterVisionType.STABLE_DIFFUSION);
-        assertThat(savedCharacters)
-                .extracting(Character::getName)
-                .containsExactly(
-                        dogDalle3CharacterName,
-                        catDalle3CharacterName,
-                        midjourneyCharacterName,
-                        stableDiffusionCharacterName);
-        assertThat(savedCharacters)
-                .extracting(Character::getSelectionThumbnailUrl)
-                .containsExactly(
-                        dogDalle3Url,
-                        catDalle3Url,
-                        midjourneyCharacterUrl,
-                        stableDiffusionCharacterUrl
-                );
+                .containsExactly(CharacterVisionType.DALL_E_3, CharacterVisionType.DALL_E_3, CharacterVisionType.STABLE_DIFFUSION);
         assertThat(savedCharacters)
                 .extracting(Character::getBasePrompt)
                 .containsExactly(
                         dogDalle3CharacterBasePrompt,
                         catDalle3CharacterBasePrompt,
-                        midjourneyCharacterNameCharacterBasePrompt,
                         stableDiffusionCharacterNameCharacterBasePrompt
                 );
-        Character savedStableDiffusionCharacter = savedCharacters.get(3);
+        Character savedStableDiffusionCharacter = savedCharacters.get(2);
         assertThat(savedStableDiffusionCharacter.getCharacterVisionType()).isEqualTo(CharacterVisionType.STABLE_DIFFUSION);
         assertThat(savedStableDiffusionCharacter.getName()).isEqualTo(stableDiffusionCharacterName);
         assertThat(savedStableDiffusionCharacter.getSelectionThumbnailUrl()).isEqualTo(stableDiffusionCharacterUrl);

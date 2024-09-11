@@ -1,6 +1,5 @@
 package com.startingblue.fourtooncookie.diary.service;
 
-import com.startingblue.fourtooncookie.aws.lambda.LambdaInvoker;
 import com.startingblue.fourtooncookie.aws.s3.service.DiaryImageS3Service;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.service.CharacterService;
@@ -19,13 +18,15 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -44,7 +45,7 @@ public class DiaryService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final DiaryImageS3Service diaryImageS3Service;
 
-    public void createDiary(final DiarySaveRequest request, final UUID memberId) {
+    public Long createDiary(final DiarySaveRequest request, final UUID memberId) {
         Member member = memberService.readById(memberId);
         Character character = characterService.readById(request.characterId());
         verifyUniqueDiary(memberId, request.diaryDate());
@@ -52,6 +53,7 @@ public class DiaryService {
         Diary diary = buildDiary(request, member, character);
         diaryRepository.save(diary);
         applicationEventPublisher.publishEvent(new DiaryLambdaCallEvent(diary, character));
+        return diary.getId();
     }
 
     private Diary buildDiary(DiarySaveRequest request, Member member, Character character) {
