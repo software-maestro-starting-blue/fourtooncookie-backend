@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAsync
 @SpringBootApplication
 public class FourtoonCookieApplication {
-
+ 
 	public static void main(String[] args) {
 		SpringApplication.run(FourtoonCookieApplication.class, args);
 	}
