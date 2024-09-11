@@ -31,5 +31,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: Gradle Wrapper
+        run: gradle wrapper
+
       - name: Run tests
         run: ./gradlew test
