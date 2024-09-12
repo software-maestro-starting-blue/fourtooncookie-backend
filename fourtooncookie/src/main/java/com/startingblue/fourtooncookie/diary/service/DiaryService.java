@@ -5,6 +5,7 @@ import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.service.CharacterService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
+import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
@@ -62,6 +63,7 @@ public class DiaryService {
                 .isFavorite(false)
                 .diaryDate(request.diaryDate())
                 .paintingImageUrls(Collections.emptyList())
+                .status(DiaryStatus.IN_PROGRESS)
                 .character(character)
                 .memberId(member.getId())
                 .build();
@@ -101,7 +103,7 @@ public class DiaryService {
     public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
         Diary existedDiary = readById(diaryId);
         Character character = characterService.readById(request.characterId());
-        existedDiary.update(request.content(), character);
+        existedDiary.update(request.content(), character, DiaryStatus.IN_PROGRESS);
         diaryRepository.save(existedDiary);
         applicationEventPublisher.publishEvent(new DiaryLambdaCallEvent(existedDiary, character));
     }

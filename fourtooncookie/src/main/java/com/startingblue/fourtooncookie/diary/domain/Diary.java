@@ -48,14 +48,21 @@ public final class Diary extends BaseEntity {
     @NotNull(message = "멤버 아이디는 필수 입니다.")
     private UUID memberId;
 
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "일기 상태는 필수 입니다.")
+    @Builder.Default
+    private DiaryStatus status = DiaryStatus.IN_PROGRESS;
+
     public static DiaryBuilder builder() {
         return new CustomDiaryBuilder();
     }
 
     public void update(String content,
-                       Character character) {
+                       Character character,
+                       DiaryStatus status) {
         this.content = content;
         this.character = character;
+        this.status = status;
         validate();
     }
 
@@ -65,6 +72,10 @@ public final class Diary extends BaseEntity {
 
     public void updatePaintingImageUrls(List<URL> paintingImageUrls) {
         this.paintingImageUrls = new ArrayList<>(paintingImageUrls);
+    }
+
+    public void updateDiaryStatus(DiaryStatus status) {
+        this.status = status;
     }
 
     public boolean isOwner(UUID memberId) {
