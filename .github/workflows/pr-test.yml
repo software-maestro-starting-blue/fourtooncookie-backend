@@ -8,11 +8,19 @@ on:
 jobs:
   test:
     runs-on: ubuntu-22.04
+
+    env:  # 워크플로우 전체에 적용되는 환경 변수
+      JWT_SECRET: ""
+      JWT_ISSUER_URI: ""
+      AWS_DIARYIMAGE_BUCKET_NAME: ""
+      AWS_DIARYIMAGE_PRESIGNEDURL_DURATION: ""
+
     defaults:
       run:
         working-directory: fourtooncookie
-
+          
     steps:
+    
       - name: Checkout Repository
         uses: actions/checkout@v4
 
