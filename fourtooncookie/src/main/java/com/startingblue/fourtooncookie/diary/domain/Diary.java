@@ -48,6 +48,11 @@ public final class Diary extends BaseEntity {
     @NotNull(message = "멤버 아이디는 필수 입니다.")
     private UUID memberId;
 
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "일기 상태는 필수 입니다.")
+    @Builder.Default
+    private DiaryStatus status = DiaryStatus.IN_PROGRESS;
+
     public static DiaryBuilder builder() {
         return new CustomDiaryBuilder();
     }
