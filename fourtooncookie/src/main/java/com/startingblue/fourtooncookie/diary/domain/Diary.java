@@ -61,6 +61,7 @@ public final class Diary extends BaseEntity {
                        Character character) {
         this.content = content;
         this.character = character;
+        this.status = DiaryStatus.IN_PROGRESS;
         validate();
     }
 
