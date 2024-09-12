@@ -58,10 +58,11 @@ public final class Diary extends BaseEntity {
     }
 
     public void update(String content,
-                       Character character) {
+                       Character character,
+                       DiaryStatus status) {
         this.content = content;
         this.character = character;
-        this.status = DiaryStatus.IN_PROGRESS;
+        this.status = status;
         validate();
     }
 

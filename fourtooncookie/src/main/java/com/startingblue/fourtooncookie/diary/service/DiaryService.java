@@ -103,7 +103,7 @@ public class DiaryService {
     public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
         Diary existedDiary = readById(diaryId);
         Character character = characterService.readById(request.characterId());
-        existedDiary.update(request.content(), character);
+        existedDiary.update(request.content(), character, DiaryStatus.IN_PROGRESS);
         diaryRepository.save(existedDiary);
         applicationEventPublisher.publishEvent(new DiaryLambdaCallEvent(existedDiary, character));
     }
