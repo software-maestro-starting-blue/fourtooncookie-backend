@@ -74,6 +74,10 @@ public final class Diary extends BaseEntity {
         this.paintingImageUrls = new ArrayList<>(paintingImageUrls);
     }
 
+    public void updateDiaryStatus(DiaryStatus status) {
+        this.status = status;
+    }
+
     public boolean isOwner(UUID memberId) {
         return this.memberId.equals(memberId);
     }

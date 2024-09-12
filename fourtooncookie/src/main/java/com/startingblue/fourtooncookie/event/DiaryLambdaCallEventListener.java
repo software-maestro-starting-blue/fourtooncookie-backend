@@ -26,6 +26,7 @@ public class DiaryLambdaCallEventListener {
     public void handleDiaryLambdaCallEvent(DiaryLambdaCallEvent event) {
         try {
             lambdaInvoker.invokeImageGenerateLambdaAsync(event.diary(), event.character());
+            event.diary().updateDiaryStatus(DiaryStatus.COMPLETED);
         } catch (RuntimeException e) {
             handleLambdaInvocationFailure(event.diary(), e);
         }
