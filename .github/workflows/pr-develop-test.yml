@@ -22,6 +22,9 @@ jobs:
           java-version: "17"
           distribution: "corretto"
 
+      - name: Give permission for Gradle
+        run: chmod +x gradlew
+
       - name: Cache Gradle
         id: cache-gradle
         uses: actions/cache@v4
