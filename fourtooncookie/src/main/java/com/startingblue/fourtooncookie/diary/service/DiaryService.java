@@ -70,6 +70,7 @@ public class DiaryService {
     }
 
     @Async
+    @Transactional
     public void createDiaryImageLambda(Diary diary, Character character) {
         try {
             diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(diary, character);
