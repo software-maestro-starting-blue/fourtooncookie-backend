@@ -33,7 +33,7 @@ public class DiaryImageGenerationLambdaInvoker extends LambdaInvoker {
         return "fourtooncookie-diaryimage-ai-apply-lambda";
     }
 
-    public void invokeDiaryImageGenerationLambda(Diary diary, Character character) {
+    public void invokeDiaryImageGenerationLambda(Diary diary, Character character) throws RuntimeException {
         DiaryImageGenerationLambdaPayload payload = new DiaryImageGenerationLambdaPayload(
                 diary.getId(),
                 diary.getContent(),

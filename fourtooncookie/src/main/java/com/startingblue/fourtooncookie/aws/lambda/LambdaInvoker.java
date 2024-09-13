@@ -14,7 +14,6 @@ public abstract class LambdaInvoker {
 
     private final LambdaClient lambdaClient;
 
-    @Async
     public void invokeLambdaAsync(Object payload) {
         try {
             String serializedPayload = serializePayload(payload);
