@@ -1,23 +1,24 @@
 package com.startingblue.fourtooncookie.diary.service;
 
+import com.startingblue.fourtooncookie.aws.lambda.diaryImageGenerationPayload.DiaryImageGenerationLambdaInvoker;
 import com.startingblue.fourtooncookie.aws.s3.service.DiaryImageS3Service;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.service.CharacterService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
+import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
-import com.startingblue.fourtooncookie.event.domain.DiaryLambdaCallEvent;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,8 +43,8 @@ public class DiaryService {
     private final DiaryRepository diaryRepository;
     private final MemberService memberService;
     private final CharacterService characterService;
-    private final ApplicationEventPublisher applicationEventPublisher;
     private final DiaryImageS3Service diaryImageS3Service;
+    private final DiaryImageGenerationLambdaInvoker diaryImageGenerationLambdaInvoker;
 
     public Long createDiary(final DiarySaveRequest request, final UUID memberId) {
         Member member = memberService.readById(memberId);
@@ -52,7 +53,7 @@ public class DiaryService {
 
         Diary diary = buildDiary(request, member, character);
         diaryRepository.save(diary);
-        applicationEventPublisher.publishEvent(new DiaryLambdaCallEvent(diary, character));
+        createDiaryImageLambda(diary, character);
         return diary.getId();
     }
 
@@ -62,9 +63,29 @@ public class DiaryService {
                 .isFavorite(false)
                 .diaryDate(request.diaryDate())
                 .paintingImageUrls(Collections.emptyList())
+                .status(DiaryStatus.IN_PROGRESS)
                 .character(character)
                 .memberId(member.getId())
                 .build();
+    }
+
+    @Async
+    @Transactional
+    public void createDiaryImageLambda(Diary diary, Character character) {
+        try {
+            diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(diary, character);
+            diary.updateDiaryStatus(DiaryStatus.COMPLETED);
+        } catch (Exception e) {
+            log.error("Lambda 호출 중 오류 발생: {}", e.getMessage());
+            handleLambdaInvocationFailure(diary);
+        }
+    }
+
+    private void handleLambdaInvocationFailure(Diary diary) {
+        diary.update(diary.getContent(),
+                diary.getCharacter(),
+                DiaryStatus.FAILED);
+        diaryRepository.save(diary);
     }
 
     @Transactional(readOnly = true)
@@ -101,9 +122,8 @@ public class DiaryService {
     public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
         Diary existedDiary = readById(diaryId);
         Character character = characterService.readById(request.characterId());
-        existedDiary.update(request.content(), character);
-        diaryRepository.save(existedDiary);
-        applicationEventPublisher.publishEvent(new DiaryLambdaCallEvent(existedDiary, character));
+        existedDiary.update(request.content(), character, DiaryStatus.IN_PROGRESS);
+        createDiaryImageLambda(existedDiary, character);
     }
 
     public void deleteDiary(Long diaryId) {

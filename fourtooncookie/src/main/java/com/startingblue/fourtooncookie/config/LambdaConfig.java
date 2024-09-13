@@ -24,14 +24,14 @@ public class LambdaConfig {
                 .overrideConfiguration(
                         ClientOverrideConfiguration.builder()
                                 .retryPolicy(RetryPolicy.none()) // Retry 설정 (필요에 따라 변경 가능)
-                                .apiCallTimeout(Duration.ofMinutes(2)) // 전체 API 호출 타임아웃 설정
-                                .apiCallAttemptTimeout(Duration.ofMinutes(2)) // 개별 호출 시도에 대한 타임아웃 설정
+                                .apiCallTimeout(Duration.ofMinutes(3)) // 전체 API 호출 타임아웃 설정
+                                .apiCallAttemptTimeout(Duration.ofMinutes(3)) // 개별 호출 시도에 대한 타임아웃 설정
                                 .build()
                 )
                 .httpClient(
                         ApacheHttpClient.builder()
-                                .socketTimeout(Duration.ofMinutes(1)) // 읽기 타임아웃 설정
-                                .connectionTimeout(Duration.ofSeconds(120)) // 연결 타임아웃 설정
+                                .socketTimeout(Duration.ofMinutes(3)) // 읽기 타임아웃 설정
+                                .connectionTimeout(Duration.ofSeconds(3)) // 연결 타임아웃 설정
                                 .build()
                 )
                 .region(region)
