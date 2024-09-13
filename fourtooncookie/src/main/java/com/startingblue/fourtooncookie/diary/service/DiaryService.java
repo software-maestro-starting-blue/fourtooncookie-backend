@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +52,8 @@ public class DiaryService {
         verifyUniqueDiary(memberId, request.diaryDate());
 
         Diary diary = buildDiary(request, member, character);
-        createDiaryAndInvokeLambda(diary, character);
+        diaryRepository.save(diary);
+        createDiaryImageLambda(diary, character);
         return diary.getId();
     }
 
@@ -67,11 +69,10 @@ public class DiaryService {
                 .build();
     }
 
-    public void createDiaryAndInvokeLambda(Diary diary, Character character) {
+    @Async
+    public void createDiaryImageLambda(Diary diary, Character character) {
         try {
-            diaryRepository.save(diary);
             diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(diary, character);
-
             diary.updateDiaryStatus(DiaryStatus.COMPLETED);
         } catch (Exception e) {
             log.error("Lambda 호출 중 오류 발생: {}", e.getMessage());
@@ -121,7 +122,7 @@ public class DiaryService {
         Diary existedDiary = readById(diaryId);
         Character character = characterService.readById(request.characterId());
         existedDiary.update(request.content(), character, DiaryStatus.IN_PROGRESS);
-        createDiaryAndInvokeLambda(existedDiary, character);
+        createDiaryImageLambda(existedDiary, character);
     }
 
     public void deleteDiary(Long diaryId) {
