@@ -1,6 +1,7 @@
 package com.startingblue.fourtooncookie.diary.dto.response;
 
 import com.startingblue.fourtooncookie.diary.domain.Diary;
+import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -13,7 +14,8 @@ public record DiarySavedResponse(
         boolean isFavorite,
         LocalDate diaryDate,
         List<String> paintingImageUrls,
-        Long characterId
+        Long characterId,
+        DiaryStatus diaryStatus
 ) {
     public static DiarySavedResponse of(Diary diary) {
         return DiarySavedResponse.builder()
@@ -26,6 +28,7 @@ public record DiarySavedResponse(
                         .map(String::valueOf)
                         .toList())
                 .characterId(diary.getCharacter().getId())
+                .diaryStatus(diary.getStatus())
                 .build();
     }
 }

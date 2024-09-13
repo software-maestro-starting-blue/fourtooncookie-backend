@@ -26,35 +26,59 @@ public class AuthenticationFilter extends HttpFilter {
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+        log.info("doFilter() called with requestURI: {}, method: {}", request.getRequestURI(), request.getMethod());
+
         String requestURI = request.getRequestURI();
+        String method = request.getMethod();
+
+        if (shouldBypassAuthentication(requestURI, method)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         try {
-            if (requestURI.startsWith("/h2-console") || requestURI.startsWith("/health")) {
+            UUID memberId = extractUUIDFromToken(request);
+            log.info("Login attempt for memberId: {}", memberId);
+
+            if (isSignupRequest(requestURI, method)) {
+                log.info("Processing signup request for URI: {}", requestURI);
+                setMemberIdAttribute(request, memberId);
                 chain.doFilter(request, response);
                 return;
             }
 
-            String token = jwtExtractor.resolveToken(request);
-            Claims claims = jwtExtractor.parseToken(token);
-            UUID memberId = UUID.fromString(claims.getSubject());
-            log.info("login attempt memberId: {}", memberId);
+            handleRequestByUUID(request, response, chain, memberId);
 
-            if (isSignupRequest(requestURI, request.getMethod())) {
-                request.setAttribute("memberId", memberId);
-                chain.doFilter(request, response);
-                return;
-            }
-
-            if (isExistsMember(memberId)) {
-                log.info("login success memberId: {}", memberId);
-                request.setAttribute("memberId", memberId);
-                chain.doFilter(request, response);
-            } else {
-                log.error("Member with id {} not found", memberId);
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, String.format("Member with id %s not found", memberId));
-            }
         } catch (AuthenticationException e) {
             log.error("Authentication failed: {}", e.getMessage());
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed: " + e.getMessage());
+        }
+    }
+
+    private boolean shouldBypassAuthentication(String requestURI, String method) {
+        return requestURI.startsWith("/h2-console") || requestURI.startsWith("/health") ||
+                (method.equalsIgnoreCase("GET") && (requestURI.startsWith("/character") || requestURI.startsWith("/artwork")));
+    }
+
+    private UUID extractUUIDFromToken(HttpServletRequest request) {
+        String token = jwtExtractor.resolveToken(request);
+        Claims claims = jwtExtractor.parseToken(token);
+        return UUID.fromString(claims.getSubject());
+    }
+
+    private void setMemberIdAttribute(HttpServletRequest request, UUID memberId) {
+        request.setAttribute("memberId", memberId);
+    }
+
+    private void handleRequestByUUID(HttpServletRequest request, HttpServletResponse response, FilterChain chain, UUID memberId)
+            throws IOException, ServletException {
+        if (isExistsMember(memberId)) {
+            log.info("Login success for memberId: {}", memberId);
+            setMemberIdAttribute(request, memberId);
+            chain.doFilter(request, response);
+        } else {
+            log.error("Member with id {} not found", memberId);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, String.format("Member with id %s not found", memberId));
         }
     }
 
