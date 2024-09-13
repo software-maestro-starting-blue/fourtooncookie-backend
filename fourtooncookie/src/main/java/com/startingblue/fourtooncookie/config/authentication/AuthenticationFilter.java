@@ -37,7 +37,7 @@ public class AuthenticationFilter extends HttpFilter {
         }
 
         try {
-            UUID memberId = extractMemberIdFromToken(request);
+            UUID memberId = extractUUIDFromToken(request);
             log.info("Login attempt for memberId: {}", memberId);
 
             if (isSignupRequest(requestURI, method)) {
@@ -47,7 +47,7 @@ public class AuthenticationFilter extends HttpFilter {
                 return;
             }
 
-            handleExistingMemberAuthentication(request, response, chain, memberId);
+            handleRequestByUUID(request, response, chain, memberId);
 
         } catch (AuthenticationException e) {
             log.error("Authentication failed: {}", e.getMessage());
@@ -60,7 +60,7 @@ public class AuthenticationFilter extends HttpFilter {
                 (method.equalsIgnoreCase("GET") && (requestURI.startsWith("/character") || requestURI.startsWith("/artwork")));
     }
 
-    private UUID extractMemberIdFromToken(HttpServletRequest request) {
+    private UUID extractUUIDFromToken(HttpServletRequest request) {
         String token = jwtExtractor.resolveToken(request);
         Claims claims = jwtExtractor.parseToken(token);
         return UUID.fromString(claims.getSubject());
@@ -70,7 +70,7 @@ public class AuthenticationFilter extends HttpFilter {
         request.setAttribute("memberId", memberId);
     }
 
-    private void handleExistingMemberAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, UUID memberId)
+    private void handleRequestByUUID(HttpServletRequest request, HttpServletResponse response, FilterChain chain, UUID memberId)
             throws IOException, ServletException {
         if (isExistsMember(memberId)) {
             log.info("Login success for memberId: {}", memberId);
