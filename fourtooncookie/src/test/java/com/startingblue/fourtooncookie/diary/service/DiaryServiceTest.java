@@ -81,26 +81,6 @@ class DiaryServiceTest {
         memberRepository.save(member);
     }
 
-//    @DisplayName("작성한 일기를 저장한다.")
-//    @Test
-//    void createDiaryTest() {
-//        // given
-//        DiarySaveRequest request = new DiarySaveRequest("Initial content", LocalDate.of(2024, 7, 21), character.getId());
-//
-//        // when
-//        diaryService.createDiary(request, member.getId());
-//
-//        // then
-//        List<Diary> diaries = diaryRepository.findAll();
-//        assertThat(diaries).hasSize(1);
-//
-//        Diary savedDiary = diaries.get(0);
-//        assertThat(savedDiary.getContent()).isEqualTo("Initial content");
-//        assertThat(savedDiary.getDiaryDate()).isEqualTo(LocalDate.of(2024, 7, 21));
-//        assertThat(savedDiary.getCharacter()).isEqualTo(character);
-//        assertThat(savedDiary.getMemberId()).isEqualTo(member.getId());
-//    }
-
     @DisplayName("저장된 일기를 삭제한다.")
     @Test
     void deleteDiaryTest() throws MalformedURLException {
@@ -141,31 +121,6 @@ class DiaryServiceTest {
                 .isInstanceOf(DiaryNotFoundException.class);
     }
 
-//    @DisplayName("회원의 일기 목록을 페이지 단위로 읽어온다.")
-//    @Test
-//    void readDiariesByMemberIdTest() {
-//        // given
-//        for (int i = 1; i <= 9; i++) {
-//            DiarySaveRequest request = new DiarySaveRequest("Content " + i, LocalDate.of(2024, 7, 21).plusDays(i), character.getId());
-//            diaryService.createDiary(request, member.getId());
-//        }
-//
-//        // when
-//        DiarySavedResponses diariesPages1 = DiarySavedResponses.of(diaryService.readDiariesByMemberId(member.getId(), 0, 5));
-//        DiarySavedResponses diariesPages2 = DiarySavedResponses.of(diaryService.readDiariesByMemberId(member.getId(), 1, 5));
-//
-//        List<DiarySavedResponse> diariesPage1 = diariesPages1.diarySavedResponses();
-//        List<DiarySavedResponse> diariesPage2 = diariesPages2.diarySavedResponses();
-//        // then
-//        assertThat(diariesPage1).hasSize(5);
-//        assertThat(diariesPage1.get(0).content()).isEqualTo("Content 9");
-//        assertThat(diariesPage1.get(4).content()).isEqualTo("Content 5");
-//
-//        assertThat(diariesPage2).hasSize(4);
-//        assertThat(diariesPage2.get(0).content()).isEqualTo("Content 4");
-//        assertThat(diariesPage2.get(3).content()).isEqualTo("Content 1");
-//    }
-
     @DisplayName("존재하지 않는 일기는 삭제하지 못한다.")
     @Test
     void 존재하지_않는_일기는_삭제하지_못한다() throws MalformedURLException {
@@ -181,36 +136,6 @@ class DiaryServiceTest {
         boolean exists = diaryRepository.existsById(diary.getId());
         assertThat(exists).isTrue();
     }
-
-//    @DisplayName("일기 내용, 해시태그, 캐릭터를 업데이트 한다.")
-//    @Test
-//    void updateDiaryTest() throws MalformedURLException {
-//        // given
-//
-//        Diary diary = createDiary(LocalDate.of(2024, 7, 21), character, member);
-//        diaryRepository.save(diary);
-//
-//        Character newCharacter = Character.builder()
-//                .characterVisionType(CharacterVisionType.DALL_E_3)
-//                .paymentType(PaymentType.FREE)
-//                .name("오동이")
-//                .artwork(artwork)
-//                .selectionThumbnailUrl(new URL("http://오동이.png"))
-//                .basePrompt("base prompt")
-//                .build();
-//
-//        characterRepository.save(newCharacter);
-//
-//        DiaryUpdateRequest request = new DiaryUpdateRequest("새로운 일기 내용", newCharacter.getId());
-//
-//        // when
-//        diaryService.updateDiary(diary.getId(), request);
-//
-//        // then
-//        Diary updatedDiary = diaryRepository.findById(diary.getId()).get();
-//        assertThat(updatedDiary.getContent()).isEqualTo("새로운 일기 내용");
-//        assertThat(updatedDiary.getCharacter()).isEqualTo(newCharacter);
-//    }
 
     private Diary createDiary(LocalDate diaryDate, Character character, Member member) throws MalformedURLException {
         return Diary.builder()
