@@ -82,7 +82,7 @@ public class DiaryService {
     }
 
     private void handleLambdaInvocationFailure(Diary diary) {
-        diary.update("일기 생성 중 오류가 발생했습니다. 일기를 삭제 후 다시 생성해 주세요.",
+        diary.update(diary.getContent(),
                 diary.getCharacter(),
                 DiaryStatus.FAILED);
         diaryRepository.save(diary);
