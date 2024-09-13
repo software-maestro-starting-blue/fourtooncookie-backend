@@ -53,7 +53,7 @@ public class DiaryService {
 
         Diary diary = buildDiary(request, member, character);
         diaryRepository.save(diary);
-        createDiaryImageLambda(diary, character);
+        diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(diary, character);
         return diary.getId();
     }
 
@@ -67,25 +67,6 @@ public class DiaryService {
                 .character(character)
                 .memberId(member.getId())
                 .build();
-    }
-
-    @Async
-    @Transactional
-    public void createDiaryImageLambda(Diary diary, Character character) {
-        try {
-            diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(diary, character);
-            diary.updateDiaryStatus(DiaryStatus.COMPLETED);
-        } catch (Exception e) {
-            log.error("Lambda 호출 중 오류 발생: {}", e.getMessage());
-            handleLambdaInvocationFailure(diary);
-        }
-    }
-
-    private void handleLambdaInvocationFailure(Diary diary) {
-        diary.update(diary.getContent(),
-                diary.getCharacter(),
-                DiaryStatus.FAILED);
-        diaryRepository.save(diary);
     }
 
     @Transactional(readOnly = true)
@@ -123,7 +104,7 @@ public class DiaryService {
         Diary existedDiary = readById(diaryId);
         Character character = characterService.readById(request.characterId());
         existedDiary.update(request.content(), character, DiaryStatus.IN_PROGRESS);
-        createDiaryImageLambda(existedDiary, character);
+        diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(existedDiary, character);
     }
 
     public void deleteDiary(Long diaryId) {
