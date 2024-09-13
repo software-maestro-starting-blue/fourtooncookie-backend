@@ -80,15 +80,10 @@ public class DiaryService {
     }
 
     private void handleLambdaInvocationFailure(Diary diary) {
-        try {
-            diary.update("일기 생성 중 오류가 발생했습니다. 일기를 삭제 후 다시 생성해 주세요.",
-                    diary.getCharacter(),
-                    DiaryStatus.FAILED);
-            diaryRepository.save(diary);
-        } catch (Exception e) {
-            log.error("일기 상태 업데이트 중 오류 발생: {}", e.getMessage());
-            throw new RuntimeException("일기 상태 업데이트 실패", e);
-        }
+        diary.update("일기 생성 중 오류가 발생했습니다. 일기를 삭제 후 다시 생성해 주세요.",
+                diary.getCharacter(),
+                DiaryStatus.FAILED);
+        diaryRepository.save(diary);
     }
 
     @Transactional(readOnly = true)
