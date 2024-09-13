@@ -28,7 +28,11 @@ public class AuthenticationFilter extends HttpFilter {
             throws IOException, ServletException {
         String requestURI = request.getRequestURI();
         try {
-            if (requestURI.startsWith("/h2-console") || requestURI.startsWith("/health")) {
+            if (requestURI.startsWith("/h2-console") || requestURI.startsWith("/health") ||
+                (request.getMethod().equalsIgnoreCase("GET") &&
+                    (requestURI.startsWith("/character") || requestURI.startsWith("/artwork"))
+                )
+            ) {
                 chain.doFilter(request, response);
                 return;
             }
