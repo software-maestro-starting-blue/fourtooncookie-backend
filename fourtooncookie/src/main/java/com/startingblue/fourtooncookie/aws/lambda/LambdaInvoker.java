@@ -1,43 +1,45 @@
 package com.startingblue.fourtooncookie.aws.lambda;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.lambda.LambdaClient;
 import software.amazon.awssdk.services.lambda.model.InvocationType;
 import software.amazon.awssdk.services.lambda.model.InvokeRequest;
 
-@RequiredArgsConstructor
 @Slf4j
 public abstract class LambdaInvoker {
 
     private final LambdaClient lambdaClient;
+    private final String functionName;
+    private final InvocationType invocationType;
 
-    public void invokeLambdaAsync(Object payload) {
+    public LambdaInvoker(LambdaClient lambdaClient, String functionName, InvocationType invocationType) {
+        this.lambdaClient = lambdaClient;
+        this.functionName = functionName;
+        this.invocationType = invocationType;
+    }
+
+    public void invokeLambda(Object payload) {
         try {
-            String serializedPayload = serializePayload(payload);
-            invokeLambda(serializedPayload);
+            log.info("Invoking Lambda function: {} with payload: {}", functionName);
+
+            InvokeRequest invokeRequest = InvokeRequest.builder()
+                    .functionName(functionName)
+                    .payload(SdkBytes.fromUtf8String(payload.toString()))
+                    .invocationType(invocationType)
+                    .build();
+
+            var response = lambdaClient.invoke(invokeRequest);
+
+            if (response.payload().asUtf8String().equals("false")) {
+                log.error("Lambda 호출 중 오류 발생: {}", functionName);
+                throw new RuntimeException("Lambda 호출 실패");
+            }
+
+            log.info("Lambda 호출 성공: {}", functionName);
         } catch (Exception e) {
-            log.error("Lambda 호출 중 오류 발생: {}", e.getMessage());
+            log.error("Lambda 호출 중 오류 발생: {}", e.getMessage(), e);
             throw new RuntimeException("Lambda 호출 실패", e);
         }
     }
-
-    protected abstract String serializePayload(Object payload);
-
-    private void invokeLambda(String payload) {
-        InvokeRequest invokeRequest = InvokeRequest.builder()
-                .functionName(getFunctionName())
-                .payload(SdkBytes.fromUtf8String(payload))
-                .invocationType(InvocationType.REQUEST_RESPONSE)
-                .build();
-
-        var response = lambdaClient.invoke(invokeRequest);
-        if (response.payload().asUtf8String().equals("false")) {
-            throw new RuntimeException("Lambda 호출 실패");
-        }
-    }
-
-    protected abstract String getFunctionName();
 }

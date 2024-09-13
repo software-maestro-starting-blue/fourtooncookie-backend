@@ -7,34 +7,36 @@ import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.lambda.LambdaClient;
+import software.amazon.awssdk.services.lambda.model.InvocationType;
 
 @Service
 public class DiaryImageGenerationLambdaInvoker extends LambdaInvoker {
 
+    private static final String FUNCTION_NAME = "fourtooncookie-diaryimage-ai-apply-lambda";
+
     private final ObjectMapper objectMapper;
 
-    public DiaryImageGenerationLambdaInvoker(LambdaClient lambdaClient, ObjectMapper objectMapper) {
-        super(lambdaClient);
-        this.objectMapper = objectMapper;
+    public DiaryImageGenerationLambdaInvoker(LambdaClient lambdaClient, ObjectMapper objectMapper1) {
+        super(lambdaClient, FUNCTION_NAME, InvocationType.REQUEST_RESPONSE);
+        this.objectMapper = objectMapper1;
     }
 
-    @Override
-    protected String serializePayload(Object payload) {
+    public void invokeDiaryImageGenerationLambda(Diary diary, Character character) throws RuntimeException {
+        DiaryImageGenerationLambdaPayload diaryImageGenerationLambdaPayload = buildPayload(diary, character);
+        String serializePayload = serializePayload(diaryImageGenerationLambdaPayload);
+        invokeLambda(serializePayload);
+    }
+
+    private String serializePayload(DiaryImageGenerationLambdaPayload payload) {
         try {
-            DiaryImageGenerationLambdaPayload diaryPayload = (DiaryImageGenerationLambdaPayload) payload;
-            return objectMapper.writeValueAsString(diaryPayload);
+            return objectMapper.writeValueAsString(payload);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("페이로드 직렬화 중 오류 발생", e);
         }
     }
 
-    @Override
-    protected String getFunctionName() {
-        return "fourtooncookie-diaryimage-ai-apply-lambda";
-    }
-
-    public void invokeDiaryImageGenerationLambda(Diary diary, Character character) throws RuntimeException {
-        DiaryImageGenerationLambdaPayload payload = new DiaryImageGenerationLambdaPayload(
+    private DiaryImageGenerationLambdaPayload buildPayload(Diary diary, Character character) {
+        return new DiaryImageGenerationLambdaPayload(
                 diary.getId(),
                 diary.getContent(),
                 new DiaryImageGenerationCharacterPayload(
@@ -44,6 +46,5 @@ public class DiaryImageGenerationLambdaInvoker extends LambdaInvoker {
                         character.getBasePrompt()
                 )
         );
-        invokeLambdaAsync(payload);
     }
 }
