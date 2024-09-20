@@ -44,19 +44,6 @@ public class Member extends BaseEntity {
         this.gender = gender;
     }
 
-    public void softDelete(LocalDateTime current) {
-        if (current == null) {
-            throw new IllegalArgumentException("Current time cannot be null");
-        }
-        if (current.isAfter(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Current time cannot be after current time");
-        }
-        if (deletedDateTime != null && current.isAfter(deletedDateTime)) {
-            throw new IllegalArgumentException("Cannot delete at a time after the current deletedAt timestamp");
-        }
-        deletedDateTime = current;
-    }
-
     public boolean isAdmin() {
         return role == Role.ADMIN;
     }

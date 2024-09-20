@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -41,16 +40,6 @@ public class MemberService {
 
     public void hardDeleteById(UUID memberId) {
         memberRepository.deleteById(memberId);
-    }
-
-    public void softDeleteById(UUID memberId) {
-        softDeleteById(memberId, LocalDateTime.now());
-    }
-
-    public void softDeleteById(UUID memberId, LocalDateTime current) {
-        Member foundMember = readById(memberId);
-        foundMember.softDelete(current);
-        memberRepository.save(foundMember);
     }
 
     public boolean verifyMemberExists(UUID memberId) {
