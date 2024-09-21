@@ -51,7 +51,7 @@ class AuthenticationFilterTest {
 
     @Test
     @DisplayName("인증 성공 - 회원 존재")
-    void doFilter_Success_ValidTokenAndMemberExists() throws IOException, ServletException {
+    void doFilterSuccessValidTokenAndMemberExists() throws IOException, ServletException {
         // Given
         when(request.getRequestURI()).thenReturn("/member");
         when(request.getMethod()).thenReturn("GET");
@@ -71,7 +71,7 @@ class AuthenticationFilterTest {
 
     @Test
     @DisplayName("인증 실패 - 유효하지 않은 토큰")
-    void doFilter_Failure_InvalidToken() throws IOException, ServletException {
+    void doFilterFailureInvalidToken() throws IOException, ServletException {
         // Given
         when(request.getRequestURI()).thenReturn("/member");
         when(request.getMethod()).thenReturn("GET");
@@ -88,7 +88,7 @@ class AuthenticationFilterTest {
 
     @Test
     @DisplayName("인증 실패 - 회원 존재하지 않음")
-    void doFilter_Failure_MemberNotExists() throws IOException, ServletException {
+    void doFilterFailureMemberNotExists() throws IOException, ServletException {
         // Given
         when(request.getRequestURI()).thenReturn("/member");
         when(request.getMethod()).thenReturn("GET");
@@ -109,7 +109,7 @@ class AuthenticationFilterTest {
 
     @Test
     @DisplayName("회원가입 요청 처리 - 성공")
-    void doFilter_Success_SignupRequest() throws IOException, ServletException {
+    void doFilterSuccessSignupRequest() throws IOException, ServletException {
         // Given
         when(request.getRequestURI()).thenReturn("/member");
         when(request.getMethod()).thenReturn("POST");
@@ -129,7 +129,7 @@ class AuthenticationFilterTest {
 
     @Test
     @DisplayName("회원 존재 요청 처리 - 성공")
-    void doFilter_Success_MemberExists() throws IOException, ServletException {
+    void doFilterSuccessMemberExists() throws IOException, ServletException {
         // Given
         when(request.getRequestURI()).thenReturn("/member/profile");
         when(request.getMethod()).thenReturn("GET");
@@ -153,7 +153,7 @@ class AuthenticationFilterTest {
 
     @Test
     @DisplayName("인증 우회 - [GET] /health URI")
-    void doFilter_BypassAuthenticationHealth() throws IOException, ServletException {
+    void doFilterBypassAuthenticationHealth() throws IOException, ServletException {
         // Given
         when(request.getRequestURI()).thenReturn("/health");
         when(request.getMethod()).thenReturn("GET");
@@ -168,7 +168,7 @@ class AuthenticationFilterTest {
 
     @Test
     @DisplayName("인증 우회 - [GET] /artwork URI")
-    void doFilter_BypassAuthenticationGetArtwork() throws IOException, ServletException {
+    void doFilterBypassAuthenticationGetArtwork() throws IOException, ServletException {
         // Given
         when(request.getRequestURI()).thenReturn("/artwork");
         when(request.getMethod()).thenReturn("GET");
@@ -182,7 +182,7 @@ class AuthenticationFilterTest {
     }
     @Test
     @DisplayName("인증 우회 - [GET] /character URI")
-    void doFilter_BypassAuthenticationGetCharacter() throws IOException, ServletException {
+    void doFilterBypassAuthenticationGetCharacter() throws IOException, ServletException {
         // Given
         when(request.getRequestURI()).thenReturn("/character");
         when(request.getMethod()).thenReturn("GET");
