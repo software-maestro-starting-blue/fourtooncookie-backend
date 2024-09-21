@@ -75,7 +75,7 @@ public class DiaryImageS3ServiceTest {
 
     @Test
     @DisplayName("이미지 업로드 중 오류 발생 테스트")
-    void testUploadImage_Exception() {
+    void testUploadImageException() {
         Long diaryId = 1L;
         byte[] image = "test-image".getBytes();
         Integer gridPosition = 1;
@@ -119,7 +119,7 @@ public class DiaryImageS3ServiceTest {
 
     @Test
     @DisplayName("이미지가 존재하지 않을 때 예외 발생")
-    void testGeneratePreSignedImageUrl_ImageNotExist() {
+    void testGeneratePreSignedImageUrlImageNotExist() {
         Long diaryId = 1L;
         Integer gridPosition = 1;
 
@@ -140,7 +140,7 @@ public class DiaryImageS3ServiceTest {
 
     @Test
     @DisplayName("프리사인 URL 생성 중 오류 발생 시 예외 발생")
-    void testGeneratePreSignedImageUrl_ExceptionDuringPresign() {
+    void testGeneratePreSignedImageUrlExceptionDuringPresign() {
         Long diaryId = 1L;
         Integer gridPosition = 1;
         String keyName = diaryId + "/" + gridPosition + ".png";
@@ -169,7 +169,7 @@ public class DiaryImageS3ServiceTest {
 
     @Test
     @DisplayName("이미지 존재 여부 확인 성공")
-    void testIsImageExist_Success() {
+    void testIsImageExistSuccess() {
         Long diaryId = 1L;
         Integer gridPosition = 1;
 
@@ -191,7 +191,7 @@ public class DiaryImageS3ServiceTest {
 
     @Test
     @DisplayName("이미지가 존재하지 않을 때")
-    void testIsImageExist_NotExist() {
+    void testIsImageExistNotExist() {
         Long diaryId = 1L;
         Integer gridPosition = 1;
 
@@ -210,7 +210,7 @@ public class DiaryImageS3ServiceTest {
 
     @Test
     @DisplayName("이미지 존재 여부 확인 중 오류 발생 시 예외 발생")
-    void testIsImageExist_ExceptionDuringCheck() {
+    void testIsImageExistExceptionDuringCheck() {
         Long diaryId = 1L;
         Integer gridPosition = 1;
         String keyName = diaryId + "/" + gridPosition + ".png";
