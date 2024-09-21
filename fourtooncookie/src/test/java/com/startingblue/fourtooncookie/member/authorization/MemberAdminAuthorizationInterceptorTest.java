@@ -35,6 +35,33 @@ class MemberAdminAuthorizationInterceptorTest {
     @InjectMocks
     private MemberAdminAuthorizationInterceptor memberAdminAuthorizationInterceptor;
 
+    @DisplayName("memberId가 empty인 경우 false 반환")
+    @ParameterizedTest
+    @ValueSource(strings = {""})
+    void whenMemberIdEmptyThenFalse(String memberId) {
+        //given & then
+        when(request.getAttribute("memberId")).thenReturn(memberId);
+        when(request.getRequestURI()).thenReturn("");
+        when(request.getMethod()).thenReturn(HttpMethod.GET.name());
+        boolean result = memberAdminAuthorizationInterceptor.preHandle(request, response, new Object());
+
+        //then
+        assertFalse(result);
+    }
+    @DisplayName("memberId가 uuid가 아닌 경우 false 반환")
+    @ParameterizedTest
+    @ValueSource(strings = {"illegalId"})
+    void whenMEmberIdIllegalThenFalse(String memberId) {
+        //given & then
+        when(request.getAttribute("memberId")).thenReturn(memberId);
+        when(request.getRequestURI()).thenReturn("");
+        when(request.getMethod()).thenReturn(HttpMethod.GET.name());
+        boolean result = memberAdminAuthorizationInterceptor.preHandle(request, response, new Object());
+
+        //then
+        assertFalse(result);
+    }
+
     @DisplayName("인가하는 경로인 경우 true 반환")
     @ParameterizedTest
     @ValueSource(strings = {"/character", "/artwork"})
