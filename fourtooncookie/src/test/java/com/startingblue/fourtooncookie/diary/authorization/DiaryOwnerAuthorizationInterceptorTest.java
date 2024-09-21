@@ -1,18 +1,20 @@
 package com.startingblue.fourtooncookie.diary.authorization;
 
 import com.startingblue.fourtooncookie.diary.service.DiaryService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.util.UUID;
 
-import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
@@ -22,101 +24,112 @@ class DiaryOwnerAuthorizationInterceptorTest {
     @Mock
     private DiaryService diaryService;
 
-    @Mock
-    private HttpServletRequest request;
-
-    @Mock
-    private HttpServletResponse response;
-
     @InjectMocks
     private DiaryOwnerAuthorizationInterceptor diaryOwnerAuthorizationInterceptor;
 
-    private final UUID memberId = UUID.randomUUID();
-    private final Long diaryId = 1L;
+    private MockHttpServletRequest request;
+    private MockHttpServletResponse response;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        request = new MockHttpServletRequest();
+        response = new MockHttpServletResponse();
     }
 
-    @DisplayName("Authorization succeeds when member is the diary owner")
     @Test
-    void testPreHandle_Authorized() throws Exception {
-        // Simulate the request having the correct memberId and diaryId
-        when(request.getAttribute("memberId")).thenReturn(memberId.toString());
-        when(request.getRequestURI()).thenReturn("/diary/" + diaryId);
+    @DisplayName("유효한 memberId와 diaryId로 권한이 있을 때 - 성공")
+    void preHandleSuccessAuthorized() {
+        // Given
+        String validMemberId = UUID.randomUUID().toString();
+        long validDiaryId = 1L;
 
-        // Simulate that the member is authorized
-        when(diaryService.verifyDiaryOwner(memberId, diaryId)).thenReturn(true);
+        request.setRequestURI("/diary/" + validDiaryId);
+        request.setAttribute("memberId", validMemberId);
 
-        // Call the interceptor
+        when(diaryService.verifyDiaryOwner(UUID.fromString(validMemberId), validDiaryId)).thenReturn(true);
+
+        // When
         boolean result = diaryOwnerAuthorizationInterceptor.preHandle(request, response, new Object());
 
-        // Verify the outcome
+        // Then
         assertTrue(result);
-        verify(response, never()).setStatus(SC_FORBIDDEN);
+        verify(diaryService, times(1)).verifyDiaryOwner(UUID.fromString(validMemberId), validDiaryId);
     }
 
-    @DisplayName("Authorization fails when member is not the diary owner")
     @Test
-    void testPreHandle_Unauthorized() throws Exception {
-        // Simulate the request having the correct memberId and diaryId
-        when(request.getAttribute("memberId")).thenReturn(memberId.toString());
-        when(request.getRequestURI()).thenReturn("/diary/" + diaryId);
+    @DisplayName("유효하지 않은 memberId로 권한 실패 - memberId 누락")
+    void preHandleFailureMissingMemberId() {
+        // Given
+        request.setRequestURI("/diary/1");
+        request.setAttribute("memberId", null);
 
-        // Simulate that the member is not authorized
-        when(diaryService.verifyDiaryOwner(memberId, diaryId)).thenReturn(false);
-
-        // Call the interceptor
+        // When
         boolean result = diaryOwnerAuthorizationInterceptor.preHandle(request, response, new Object());
 
-        // Verify the outcome
+        // Then
         assertFalse(result);
-        verify(response).setStatus(SC_FORBIDDEN);  // Expecting the response to set 403 status
+        assertTrue(response.getStatus() == HttpServletResponse.SC_FORBIDDEN);
+        verify(diaryService, never()).verifyDiaryOwner(any(UUID.class), anyLong());
     }
 
-    @DisplayName("Fails when memberId is missing or invalid")
     @Test
-    void testPreHandle_InvalidMemberId() throws Exception {
-        // Simulate the request having a missing or invalid memberId
-        when(request.getAttribute("memberId")).thenReturn(null);
-        when(request.getRequestURI()).thenReturn("/diary/" + diaryId);
+    @DisplayName("유효하지 않은 diaryId로 권한 실패 - diaryId 누락")
+    void preHandleFailureMissingDiaryId() {
+        // Given
+        String validMemberId = UUID.randomUUID().toString();
+        request.setRequestURI("/diary/");
+        request.setAttribute("memberId", validMemberId);
 
-        // Call the interceptor
+        // When
         boolean result = diaryOwnerAuthorizationInterceptor.preHandle(request, response, new Object());
 
-        // Verify the outcome
+        // Then
         assertFalse(result);
-        verify(response).setStatus(SC_FORBIDDEN);
+        assertTrue(response.getStatus() == HttpServletResponse.SC_FORBIDDEN);
+        verify(diaryService, never()).verifyDiaryOwner(any(UUID.class), anyLong());
     }
 
-    @DisplayName("Fails when diaryId is missing or invalid")
     @Test
-    void testPreHandle_InvalidDiaryId() throws Exception {
-        // Simulate the request having a valid memberId but missing/invalid diaryId
-        when(request.getAttribute("memberId")).thenReturn(memberId.toString());
-        when(request.getRequestURI()).thenReturn("/diary/");
+    @DisplayName("유효한 memberId와 diaryId로 권한 실패 - 권한 없음")
+    void preHandleFailureNotAuthorized() {
+        // Given
+        String validMemberId = UUID.randomUUID().toString();
+        long validDiaryId = 1L;
 
-        // Call the interceptor
+        request.setRequestURI("/diary/" + validDiaryId);
+        request.setAttribute("memberId", validMemberId);
+
+        when(diaryService.verifyDiaryOwner(UUID.fromString(validMemberId), validDiaryId)).thenReturn(false);
+
+        // When
         boolean result = diaryOwnerAuthorizationInterceptor.preHandle(request, response, new Object());
 
-        // Verify the outcome
+        // Then
         assertFalse(result);
-        verify(response).setStatus(SC_FORBIDDEN);
+        assertTrue(response.getStatus() == HttpServletResponse.SC_FORBIDDEN);
+        verify(diaryService, times(1)).verifyDiaryOwner(UUID.fromString(validMemberId), validDiaryId);
     }
 
-    @DisplayName("Fails when memberId is invalid UUID")
-    @Test
-    void testPreHandle_InvalidUUID() throws Exception {
-        // Simulate the request having an invalid memberId format
-        when(request.getAttribute("memberId")).thenReturn("invalid-uuid");
-        when(request.getRequestURI()).thenReturn("/diary/" + diaryId);
+    @ParameterizedTest
+    @CsvSource({
+            "null",
+            "'',",
+            "' '",
+            "invalid-uuid"
+    })
+    @DisplayName("유효하지 않은 memberId 형식 - 실패")
+    void preHandleFailureInvalidMemberId(String memberId) {
+        // Given
+        request.setRequestURI("/diary/1");
+        request.setAttribute("memberId", memberId);
 
-        // Call the interceptor
+        // When
         boolean result = diaryOwnerAuthorizationInterceptor.preHandle(request, response, new Object());
 
-        // Verify the outcome
+        // Then
         assertFalse(result);
-        verify(response).setStatus(SC_FORBIDDEN);  // Expecting the response to set 403 status
+        assertTrue(response.getStatus() == HttpServletResponse.SC_FORBIDDEN); // 403 Forbidden 응답
+        verify(diaryService, never()).verifyDiaryOwner(any(UUID.class), anyLong()); // diaryService는 호출되지 않아야 함
     }
 }
