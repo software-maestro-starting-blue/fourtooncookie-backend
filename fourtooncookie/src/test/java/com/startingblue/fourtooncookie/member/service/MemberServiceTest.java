@@ -3,26 +3,26 @@ package com.startingblue.fourtooncookie.member.service;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
-import com.startingblue.fourtooncookie.member.dto.response.MemberSavedResponse;
+import com.startingblue.fourtooncookie.member.domain.Role;
+import com.startingblue.fourtooncookie.member.dto.request.MemberSaveRequest;
+import com.startingblue.fourtooncookie.member.exception.MemberDuplicateException;
+import com.startingblue.fourtooncookie.member.exception.MemberNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@Transactional
-public class MemberServiceTest {
+class MemberServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
@@ -30,126 +30,173 @@ public class MemberServiceTest {
     @InjectMocks
     private MemberService memberService;
 
-    @Test
-    @DisplayName("supabase에 저장된 멤버를 찾는다.")
-    void getById() {
-        // given
-        UUID memberId = UUID.randomUUID();
-        String name = "Test User";
-        LocalDate birth = LocalDate.of(2000, 1, 1);
-        Gender gender = Gender.MALE;
+    private UUID memberId;
+    private MemberSaveRequest memberSaveRequest;
+    private Member member;
 
-        Member member = Member.builder()
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        memberId = UUID.randomUUID();
+        memberSaveRequest = new MemberSaveRequest("Test User", LocalDate.of(2000, 1, 1), Gender.MALE);
+
+        member = Member.builder()
                 .id(memberId)
-                .name(name)
-                .birth(birth)
-                .gender(gender)
+                .name("Test User")
+                .birth(LocalDate.of(2000, 1, 1))
+                .gender(Gender.MALE)
+                .role(Role.MEMBER)
                 .build();
+    }
+
+    @Test
+    @DisplayName("멤버 저장 시 중복 멤버가 있는 경우 MemberDuplicateException 발생")
+    void save_ThrowsException_WhenMemberExists() {
+        // given
+        when(memberRepository.existsById(memberId)).thenReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> memberService.save(memberId, memberSaveRequest))
+                .isInstanceOf(MemberDuplicateException.class)
+                .hasMessageContaining("Member with id " + memberId + " already exists");
+
+        verify(memberRepository, never()).save(any(Member.class)); // 멤버 저장 호출이 발생하지 않음
+    }
+
+    @Test
+    @DisplayName("새로운 멤버를 성공적으로 저장")
+    void save_Success_WhenMemberDoesNotExist() {
+        // given
+        when(memberRepository.existsById(memberId)).thenReturn(false);
 
         // when
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        memberService.save(memberId, memberSaveRequest);
 
         // then
-        MemberSavedResponse memberSavedResponse = MemberSavedResponse.of(memberService.readById(memberId));
-        assertThat(memberSavedResponse).isNotNull();
-        assertThat(memberSavedResponse.name()).isEqualTo(name);
-        assertThat(memberSavedResponse.birth()).isEqualTo(birth);
-        assertThat(memberSavedResponse.gender()).isEqualTo(gender);
+        verify(memberRepository, times(1)).save(any(Member.class)); // 한 번 호출
     }
 
     @Test
-    @DisplayName("supabase에 저장된 멤버를 소프트 삭제 한다. deleteAt을 갱신 한다.")
-    void softDeleteByIdById() {
-        UUID memberId = UUID.randomUUID();
-        String name = "Test User";
-        LocalDate birth = LocalDate.of(2000, 1, 1);
-        Gender gender = Gender.MALE;
-
-        Member member = Member.builder()
-                .id(memberId)
-                .name(name)
-                .birth(birth)
-                .gender(gender)
-                .build();
-
+    @DisplayName("멤버 ID로 조회 시 멤버를 찾는다.")
+    void readById_ReturnsMember_WhenMemberExists() {
+        // given
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
-        LocalDateTime current = LocalDateTime.now();
-        memberService.softDeleteById(memberId, current);
+        // when
+        Member foundMember = memberService.readById(memberId);
 
-        Member deletedMember = memberRepository.findById(memberId).orElse(null);
-        assertThat(deletedMember).isNotNull();
-        assertThat(deletedMember.getDeletedDateTime()).isEqualTo(current);
+        // then
+        assertThat(foundMember).isNotNull();
+        assertThat(foundMember.getName()).isEqualTo("Test User");
+        assertThat(foundMember.getBirth()).isEqualTo(LocalDate.of(2000, 1, 1));
     }
 
     @Test
-    @DisplayName("현재 시간보다 미래의 날짜로 소프트 삭제를 시도하면 예외가 발생한다.")
-    void softDeleteByIdById_withFutureDate() {
-        UUID memberId = UUID.randomUUID();
-        String name = "Test User";
-        LocalDate birth = LocalDate.of(2000, 1, 1);
-        Gender gender = Gender.MALE;
+    @DisplayName("멤버 ID로 조회 시 멤버를 찾을 수 없을 때 MemberNotFoundException 발생")
+    void readById_ThrowsException_WhenMemberNotFound() {
+        // given
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
-        Member member = Member.builder()
-                .id(memberId)
-                .name(name)
-                .birth(birth)
-                .gender(gender)
-                .build();
-
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
-
-        LocalDateTime future = LocalDateTime.now().plusDays(1);
-
-        assertThatThrownBy(() -> memberService.softDeleteById(memberId, future))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Current time cannot be after current time");
+        // when & then
+        assertThatThrownBy(() -> memberService.readById(memberId))
+                .isInstanceOf(MemberNotFoundException.class)
+                .hasMessageContaining("member not found");
     }
 
     @Test
-    @DisplayName("현재 시간보다 과거의 날짜로 소프트 삭제를 시도하면 성공한다.")
-    void softDeleteByIdById_withPastDate() {
-        UUID memberId = UUID.randomUUID();
-        String name = "Test User";
-        LocalDate birth = LocalDate.of(2000, 1, 1);
-        Gender gender = Gender.MALE;
+    @DisplayName("멤버를 성공적으로 삭제")
+    void hardDeleteById_DeletesMember_WhenCalled() {
+        // when
+        memberService.hardDeleteById(memberId);
 
-        Member member = Member.builder()
-                .id(memberId)
-                .name(name)
-                .birth(birth)
-                .gender(gender)
-                .build();
-
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
-
-        LocalDateTime past = LocalDateTime.now().minusDays(1);
-        memberService.softDeleteById(memberId, past);
-
-        Member deletedMember = memberRepository.findById(memberId).orElse(null);
-        assertThat(deletedMember).isNotNull();
-        assertThat(deletedMember.getDeletedDateTime()).isEqualTo(past);
+        // then
+        verify(memberRepository, times(1)).deleteById(memberId); // 삭제 호출
     }
 
     @Test
-    @DisplayName("null 값을 사용하여 소프트 삭제를 시도하면 예외가 발생한다.")
-    void softDeleteByIdById_withNull() {
-        UUID memberId = UUID.randomUUID();
-        String name = "Test User";
-        LocalDate birth = LocalDate.of(2000, 1, 1);
-        Gender gender = Gender.MALE;
+    @DisplayName("멤버 존재 여부를 확인")
+    void verifyMemberExists_ReturnsTrue_WhenMemberExists() {
+        // given
+        when(memberRepository.existsById(memberId)).thenReturn(true);
 
-        Member member = Member.builder()
-                .id(memberId)
-                .name(name)
-                .birth(birth)
-                .gender(gender)
-                .build();
+        // when
+        boolean exists = memberService.verifyMemberExists(memberId);
 
+        // then
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    @DisplayName("멤버가 존재하지 않으면 false 반환")
+    void verifyMemberExists_ReturnsFalse_WhenMemberNotExists() {
+        // given
+        when(memberRepository.existsById(memberId)).thenReturn(false);
+
+        // when
+        boolean exists = memberService.verifyMemberExists(memberId);
+
+        // then
+        assertThat(exists).isFalse();
+    }
+
+    @Test
+    @DisplayName("멤버의 가입 여부 확인")
+    void verifyMemberSignUp_ReturnsTrue_WhenSignedUp() {
+        // given
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
-        assertThatThrownBy(() -> memberService.softDeleteById(memberId, null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Current time cannot be null");
+        // when
+        boolean signedUp = memberService.verifyMemberSignUp(memberId);
+
+        // then
+        assertThat(signedUp).isTrue();
+    }
+
+    @Test
+    @DisplayName("멤버의 가입 상태가 불완전할 경우 false 반환")
+    void verifyMemberSignUp_ReturnsFalse_WhenNotSignedUp() {
+        // given
+        Member incompleteMember = Member.builder().id(memberId).build();
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(incompleteMember));
+
+        // when
+        boolean signedUp = memberService.verifyMemberSignUp(memberId);
+
+        // then
+        assertThat(signedUp).isFalse();
+    }
+
+    @Test
+    @DisplayName("멤버가 관리자인 경우 true 반환")
+    void verifyMemberAdmin_ReturnsTrue_WhenAdmin() {
+        // given
+        UUID adminMemberId = UUID.randomUUID();
+        Member adminMember = Member.builder()
+                .id(adminMemberId)
+                .name("Test User")
+                .birth(LocalDate.of(2000, 1, 1))
+                .gender(Gender.MALE)
+                .role(Role.ADMIN)
+                .build();
+        when(memberRepository.findById(adminMemberId)).thenReturn(Optional.of(adminMember));
+
+        // when
+        boolean isAdmin = memberService.verifyMemberAdmin(adminMemberId);
+
+        // then
+        assertThat(isAdmin).isTrue();
+    }
+
+    @Test
+    @DisplayName("멤버가 관리자가 아닐 경우 false 반환")
+    void verifyMemberAdmin_ReturnsFalse_WhenNotAdmin() {
+        // given
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+
+        // when
+        boolean isAdmin = memberService.verifyMemberAdmin(memberId);
+
+        // then
+        assertThat(isAdmin).isFalse();
     }
 }
