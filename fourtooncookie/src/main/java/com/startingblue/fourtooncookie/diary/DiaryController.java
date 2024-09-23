@@ -49,12 +49,11 @@ public class DiaryController {
     }
 
     @GetMapping("/{diaryId}")
-    public ResponseEntity<DiarySavedResponse> readDiaryByMember (
+    public ResponseEntity<DiarySavedResponse> readDiaryById (
             @PathVariable final Long diaryId) {
-        DiarySavedResponse response = DiarySavedResponse.of(diaryService.readById(diaryId));
+        DiarySavedResponse response = DiarySavedResponse.of(diaryService.readDiaryById(diaryId));
         return ok(response);
     }
-
 
     @PutMapping("/{diaryId}")
     public ResponseEntity<HttpStatus> updateDiary(@PathVariable final Long diaryId,
