@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.member.dto;
 
-import com.startingblue.fourtooncookie.global.authentication.filter.AuthenticationException;
+import com.startingblue.fourtooncookie.config.authentication.AuthenticationException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.core.MethodParameter;

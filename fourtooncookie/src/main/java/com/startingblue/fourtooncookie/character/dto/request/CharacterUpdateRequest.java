@@ -1,7 +1,7 @@
 package com.startingblue.fourtooncookie.character.dto.request;
 
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
-import com.startingblue.fourtooncookie.global.domain.PaymentType;
+import com.startingblue.fourtooncookie.character.domain.PaymentType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

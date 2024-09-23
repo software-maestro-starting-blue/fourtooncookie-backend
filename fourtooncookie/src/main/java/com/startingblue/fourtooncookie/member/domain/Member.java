@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.member.domain;
 
-import com.startingblue.fourtooncookie.global.domain.BaseEntity;
+import com.startingblue.fourtooncookie.config.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +42,19 @@ public class Member extends BaseEntity {
         this.name = name;
         this.birth = birth;
         this.gender = gender;
+    }
+
+    public void softDelete(LocalDateTime current) {
+        if (current == null) {
+            throw new IllegalArgumentException("Current time cannot be null");
+        }
+        if (current.isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Current time cannot be after current time");
+        }
+        if (deletedDateTime != null && current.isAfter(deletedDateTime)) {
+            throw new IllegalArgumentException("Cannot delete at a time after the current deletedAt timestamp");
+        }
+        deletedDateTime = current;
     }
 
     public boolean isAdmin() {
