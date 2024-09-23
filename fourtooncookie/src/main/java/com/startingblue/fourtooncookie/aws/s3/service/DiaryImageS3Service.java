@@ -134,7 +134,7 @@ public class DiaryImageS3Service {
     }
 
     public byte[] mergeImagesTo2x2(List<byte[]> images) throws IOException {
-        if (images.size() <= 4) {
+        if (images.size() < 4) {
             throw new IllegalArgumentException("4개의 이미지가 필요합니다.");
         }
 
