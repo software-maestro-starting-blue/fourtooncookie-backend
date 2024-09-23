@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.member.domain;
 
-import com.startingblue.fourtooncookie.config.BaseEntity;
+import com.startingblue.fourtooncookie.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
