@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import static org.springframework.http.ResponseEntity.*;
@@ -55,7 +56,6 @@ public class DiaryController {
         return ok(response);
     }
 
-
     @PutMapping("/{diaryId}")
     public ResponseEntity<HttpStatus> updateDiary(@PathVariable final Long diaryId,
                                             @RequestBody final DiaryUpdateRequest request) {
@@ -74,5 +74,15 @@ public class DiaryController {
     public ResponseEntity<HttpStatus> deleteDiary(@PathVariable final Long diaryId) {
         diaryService.deleteDiary(diaryId);
         return noContent().build();
+    }
+
+    @GetMapping("/{diaryId}/download")
+    public ResponseEntity<byte[]> readDiaryByIdDownload(
+            @PathVariable final Long diaryId) throws IOException {
+
+        byte[] imageData = diaryService.readDiaryImage(diaryId);
+
+        return ResponseEntity.ok()
+                .body(imageData);
     }
 }
