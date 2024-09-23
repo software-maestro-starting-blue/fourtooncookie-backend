@@ -1,6 +1,7 @@
 package com.startingblue.fourtooncookie.character.domain;
 
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
+import com.startingblue.fourtooncookie.global.domain.PaymentType;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,11 +36,13 @@ public class CharacterTest {
     @Test
     @DisplayName("유효한 Character 객체 생성")
     public void validCharacterCreation() {
+        // given
         CharacterVisionType visionType = CharacterVisionType.DALL_E_3;
         PaymentType paymentType = PaymentType.FREE;
         String name = "ValidName";
         String basePrompt = "Base Prompt";
 
+        // when
         Character character = Character.builder()
                 .characterVisionType(visionType)
                 .paymentType(paymentType)
@@ -49,6 +52,7 @@ public class CharacterTest {
                 .basePrompt(basePrompt)
                 .build();
 
+        // then
         assertThat(character).isNotNull();
         assertThat(character.getCharacterVisionType()).isEqualTo(visionType);
         assertThat(character.getPaymentType()).isEqualTo(paymentType);
@@ -61,11 +65,13 @@ public class CharacterTest {
     @Test
     @DisplayName("이름이 빈 문자열인 Character 객체 생성시 ConstraintViolationException")
     public void testInvalidCharacterCreation_NameBlank() {
+        // given
         CharacterVisionType visionType = CharacterVisionType.DALL_E_3;
         PaymentType paymentType = PaymentType.FREE;
         String name = "";
         String basePrompt = "Base Prompt";
 
+        // when & then
         assertThatThrownBy(() -> {
             Character.builder()
                     .characterVisionType(visionType)
@@ -82,11 +88,13 @@ public class CharacterTest {
     @Test
     @DisplayName("Artwork가 null인 Character 객체 생성 시 ConstraintViolationException")
     public void testInvalidCharacterCreation_ArtworkNull() {
+        // given
         CharacterVisionType visionType = CharacterVisionType.DALL_E_3;
         PaymentType paymentType = PaymentType.FREE;
         String name = "ValidName";
         String basePrompt = "Base Prompt";
 
+        // when & then
         assertThatThrownBy(() -> {
             Character.builder()
                     .characterVisionType(visionType)
@@ -103,11 +111,13 @@ public class CharacterTest {
     @Test
     @DisplayName("썸네일 URL이 null인 Character 객체 생성 시 ConstraintViolationException")
     public void testInvalidCharacterCreation_ThumbnailUrlNull() {
+        // given
         CharacterVisionType visionType = CharacterVisionType.DALL_E_3;
         PaymentType paymentType = PaymentType.FREE;
         String name = "ValidName";
         String basePrompt = "Base Prompt";
 
+        // when & then
         assertThatThrownBy(() -> {
             Character.builder()
                     .characterVisionType(visionType)
@@ -124,11 +134,13 @@ public class CharacterTest {
     @Test
     @DisplayName("기본 프롬프트가 빈 문자열인 Character 객체 생성 시 ConstraintViolationException")
     public void testInvalidCharacterCreation_BasePromptBlank() {
+        // given
         CharacterVisionType visionType = CharacterVisionType.DALL_E_3;
         PaymentType paymentType = PaymentType.FREE;
         String name = "ValidName";
         String basePrompt = "";
 
+        // when & then
         assertThatThrownBy(() -> {
             Character.builder()
                     .characterVisionType(visionType)
@@ -145,10 +157,12 @@ public class CharacterTest {
     @Test
     @DisplayName("캐릭터 결제 유형이 null인 Character 객체 생성 시 ConstraintViolationException")
     public void testInvalidCharacterCreation_PaymentTypeNull() {
+        // given
         CharacterVisionType visionType = CharacterVisionType.DALL_E_3;
         String name = "ValidName";
         String basePrompt = "Base Prompt";
 
+        // when & then
         assertThatThrownBy(() -> {
             Character.builder()
                     .characterVisionType(visionType)
@@ -165,10 +179,12 @@ public class CharacterTest {
     @Test
     @DisplayName("캐릭터 비전 유형이 null인 Character 객체 생성 시 ConstraintViolationException")
     public void testInvalidCharacterCreation_CharacterVisionTypeNull() {
+        // given
         PaymentType paymentType = PaymentType.FREE;
         String name = "ValidName";
         String basePrompt = "Base Prompt";
 
+        // when & then
         assertThatThrownBy(() -> {
             Character.builder()
                     .characterVisionType(null)
@@ -185,6 +201,7 @@ public class CharacterTest {
     @Test
     @DisplayName("Character 객체 업데이트 성공")
     public void testUpdateCharacter() {
+        // given
         CharacterVisionType initialVisionType = CharacterVisionType.DALL_E_3;
         PaymentType initialPaymentType = PaymentType.FREE;
         String initialName = "OldName";
@@ -204,8 +221,10 @@ public class CharacterTest {
         String newName = "NewName";
         String newBasePrompt = "New Prompt";
 
+        // when
         character.update(newVisionType, newPaymentType, artwork, newName, newUrl, newBasePrompt);
 
+        // then
         assertThat(character.getCharacterVisionType()).isEqualTo(newVisionType);
         assertThat(character.getPaymentType()).isEqualTo(newPaymentType);
         assertThat(character.getName()).isEqualTo(newName);
@@ -217,6 +236,7 @@ public class CharacterTest {
     @Test
     @DisplayName("Character 업데이트 시 이름이 빈 문자열일 때 ConstraintViolationException")
     public void testUpdateCharacter_InvalidName() {
+        // given
         CharacterVisionType initialVisionType = CharacterVisionType.DALL_E_3;
         PaymentType initialPaymentType = PaymentType.FREE;
         String initialName = "ValidName";
@@ -236,6 +256,7 @@ public class CharacterTest {
         String newName = "";
         String newBasePrompt = "New Prompt";
 
+        // when & then
         assertThatThrownBy(() -> {
             character.update(newVisionType, newPaymentType, artwork, newName, validUrl, newBasePrompt);
         }).isInstanceOf(ConstraintViolationException.class)
