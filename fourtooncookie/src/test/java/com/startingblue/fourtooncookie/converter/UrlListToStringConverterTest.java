@@ -1,7 +1,7 @@
 package com.startingblue.fourtooncookie.converter;
 
-import com.startingblue.fourtooncookie.converter.exception.ConversionException;
-import com.startingblue.fourtooncookie.converter.jpa.UrlListToStringConverter;
+import com.startingblue.fourtooncookie.global.converter.exception.ConversionException;
+import com.startingblue.fourtooncookie.global.converter.jpa.UrlListToStringConverter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -2,6 +2,7 @@ package com.startingblue.fourtooncookie.character.domain;
 
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
+import com.startingblue.fourtooncookie.global.domain.PaymentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
