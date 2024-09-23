@@ -5,7 +5,7 @@ import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
-import com.startingblue.fourtooncookie.character.domain.PaymentType;
+import com.startingblue.fourtooncookie.global.domain.PaymentType;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
@@ -25,7 +25,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;

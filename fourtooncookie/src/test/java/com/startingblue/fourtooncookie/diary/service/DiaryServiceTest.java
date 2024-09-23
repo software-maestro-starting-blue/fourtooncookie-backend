@@ -5,13 +5,11 @@ import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
-import com.startingblue.fourtooncookie.character.domain.PaymentType;
+import com.startingblue.fourtooncookie.global.domain.PaymentType;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
-import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
-import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
-import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponses;
+import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
@@ -136,6 +134,102 @@ class DiaryServiceTest {
         boolean exists = diaryRepository.existsById(diary.getId());
         assertThat(exists).isTrue();
     }
+
+    @DisplayName("일기를 생성하면 저장된 ID를 반환한다.")
+    @Test
+    void createDiaryTest() throws MalformedURLException {
+        // given
+        DiarySaveRequest request = new DiarySaveRequest("오늘의 일기", LocalDate.now(), character.getId());
+
+        // when
+        Long diaryId = diaryService.createDiary(request, member.getId());
+
+        // then
+        Diary savedDiary = diaryRepository.findById(diaryId).orElseThrow(DiaryNotFoundException::new);
+        assertThat(savedDiary.getId()).isEqualTo(diaryId);
+        assertThat(savedDiary.getContent()).isEqualTo(request.content());
+        assertThat(savedDiary.getDiaryDate()).isEqualTo(request.diaryDate());
+    }
+
+    @DisplayName("일기를 즐겨찾기로 설정한다.")
+    @Test
+    void updateDiaryFavoriteTest() throws MalformedURLException {
+        // given
+        Diary diary = createDiary(LocalDate.of(2024, 7, 21), character, member);
+        diaryRepository.save(diary);
+
+        // when
+        diaryService.updateDiaryFavorite(diary.getId(), true);
+
+        // then
+        Diary updatedDiary = diaryService.readById(diary.getId());
+        assertThat(updatedDiary.isFavorite()).isTrue();
+    }
+
+    @DisplayName("저장된 모든 일기를 페이지네이션하여 가져온다.")
+    @Test
+    void readDiariesByMemberIdTest() throws MalformedURLException {
+        // given
+        LocalDate now = LocalDate.now();
+        List<Diary> diaries = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            diaries.add(createDiary(now.minusDays(i), character, member));
+        }
+        diaryRepository.saveAll(diaries);
+
+        // when
+        List<Diary> foundDiaries = diaryService.readDiariesByMemberId(member.getId(), 0, 3);
+
+        // then
+        assertThat(foundDiaries).hasSize(3);
+        assertThat(foundDiaries.get(0).getDiaryDate()).isEqualTo(now);
+        assertThat(foundDiaries.get(2).getDiaryDate()).isEqualTo(now.minusDays(2));
+    }
+
+    @DisplayName("같은 날짜에 중복 일기를 작성하면 예외가 발생한다.")
+    @Test
+    void duplicateDiaryTest() throws MalformedURLException {
+        // given
+        LocalDate now = LocalDate.now();
+        DiarySaveRequest request = new DiarySaveRequest("오늘의 일기", now, character.getId());
+        diaryService.createDiary(request, member.getId());
+
+        // when & then
+        assertThatThrownBy(() -> diaryService.createDiary(request, member.getId()))
+                .isInstanceOf(DiaryDuplicateException.class);
+    }
+
+    @DisplayName("일기의 소유자가 맞는지 확인한다.")
+    @Test
+    void verifyDiaryOwnerTest() throws MalformedURLException {
+        // given
+        Diary diary = createDiary(LocalDate.now(), character, member);
+        diaryRepository.save(diary);
+
+        // when
+        boolean isOwner = diaryService.verifyDiaryOwner(member.getId(), diary.getId());
+
+        // then
+        assertThat(isOwner).isTrue();
+    }
+
+    @DisplayName("다른 사용자는 일기의 소유자가 아니므로 false를 반환한다.")
+    @Test
+    void verifyDiaryOwnerFalseTest() throws MalformedURLException {
+        // given
+        Diary diary = createDiary(LocalDate.now(), character, member);
+        diaryRepository.save(diary);
+
+        Member otherMember = createMember("다른 사람", LocalDate.of(1995, 1, 1), Gender.FEMALE);
+        memberRepository.save(otherMember);
+
+        // when
+        boolean isOwner = diaryService.verifyDiaryOwner(otherMember.getId(), diary.getId());
+
+        // then
+        assertThat(isOwner).isFalse();
+    }
+
 
     private Diary createDiary(LocalDate diaryDate, Character character, Member member) throws MalformedURLException {
         return Diary.builder()
