@@ -1,0 +1,73 @@
+name: CI/CD DEV
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy'
+        required: true
+        default: 'develop'
+
+permissions:
+  contents: read
+
+jobs:
+  build-backend:
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: fourtooncookie
+
+    steps:
+      - name: Set up Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "corretto"
+
+      - name: Give permission for Gradle
+        run: chmod +x gradlew
+
+      - name: Cache Gradle
+        id: cache-gradle
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      
+      - name: Gradle Wrapper
+        run: gradle wrapper
+      
+      - name: Build with Gradle
+        run: ./gradlew bootJar
+
+      - name: Upload jar file artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BackendApplicationJar
+          path: fourtooncookie/build/libs/*.jar
+          
+  deploy:
+    needs: [build-backend]
+    runs-on: [self-hosted, fourtooncookie-dev]
+
+    steps:
+      - name: Remove previous version BACK jar
+        working-directory: backend/prod/
+        run: rm -f *.jar
+
+      - name: Download BACK jar file from artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: BackendApplicationJar
+          path: backend/prod/
+          
+      - name: Deploy BACK to production server
+        working-directory: backend/prod/
+        run: RUNNER_TRACKING_ID="" sh deploy.sh
