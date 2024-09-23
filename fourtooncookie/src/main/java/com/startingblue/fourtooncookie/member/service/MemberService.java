@@ -43,16 +43,6 @@ public class MemberService {
         memberRepository.deleteById(memberId);
     }
 
-    public void softDeleteById(UUID memberId) {
-        softDeleteById(memberId, LocalDateTime.now());
-    }
-
-    public void softDeleteById(UUID memberId, LocalDateTime current) {
-        Member foundMember = readById(memberId);
-        foundMember.softDelete(current);
-        memberRepository.save(foundMember);
-    }
-
     public boolean verifyMemberExists(UUID memberId) {
         return memberRepository.existsById(memberId);
     }
