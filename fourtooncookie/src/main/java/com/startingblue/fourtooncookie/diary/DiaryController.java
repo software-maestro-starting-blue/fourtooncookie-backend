@@ -4,7 +4,6 @@ import com.startingblue.fourtooncookie.diary.dto.request.DiaryFavoriteRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.dto.response.DiaryCreatedResponse;
-import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponses;
 import com.startingblue.fourtooncookie.diary.service.DiaryService;
 import jakarta.validation.constraints.Max;
@@ -46,13 +45,6 @@ public class DiaryController {
             return noContent().build();
         }
         return ok(responses);
-    }
-
-    @GetMapping("/{diaryId}")
-    public ResponseEntity<DiarySavedResponse> readDiaryByMember (
-            @PathVariable final Long diaryId) {
-        DiarySavedResponse response = DiarySavedResponse.of(diaryService.readById(diaryId));
-        return ok(response);
     }
 
 
