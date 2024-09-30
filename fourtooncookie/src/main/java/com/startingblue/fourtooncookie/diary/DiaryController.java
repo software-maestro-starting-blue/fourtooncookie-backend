@@ -11,10 +11,13 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import static org.springframework.http.ResponseEntity.*;
@@ -49,12 +52,11 @@ public class DiaryController {
     }
 
     @GetMapping("/{diaryId}")
-    public ResponseEntity<DiarySavedResponse> readDiaryByMember (
+    public ResponseEntity<DiarySavedResponse> readDiaryById (
             @PathVariable final Long diaryId) {
-        DiarySavedResponse response = DiarySavedResponse.of(diaryService.readById(diaryId));
+        DiarySavedResponse response = DiarySavedResponse.of(diaryService.readDiaryById(diaryId));
         return ok(response);
     }
-
 
     @PutMapping("/{diaryId}")
     public ResponseEntity<HttpStatus> updateDiary(@PathVariable final Long diaryId,
@@ -75,4 +77,15 @@ public class DiaryController {
         diaryService.deleteDiary(diaryId);
         return noContent().build();
     }
+
+    @GetMapping("/{diaryId}/image/full")
+    public ResponseEntity<byte[]> readDiaryByIdDownload(@PathVariable final Long diaryId) throws IOException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_PNG);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(diaryService.readDiaryFullImage(diaryId));
+    }
+
 }

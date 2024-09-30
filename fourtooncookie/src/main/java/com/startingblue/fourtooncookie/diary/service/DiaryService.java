@@ -21,14 +21,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -69,6 +68,15 @@ public class DiaryService {
     }
 
     @Transactional(readOnly = true)
+    public Diary readDiaryById(final Long diaryId) {
+        Optional<Diary> foundDiary = diaryRepository.findById(diaryId);
+        List<URL> preSignedUrls = generatePreSignedUrls(foundDiary.get().getId());
+
+        foundDiary.get().updatePaintingImageUrls(preSignedUrls);
+        return foundDiary.get();
+    }
+
+    @Transactional(readOnly = true)
     public List<Diary> readDiariesByMemberId(final UUID memberId, final int pageNumber, final int pageSize) {
         Member foundMember = memberService.readById(memberId);
         Page<Diary> diaries = diaryRepository.findAllByMemberIdOrderByDiaryDateDesc(
@@ -77,21 +85,30 @@ public class DiaryService {
         );
 
         return diaries.getContent().stream().map(savedDiary -> {
-            List<URL> preSignedUrls = IntStream.rangeClosed(MIN_PAINTING_IMAGE_POSITION, MAX_PAINTING_IMAGE_POSITION)
-                    .mapToObj(imageGridPosition -> {
-                        try {
-                             return diaryImageS3Service.generatePreSignedImageUrl(savedDiary.getId(), imageGridPosition);
-                        } catch (Exception e) {
-                            log.error("Failed to generate pre-signed image url", e);
-                            return null;
-                        }
-                    })
-                    .filter(Objects::nonNull)
-                    .toList();
-
+            List<URL> preSignedUrls = generatePreSignedUrls(savedDiary.getId());
             savedDiary.updatePaintingImageUrls(preSignedUrls);
             return savedDiary;
         }).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] readDiaryFullImage(final Long diaryId) throws IOException {
+        List<byte[]> images = diaryImageS3Service.downloadImages(diaryId);
+        return diaryImageS3Service.mergeImagesTo2x2(images);
+    }
+
+    private List<URL> generatePreSignedUrls(Long diaryId) {
+        return IntStream.rangeClosed(MIN_PAINTING_IMAGE_POSITION, MAX_PAINTING_IMAGE_POSITION)
+                .mapToObj(imageGridPosition -> {
+                    try {
+                        return diaryImageS3Service.generatePreSignedImageUrl(diaryId, imageGridPosition);
+                    } catch (Exception e) {
+                        log.error("Failed to generate pre-signed image URL for diaryId: {}", diaryId, e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     public void updateDiaryFavorite(Long diaryId, boolean isFavorite) {
@@ -133,4 +150,5 @@ public class DiaryService {
     public void deleteDiaryByMemberId(UUID memberId) {
         diaryRepository.deleteByMemberId(memberId);
     }
+
 }
