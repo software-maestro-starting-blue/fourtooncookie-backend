@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
@@ -24,26 +25,23 @@ public class S3Service {
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
 
-    @Value("${aws.diaryimage.bucket.name}")
-    private String bucketName;
-
     @Value("${aws.diaryimage.presignedurl.duration}")
     private Integer preSignedUrlDurationInMinutes;
 
-    public URL generatePresignedUrl(String keyName) {
-        verifyPathExists(keyName);
-        return createPresignedUrl(keyName);
+    public URL generatePresignedUrl(String bucketName, String keyName) {
+        verifyPathExists(bucketName, keyName);
+        return createPresignedUrl(bucketName, keyName);
     }
 
-    private void verifyPathExists(String keyName) {
-        if (!isPathExists(keyName)) {
+    private void verifyPathExists(String bucketName, String keyName) {
+        if (!isPathExists(bucketName, keyName)) {
             throw new S3PathNotFoundException(String.format("S3에 이미지가 존재하지 않습니다. Key: %s", keyName));
         }
     }
 
-    private URL createPresignedUrl(String keyName) {
+    private URL createPresignedUrl(String bucketName, String keyName) {
         try {
-            GetObjectPresignRequest getObjectPresignRequest = createGetObjectPresignRequest(keyName);
+            GetObjectPresignRequest getObjectPresignRequest = createGetObjectPresignRequest(bucketName, keyName);
             PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(getObjectPresignRequest);
             return presignedGetObjectRequest.url();
         } catch (Exception e) {
@@ -51,9 +49,9 @@ public class S3Service {
         }
     }
 
-    private boolean isPathExists(String keyName) {
+    private boolean isPathExists(String bucketName, String keyName) {
         try {
-            HeadObjectRequest headObjectRequest = createHeadObjectRequest(keyName);
+            HeadObjectRequest headObjectRequest = createHeadObjectRequest(bucketName, keyName);
             s3Client.headObject(headObjectRequest);
             return true;
         } catch (NoSuchKeyException e) {
@@ -63,7 +61,7 @@ public class S3Service {
         }
     }
 
-    private HeadObjectRequest createHeadObjectRequest(String keyName) {
+    private HeadObjectRequest createHeadObjectRequest(String bucketName, String keyName) {
         return HeadObjectRequest.builder()
                 .bucket(bucketName)
                 .key(keyName)
@@ -77,21 +75,23 @@ public class S3Service {
         throw new S3Exception("S3에 이미지 존재 여부 확인 중 오류가 발생했습니다.", e);
     }
 
-    private GetObjectPresignRequest createGetObjectPresignRequest(String keyName) {
+    private GetObjectPresignRequest createGetObjectPresignRequest(String bucketName, String keyName) {
         return GetObjectPresignRequest.builder()
                 .getObjectRequest(r -> r.bucket(bucketName).key(keyName))
                 .signatureDuration(Duration.ofMinutes(preSignedUrlDurationInMinutes))
                 .build();
     }
 
-    public byte[] getImageFromS3(String keyName) {
+    public byte[] getImageFromS3(String bucketName, String keyName) {
         try {
             return s3Client.getObjectAsBytes(GetObjectRequest.builder()
                     .bucket(bucketName)
                     .key(keyName)
                     .build()).asByteArray();
+        } catch (NoSuchBucketException e) {
+            throw new S3PathNotFoundException("S3에 버킷이 존재하지 않습니다.");
         } catch (NoSuchKeyException e) {
-            throw new S3PathNotFoundException(String.format("S3에 이미지가 존재하지 않습니다. Key: %s", keyName));
+            throw new S3PathNotFoundException(String.format("S3에 키가 존재하지 않습니다. Key: %s", keyName));
         } catch (Exception e) {
             throw new S3Exception(String.format("S3에서 이미지 다운로드 중 오류가 발생했습니다. Key: %s", keyName), e);
         }

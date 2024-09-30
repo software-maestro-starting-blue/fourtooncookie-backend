@@ -4,6 +4,7 @@ import com.startingblue.fourtooncookie.aws.s3.service.S3Service;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.global.converter.image.ImageConverter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -20,8 +21,11 @@ public class DiaryS3Service {
     private final S3Service s3Service;
     private final ImageConverter imageConverter;
 
+    @Value("${aws.diaryimage.bucket.name}")
+    private String bucketName;
+
     public URL generatePresignedUrl(Long diaryId, int gridPosition) {
-        return s3Service.generatePresignedUrl(getKeyName(diaryId, gridPosition, IMAGE_PNG_FORMAT));
+        return s3Service.generatePresignedUrl(bucketName, getKeyName(diaryId, gridPosition, IMAGE_PNG_FORMAT));
     }
 
     public byte[] getFullImageByDiaryId(Long diaryId) throws IOException {
@@ -36,7 +40,7 @@ public class DiaryS3Service {
     }
 
     private byte[] getImageByDiaryIdAndGridPosition(Long diaryId, int gridPosition) {
-        return s3Service.getImageFromS3(getKeyName(diaryId, gridPosition, IMAGE_PNG_FORMAT));
+        return s3Service.getImageFromS3(bucketName, getKeyName(diaryId, gridPosition, IMAGE_PNG_FORMAT));
     }
 
     private String getKeyName(Long diaryId,  int gridPosition, String imageFormat) {
