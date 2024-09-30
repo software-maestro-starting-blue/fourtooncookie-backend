@@ -39,6 +39,7 @@ public class DiaryService {
     private final MemberService memberService;
     private final CharacterService characterService;
     private final DiaryS3Service diaryS3Service;
+    private final DiaryCloudFrontService diaryCloudFrontService;
     private final DiaryLambdaService diaryImageGenerationLambdaInvoker;
 
     public Long createDiary(final DiarySaveRequest request, final UUID memberId) {
@@ -145,6 +146,10 @@ public class DiaryService {
 
     public void deleteDiaryByMemberId(UUID memberId) {
         diaryRepository.deleteByMemberId(memberId);
+    }
+
+    public Map<String, String> generateSignedCookiesByMemberId(UUID memberId) {
+        return diaryCloudFrontService.generateSignedCookies(memberId);
     }
 
 }
