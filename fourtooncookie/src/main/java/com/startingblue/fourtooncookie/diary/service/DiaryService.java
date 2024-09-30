@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
@@ -90,6 +91,12 @@ public class DiaryService {
         }).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public byte[] readDiaryFullImage(final Long diaryId) throws IOException {
+        List<byte[]> images = diaryImageS3Service.downloadImages(diaryId);
+        return diaryImageS3Service.mergeImagesTo2x2(images);
+    }
+
     private List<URL> generatePreSignedUrls(Long diaryId) {
         return IntStream.rangeClosed(MIN_PAINTING_IMAGE_POSITION, MAX_PAINTING_IMAGE_POSITION)
                 .mapToObj(imageGridPosition -> {
@@ -143,4 +150,5 @@ public class DiaryService {
     public void deleteDiaryByMemberId(UUID memberId) {
         diaryRepository.deleteByMemberId(memberId);
     }
+
 }
