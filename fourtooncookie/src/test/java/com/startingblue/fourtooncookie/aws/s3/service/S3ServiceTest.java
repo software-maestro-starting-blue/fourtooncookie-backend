@@ -34,11 +34,21 @@ public class S3ServiceTest {
     @InjectMocks
     private S3Service s3Service;
 
+    PresignedGetObjectRequest presignedGetObjectRequest;
+
     private final String bucketName = "test-bucket";
     private final int preSignedUrlDurationInMinutes = 60;
 
+    static long diaryId = 1;
+    static int gridPosition = 1;
+    static String path = diaryId + "/" + gridPosition;
+    static String keyName = path + ".png";
+
     @BeforeEach
     void setUp() {
+        HeadObjectResponse headObjectResponse = mock(HeadObjectResponse.class);
+        when(s3Client.headObject(any(HeadObjectRequest.class))).thenReturn(headObjectResponse);
+        presignedGetObjectRequest = mock(PresignedGetObjectRequest.class);
         ReflectionTestUtils.setField(s3Service, "bucketName", bucketName);
         ReflectionTestUtils.setField(s3Service, "preSignedUrlDurationInMinutes", preSignedUrlDurationInMinutes);
     }
@@ -47,12 +57,6 @@ public class S3ServiceTest {
     @DisplayName("프리사인 URL 생성 성공 테스트")
     void testGeneratePresignedUrlSuccess() throws Exception {
         // given
-        String path = "1/1";
-
-        HeadObjectResponse headObjectResponse = mock(HeadObjectResponse.class);
-        when(s3Client.headObject(any(HeadObjectRequest.class))).thenReturn(headObjectResponse);
-
-        PresignedGetObjectRequest presignedGetObjectRequest = mock(PresignedGetObjectRequest.class);
         URL expectedUrl = URI.create("http://example.com").toURL();
         when(presignedGetObjectRequest.url()).thenReturn(expectedUrl);
         when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class))).thenReturn(presignedGetObjectRequest);
@@ -70,14 +74,6 @@ public class S3ServiceTest {
     @DisplayName("프리사인 URL 생성 중 오류 발생 시 S3PreSignUrlException 발생 테스트")
     void testGeneratePresignedUrlPreSignError() {
         // given
-        long diaryId = 1;
-        int gridPosition = 1;
-        String path = diaryId + "/" + gridPosition;
-        String keyName = path + ".png";
-
-        HeadObjectResponse headObjectResponse = mock(HeadObjectResponse.class);
-        when(s3Client.headObject(any(HeadObjectRequest.class))).thenReturn(headObjectResponse);
-
         when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class)))
                 .thenThrow(new RuntimeException("Presign error"));
 
