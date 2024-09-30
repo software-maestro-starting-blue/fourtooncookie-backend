@@ -7,6 +7,7 @@ import com.startingblue.fourtooncookie.diary.dto.response.DiaryCreatedResponse;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponses;
 import com.startingblue.fourtooncookie.diary.service.DiaryService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.springframework.http.ResponseEntity.*;
@@ -86,6 +88,24 @@ public class DiaryController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(diaryService.readDiaryFullImage(diaryId));
+    }
+
+
+    @GetMapping("/test")
+    public ResponseEntity<DiarySavedResponses> readDiariesByMember(
+            @RequestParam UUID memberId,
+            HttpServletResponse response,
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "10") int pageSize) {
+
+        DiarySavedResponses responses = DiarySavedResponses.of(diaryService.readDiariesByMemberId(memberId, pageNumber, pageSize));
+
+        Map<String, String> signedCookies = diaryService.generateSignedCookiesByMemberId(memberId);
+
+        signedCookies.forEach((cookieName, cookieValue) -> {
+            response.addHeader("Set-Cookie", String.format("%s=%s; Path=/; HttpOnly; Max-Age=3600", cookieName, cookieValue));
+        });
+        return ok(responses);
     }
 
 }
