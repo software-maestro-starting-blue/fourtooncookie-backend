@@ -31,17 +31,10 @@ public class S3ExceptionControllerAdvice {
         return "PreSign URL Error";
     }
 
-    @ExceptionHandler(S3ImageNotFoundException.class)
+    @ExceptionHandler(S3PathNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleS3ImageNotFoundException(S3ImageNotFoundException e) {
+    public String handleS3ImageNotFoundException(S3PathNotFoundException e) {
         log.error("S3 Image Not Found: {}", e.getMessage(), e);
         return "Image Not Found";
-    }
-
-    @ExceptionHandler(S3ImageExistenceCheckException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public String handleS3ImageExistenceCheckException(S3ImageExistenceCheckException e) {
-        log.error("S3 Image Existence Check Error: {}", e.getMessage(), e);
-        return "Image Existence Check Error";
     }
 }
