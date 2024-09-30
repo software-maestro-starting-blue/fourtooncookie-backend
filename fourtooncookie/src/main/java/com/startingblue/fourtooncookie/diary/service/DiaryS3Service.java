@@ -15,12 +15,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DiaryS3Service {
 
+    private static final String IMAGE_PNG_FORMAT = "png";
+
     private final S3Service s3Service;
     private final ImageConverter imageConverter;
 
     public URL generatePresignedUrl(Long diaryId, int gridPosition) {
-        String path = diaryId + "/" + gridPosition;
-        return s3Service.generatePresignedUrl(path);
+        return s3Service.generatePresignedUrl(getKeyName(diaryId, gridPosition, IMAGE_PNG_FORMAT));
     }
 
     public byte[] getFullImageByDiaryId(Long diaryId) throws IOException {
@@ -35,8 +36,11 @@ public class DiaryS3Service {
     }
 
     private byte[] getImageByDiaryIdAndGridPosition(Long diaryId, int gridPosition) {
-        String keyName = diaryId + "/" + gridPosition;
-        return s3Service.getImageFromS3(keyName);
+        return s3Service.getImageFromS3(getKeyName(diaryId, gridPosition, IMAGE_PNG_FORMAT));
+    }
+
+    private String getKeyName(Long diaryId,  int gridPosition, String imageFormat) {
+        return String.format("%s/%s.%s", diaryId, gridPosition, imageFormat);
     }
 
 }

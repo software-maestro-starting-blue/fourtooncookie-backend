@@ -30,17 +30,9 @@ public class S3Service {
     @Value("${aws.diaryimage.presignedurl.duration}")
     private Integer preSignedUrlDurationInMinutes;
 
-    private static final String IMAGE_FORMAT = ".png";
-
-    public URL generatePresignedUrl(String path) {
-        String keyName = getKeyName(path);
+    public URL generatePresignedUrl(String keyName) {
         verifyPathExists(keyName);
-
         return createPresignedUrl(keyName);
-    }
-
-    private String getKeyName(String path) {
-        return String.format("%s%s", path, IMAGE_FORMAT);
     }
 
     private void verifyPathExists(String keyName) {
