@@ -101,6 +101,20 @@ public class DiaryService {
         return diaryImageS3Service.mergeImagesTo2x2(images);
     }
 
+    private List<URL> generatePreSignedUrls(Long diaryId) {
+        return IntStream.rangeClosed(MIN_PAINTING_IMAGE_POSITION, MAX_PAINTING_IMAGE_POSITION)
+                .mapToObj(imageGridPosition -> {
+                    try {
+                        return diaryImageS3Service.generatePreSignedImageUrl(diaryId, imageGridPosition);
+                    } catch (Exception e) {
+                        log.error("Failed to generate pre-signed image URL for diaryId: {}", diaryId, e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
     public void updateDiaryFavorite(Long diaryId, boolean isFavorite) {
         Diary foundDiary = readById(diaryId);
         foundDiary.updateFavorite(isFavorite);
