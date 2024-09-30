@@ -1,25 +1,17 @@
 package com.startingblue.fourtooncookie.aws.lambda.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.lambda.LambdaClient;
 import software.amazon.awssdk.services.lambda.model.InvocationType;
 import software.amazon.awssdk.services.lambda.model.InvokeRequest;
 
+@Service
 @Slf4j
-public abstract class LambdaService {
+public class LambdaService {
 
-    private final LambdaClient lambdaClient;
-    private final String functionName;
-    private final InvocationType invocationType;
-
-    public LambdaService(LambdaClient lambdaClient, String functionName, InvocationType invocationType) {
-        this.lambdaClient = lambdaClient;
-        this.functionName = functionName;
-        this.invocationType = invocationType;
-    }
-
-    public void invokeLambda(Object payload) {
+    public void invokeLambda(LambdaClient lambdaClient, String functionName, InvocationType invocationType, Object payload) {
         try {
             log.info("Invoking Lambda function: {} with payload: {}", functionName);
 
