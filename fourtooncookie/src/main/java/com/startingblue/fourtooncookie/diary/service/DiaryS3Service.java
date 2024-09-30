@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,12 +20,23 @@ public class DiaryS3Service {
 
     public URL generatePresignedUrl(Long diaryId, int gridPosition) {
         String path = diaryId + "/" + gridPosition;
-        System.out.println(1);
         return s3Service.generatePresignedUrl(path);
     }
 
-    public byte[] getFullImageByDiaryId (Long diaryId) throws IOException {
-        return imageConverter.mergeImagesIntoGrid(s3Service.getFullImageByDiaryId(diaryId));
+    public byte[] getFullImageByDiaryId(Long diaryId) throws IOException {
+        List<byte[]> downloadedImages = new ArrayList<>();
+
+        for (int gridPosition = 0; gridPosition < 4; gridPosition++) {
+            byte[] imageData = getImageByDiaryIdAndGridPosition(diaryId, gridPosition);
+            downloadedImages.add(imageData);
+        }
+
+        return imageConverter.mergeImagesIntoGrid(downloadedImages);
+    }
+
+    private byte[] getImageByDiaryIdAndGridPosition(Long diaryId, int gridPosition) {
+        String keyName = diaryId + "/" + gridPosition;
+        return s3Service.getImageFromS3(keyName);
     }
 
 }

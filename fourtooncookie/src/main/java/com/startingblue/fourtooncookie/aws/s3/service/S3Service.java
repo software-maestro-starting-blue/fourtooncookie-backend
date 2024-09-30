@@ -92,23 +92,7 @@ public class S3Service {
                 .build();
     }
 
-    public List<byte[]> getFullImageByDiaryId(Long diaryId) {
-        List<byte[]> downloadedImages = new ArrayList<>();
-
-        for (int gridPosition = 0; gridPosition < 4; gridPosition++) {
-            byte[] imageData = getImageByDiaryIdAndGridPosition(diaryId, gridPosition);
-            downloadedImages.add(imageData);
-        }
-
-        return downloadedImages;
-    }
-
-    private byte[] getImageByDiaryIdAndGridPosition(Long diaryId, int gridPosition) {
-        String keyName = getKeyName(diaryId + "/" + gridPosition);
-        return downloadImageFromS3(keyName);
-    }
-
-    private byte[] downloadImageFromS3(String keyName) {
+    public byte[] getImageFromS3(String keyName) {
         try {
             return s3Client.getObjectAsBytes(GetObjectRequest.builder()
                     .bucket(bucketName)

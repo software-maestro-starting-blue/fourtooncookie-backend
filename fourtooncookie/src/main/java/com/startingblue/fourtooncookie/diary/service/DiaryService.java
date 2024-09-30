@@ -1,7 +1,6 @@
 package com.startingblue.fourtooncookie.diary.service;
 
 import com.startingblue.fourtooncookie.aws.lambda.diaryimagegenerationpayload.DiaryImageGenerationLambdaInvoker;
-import com.startingblue.fourtooncookie.aws.s3.service.DiaryImageS3Service;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.service.CharacterService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
@@ -27,7 +26,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +39,7 @@ public class DiaryService {
     private final DiaryRepository diaryRepository;
     private final MemberService memberService;
     private final CharacterService characterService;
-    private final DiaryImageS3Service diaryImageS3Service;
+    private final DiaryS3Service diaryS3Service;
     private final DiaryImageGenerationLambdaInvoker diaryImageGenerationLambdaInvoker;
 
     public Long createDiary(final DiarySaveRequest request, final UUID memberId) {
@@ -93,15 +91,14 @@ public class DiaryService {
 
     @Transactional(readOnly = true)
     public byte[] readDiaryFullImage(final Long diaryId) throws IOException {
-        List<byte[]> images = diaryImageS3Service.downloadImages(diaryId);
-        return diaryImageS3Service.mergeImagesTo2x2(images);
+        return diaryS3Service.getFullImageByDiaryId(diaryId);
     }
 
     private List<URL> generatePreSignedUrls(Long diaryId) {
         return IntStream.rangeClosed(MIN_PAINTING_IMAGE_POSITION, MAX_PAINTING_IMAGE_POSITION)
                 .mapToObj(imageGridPosition -> {
                     try {
-                        return diaryImageS3Service.generatePreSignedImageUrl(diaryId, imageGridPosition);
+                        return diaryS3Service.generatePresignedUrl(diaryId, imageGridPosition);
                     } catch (Exception e) {
                         log.error("Failed to generate pre-signed image URL for diaryId: {}", diaryId, e);
                         return null;
