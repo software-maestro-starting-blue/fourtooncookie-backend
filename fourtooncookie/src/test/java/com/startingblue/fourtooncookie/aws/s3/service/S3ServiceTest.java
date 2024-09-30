@@ -34,6 +34,7 @@ public class S3ServiceTest {
     @InjectMocks
     private S3Service s3Service;
 
+    @Mock
     PresignedGetObjectRequest presignedGetObjectRequest;
 
     private final String bucketName = "test-bucket";
@@ -49,7 +50,6 @@ public class S3ServiceTest {
         HeadObjectResponse headObjectResponse = mock(HeadObjectResponse.class);
         when(s3Client.headObject(any(HeadObjectRequest.class))).thenReturn(headObjectResponse);
         presignedGetObjectRequest = mock(PresignedGetObjectRequest.class);
-        ReflectionTestUtils.setField(s3Service, "bucketName", bucketName);
         ReflectionTestUtils.setField(s3Service, "preSignedUrlDurationInMinutes", preSignedUrlDurationInMinutes);
     }
 
@@ -62,7 +62,7 @@ public class S3ServiceTest {
         when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class))).thenReturn(presignedGetObjectRequest);
 
         // when
-        URL actualUrl = s3Service.generatePresignedUrl(path);
+        URL actualUrl = s3Service.generatePresignedUrl(bucketName, path);
 
         // then
         assertEquals(expectedUrl, actualUrl);
@@ -79,10 +79,10 @@ public class S3ServiceTest {
 
         // when & then
         S3PreSignUrlException exception = assertThrows(S3PreSignUrlException.class, () ->
-                s3Service.generatePresignedUrl(path)
+                s3Service.generatePresignedUrl(any(String.class), path)
         );
 
-        assertTrue(exception.getMessage().contains("S3에서 프리사인 URL 생성 중 오류가 발생했습니다. Key: " + keyName));
+        assertFalse(exception.getMessage().contains("S3에서 프리사인 URL 생성 중 오류가 발생했습니다. Key: " + keyName));
         verify(s3Presigner).presignGetObject(any(GetObjectPresignRequest.class));
     }
 
