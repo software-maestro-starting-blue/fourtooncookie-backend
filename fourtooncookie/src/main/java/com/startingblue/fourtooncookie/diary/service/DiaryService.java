@@ -140,6 +140,5 @@ public class DiaryService {
     public void deleteDiaryByMemberId(UUID memberId) {
         diaryRepository.deleteByMemberId(memberId);
     }
-
-
+    
 }
