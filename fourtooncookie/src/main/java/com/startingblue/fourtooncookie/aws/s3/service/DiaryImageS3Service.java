@@ -69,7 +69,7 @@ public class DiaryImageS3Service {
                 .build();
     }
 
-    public boolean isImageExist(Long diaryId, Integer gridPosition) {
+    private boolean isImageExist(Long diaryId, Integer gridPosition) {
         String keyName = getKeyName(diaryId, gridPosition);
         try {
             HeadObjectRequest headObjectRequest = createHeadObjectRequest(keyName);
