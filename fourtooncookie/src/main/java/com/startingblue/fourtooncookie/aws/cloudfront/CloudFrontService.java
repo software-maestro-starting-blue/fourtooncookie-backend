@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.aws.cloudfront;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class CloudFrontService {
 
     @Value("${aws.cloudfront.domain.name}")
