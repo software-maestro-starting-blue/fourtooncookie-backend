@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.diary.service;
 
-import com.startingblue.fourtooncookie.aws.lambda.diaryimagegenerationpayload.DiaryImageGenerationLambdaInvoker;
+import com.startingblue.fourtooncookie.aws.lambda.diaryimagegenerationpayload.DiaryImageGenerationLambdaService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.service.CharacterService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
@@ -40,7 +40,7 @@ public class DiaryService {
     private final MemberService memberService;
     private final CharacterService characterService;
     private final DiaryS3Service diaryS3Service;
-    private final DiaryImageGenerationLambdaInvoker diaryImageGenerationLambdaInvoker;
+    private final DiaryImageGenerationLambdaService diaryImageGenerationLambdaInvoker;
 
     public Long createDiary(final DiarySaveRequest request, final UUID memberId) {
         Member member = memberService.readById(memberId);

@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.aws.lambda;
+package com.startingblue.fourtooncookie.aws.lambda.service;
 
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.SdkBytes;
@@ -7,13 +7,13 @@ import software.amazon.awssdk.services.lambda.model.InvocationType;
 import software.amazon.awssdk.services.lambda.model.InvokeRequest;
 
 @Slf4j
-public abstract class LambdaInvoker {
+public abstract class LambdaService {
 
     private final LambdaClient lambdaClient;
     private final String functionName;
     private final InvocationType invocationType;
 
-    public LambdaInvoker(LambdaClient lambdaClient, String functionName, InvocationType invocationType) {
+    public LambdaService(LambdaClient lambdaClient, String functionName, InvocationType invocationType) {
         this.lambdaClient = lambdaClient;
         this.functionName = functionName;
         this.invocationType = invocationType;

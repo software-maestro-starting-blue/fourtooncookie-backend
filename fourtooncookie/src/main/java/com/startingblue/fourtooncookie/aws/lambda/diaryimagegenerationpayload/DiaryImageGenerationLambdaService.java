@@ -2,7 +2,7 @@ package com.startingblue.fourtooncookie.aws.lambda.diaryimagegenerationpayload;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.startingblue.fourtooncookie.aws.lambda.LambdaInvoker;
+import com.startingblue.fourtooncookie.aws.lambda.service.LambdaService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
@@ -16,7 +16,7 @@ import software.amazon.awssdk.services.lambda.model.InvocationType;
 
 @Service
 @Slf4j
-public class DiaryImageGenerationLambdaInvoker extends LambdaInvoker {
+public class DiaryImageGenerationLambdaService extends LambdaService {
 
     private static final String FUNCTION_NAME = "fourtooncookie-diaryimage-ai-apply-lambda";
 
@@ -24,7 +24,7 @@ public class DiaryImageGenerationLambdaInvoker extends LambdaInvoker {
 
     private final DiaryRepository diaryRepository;
 
-    public DiaryImageGenerationLambdaInvoker(LambdaClient lambdaClient, ObjectMapper objectMapper, DiaryRepository diaryRepository) {
+    public DiaryImageGenerationLambdaService(LambdaClient lambdaClient, ObjectMapper objectMapper, DiaryRepository diaryRepository) {
         super(lambdaClient, FUNCTION_NAME, InvocationType.REQUEST_RESPONSE);
         this.objectMapper = objectMapper;
         this.diaryRepository = diaryRepository;
