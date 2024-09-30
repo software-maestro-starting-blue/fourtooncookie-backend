@@ -50,46 +50,6 @@ public class DiaryImageS3ServiceTest {
     }
 
     @Test
-    @DisplayName("이미지 업로드 성공")
-    void testUploadImage() throws Exception {
-        Long diaryId = 1L;
-        byte[] image = "test-image".getBytes();
-        Integer gridPosition = 1;
-        String keyName = diaryId + "/" + gridPosition + ".png";
-
-        diaryImageS3Service.uploadImage(diaryId, image, gridPosition);
-
-        ArgumentCaptor<PutObjectRequest> putObjectRequestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
-        ArgumentCaptor<RequestBody> requestBodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
-
-        verify(s3Client).putObject(putObjectRequestCaptor.capture(), requestBodyCaptor.capture());
-
-        PutObjectRequest capturedRequest = putObjectRequestCaptor.getValue();
-        RequestBody capturedBody = requestBodyCaptor.getValue();
-
-        assertEquals(bucketName, capturedRequest.bucket());
-        assertEquals("image/png", capturedRequest.contentType());
-        assertEquals(keyName, capturedRequest.key());
-        assertArrayEquals(image, capturedBody.contentStreamProvider().newStream().readAllBytes());
-    }
-
-    @Test
-    @DisplayName("이미지 업로드 중 오류 발생 테스트")
-    void testUploadImageException() {
-        Long diaryId = 1L;
-        byte[] image = "test-image".getBytes();
-        Integer gridPosition = 1;
-        String keyName = diaryId + "/" + gridPosition + ".png";
-
-        doThrow(new RuntimeException("S3 error")).when(s3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
-
-        S3UploadException exception = assertThrows(S3UploadException.class, () ->
-                diaryImageS3Service.uploadImage(diaryId, image, gridPosition));
-
-        assertEquals("S3에 이미지 업로드 중 오류가 발생했습니다. Key: " + keyName, exception.getMessage());
-    }
-
-    @Test
     @DisplayName("이미지가 존재할 때 프리사인 URL 생성")
     void testGeneratePreSignedImageUrl() throws MalformedURLException {
         Long diaryId = 1L;

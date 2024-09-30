@@ -42,26 +42,8 @@ public class DiaryImageS3Service {
     private static final String IMAGE_FORMAT = ".png";
     private static final String CONTENT_TYPE = "image/png";
 
-    public void uploadImage(Long diaryId, byte[] image, Integer gridPosition) {
-        String keyName = getKeyName(diaryId, gridPosition);
-        try {
-            PutObjectRequest putObjectRequest = createPutObjectRequest(keyName);
-            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(image));
-        } catch (Exception e) {
-            throw new S3UploadException(String.format("S3에 이미지 업로드 중 오류가 발생했습니다. Key: %s", keyName), e);
-        }
-    }
-
     private String getKeyName(Long diaryId, Integer gridPosition) {
         return String.format("%d/%d%s", diaryId, gridPosition, IMAGE_FORMAT);
-    }
-
-    private PutObjectRequest createPutObjectRequest(String keyName) {
-        return PutObjectRequest.builder()
-                .bucket(bucketName)
-                .contentType(CONTENT_TYPE)
-                .key(keyName)
-                .build();
     }
 
     public URL generatePreSignedImageUrl(Long diaryId, Integer gridPosition) {
