@@ -96,7 +96,7 @@ public class DiaryService {
     }
 
     @Transactional(readOnly = true)
-    public byte[] readDiaryImage(final Long diaryId) throws IOException {
+    public byte[] readDiaryFullImage(final Long diaryId) throws IOException {
         List<byte[]> images = diaryImageS3Service.downloadImages(diaryId);
         return diaryImageS3Service.mergeImagesTo2x2(images);
     }

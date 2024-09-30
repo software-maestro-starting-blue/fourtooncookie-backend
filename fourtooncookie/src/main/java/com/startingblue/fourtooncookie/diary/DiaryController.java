@@ -85,7 +85,7 @@ public class DiaryController {
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(diaryService.readDiaryImage(diaryId));
+                .body(diaryService.readDiaryFullImage(diaryId));
     }
 
 }
