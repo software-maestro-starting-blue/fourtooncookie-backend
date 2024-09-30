@@ -80,14 +80,12 @@ public class DiaryController {
 
     @GetMapping("/{diaryId}/image/full")
     public ResponseEntity<byte[]> readDiaryByIdDownload(@PathVariable final Long diaryId) throws IOException {
-        byte[] imageData = diaryService.readDiaryImage(diaryId);
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(imageData);
+                .body(diaryService.readDiaryImage(diaryId));
     }
 
 }
