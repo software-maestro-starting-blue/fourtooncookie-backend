@@ -78,7 +78,7 @@ public class DiaryController {
         return noContent().build();
     }
 
-    @GetMapping("/{diaryId}/download")
+    @GetMapping("/{diaryId}/image/full")
     public ResponseEntity<byte[]> readDiaryByIdDownload(@PathVariable final Long diaryId) throws IOException {
         byte[] imageData = diaryService.readDiaryImage(diaryId);
 
