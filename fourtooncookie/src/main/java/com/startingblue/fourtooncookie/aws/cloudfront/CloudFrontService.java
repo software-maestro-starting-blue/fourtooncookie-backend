@@ -79,19 +79,17 @@ public class CloudFrontService {
         }
     }
 
-    // 간단한 정책을 생성 (Canned Policy)
     private String createCannedPolicy(String resourceUrl, Instant expirationTime) {
         return String.format("{\"Statement\": [{\"Resource\":\"%s\",\"Condition\": {\"DateLessThan\":{\"AWS:EpochTime\": %d}}}]}",
                 resourceUrl, expirationTime.getEpochSecond());
     }
 
     // RSA 개인 키로 정책에 서명
-    private String signPolicy(String policy, PrivateKey privateKey) throws Exception {
+    private byte[] signPolicy(String policy, PrivateKey privateKey) throws Exception {
         Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
         signature.initSign(privateKey);
         signature.update(policy.getBytes(StandardCharsets.UTF_8));
-        byte[] signatureBytes = signature.sign();
-        return new String(signatureBytes);
+        return signature.sign();
     }
 
     // PEM 형식의 개인 키를 로드
@@ -118,9 +116,9 @@ public class CloudFrontService {
             log.info("policy: {}", policy);
             PrivateKey privateKey = loadPrivateKey(privateKeyPath);
             log.info("privateKey: {}", privateKey);
-            String signature = signPolicy(policy, privateKey);
+            byte[] signature = signPolicy(policy, privateKey);
             log.info("signature: {}", signature);
-            String encodedSignature = Base64.getUrlEncoder().withoutPadding().encodeToString(signature.getBytes(StandardCharsets.UTF_8));
+            String encodedSignature = Base64.getUrlEncoder().withoutPadding().encodeToString(signature);
             log.info("encodedSignature: {}", encodedSignature);
             String signedUrl = String.format("%s?Expires=%d&Signature=%s&Key-Pair-Id=%s",
                     resourcePath, expirationTime.getEpochSecond(), encodedSignature, keyPairId);
