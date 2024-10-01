@@ -47,35 +47,26 @@ public class CloudFrontService {
     private static final String END_PRIVATE_KEY = "-----END PRIVATE KEY-----";
     private static final String KEY_FACTORY_ALGORITHM = "RSA";
 
-    public Map<String, String> generateCloudFrontSignedCookies(String path) {
+    public URL generateSignedUrl(String path) {
         try {
-            // URL을 만들고자 하는 리소스의 경로
-            String resourcePath = String.format("https://%s/%s", cloudFrontDomainName, path);
-
-            // 만료 시간 계산
+            String resourcePath = String.format("https://%s/%s/%s", cloudFrontDomainName, bucketName, path);
+            log.info("resourcePath: {}", resourcePath);
             Instant expirationTime = Instant.now().plus(SIGNED_EXPIRATION, ChronoUnit.SECONDS);
-
-            // 정책 생성 (리소스와 만료 시간에 대한 정책)
+            log.info("expirationTime: {}", expirationTime);
             String policy = createCannedPolicy(resourcePath, expirationTime);
-
-            // RSA 개인 키를 사용하여 정책 서명
+            log.info("policy: {}", policy);
             PrivateKey privateKey = loadPrivateKey(privateKeyPath);
-            String signature = signPolicy(policy, privateKey);
-
-            // Base64 인코딩
-            String encodedPolicy = Base64.getUrlEncoder().withoutPadding().encodeToString(policy.getBytes(StandardCharsets.UTF_8));
-            String encodedSignature = Base64.getUrlEncoder().withoutPadding().encodeToString(signature.getBytes(StandardCharsets.UTF_8));
-
-            // 서명된 쿠키 생성
-            Map<String, String> cookies = new HashMap<>();
-            cookies.put(CLOUD_FRONT_POLICY, encodedPolicy);
-            cookies.put(CLOUD_FRONT_SIGNATURE, encodedSignature);
-            cookies.put(CLOUD_FRONT_KEY_PAIR_ID, keyPairId);
-
-            return cookies;
-
+            log.info("privateKey: {}", privateKey);
+            byte[] signature = signPolicy(policy, privateKey);
+            log.info("signature: {}", signature);
+            String encodedSignature = Base64.getUrlEncoder().withoutPadding().encodeToString(signature);
+            log.info("encodedSignature: {}", encodedSignature);
+            String signedUrl = String.format("%s?Expires=%d&Signature=%s&Key-Pair-Id=%s",
+                    resourcePath, expirationTime.getEpochSecond(), encodedSignature, keyPairId);
+            log.info("signedUrl: {}", signedUrl);
+            return new URL(signedUrl);
         } catch (Exception e) {
-            throw new RuntimeException("CloudFront 서명된 쿠키 생성 중 오류 발생", e);
+            throw new RuntimeException("Signed URL 생성 중 오류 발생", e);
         }
     }
 
@@ -104,29 +95,6 @@ public class CloudFrontService {
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encodedKey);
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_FACTORY_ALGORITHM);
         return keyFactory.generatePrivate(keySpec);
-    }
-
-    public URL generateSignedUrl(String path) {
-        try {
-            String resourcePath = String.format("https://%s/%s/%s", cloudFrontDomainName, bucketName, path);
-            log.info("resourcePath: {}", resourcePath);
-            Instant expirationTime = Instant.now().plus(SIGNED_EXPIRATION, ChronoUnit.SECONDS);
-            log.info("expirationTime: {}", expirationTime);
-            String policy = createCannedPolicy(resourcePath, expirationTime);
-            log.info("policy: {}", policy);
-            PrivateKey privateKey = loadPrivateKey(privateKeyPath);
-            log.info("privateKey: {}", privateKey);
-            byte[] signature = signPolicy(policy, privateKey);
-            log.info("signature: {}", signature);
-            String encodedSignature = Base64.getUrlEncoder().withoutPadding().encodeToString(signature);
-            log.info("encodedSignature: {}", encodedSignature);
-            String signedUrl = String.format("%s?Expires=%d&Signature=%s&Key-Pair-Id=%s",
-                    resourcePath, expirationTime.getEpochSecond(), encodedSignature, keyPairId);
-            log.info("signedUrl: {}", signedUrl);
-            return new URL(signedUrl);
-        } catch (Exception e) {
-            throw new RuntimeException("Signed URL 생성 중 오류 발생", e);
-        }
     }
 
 }

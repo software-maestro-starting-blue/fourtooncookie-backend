@@ -90,22 +90,4 @@ public class DiaryController {
                 .body(diaryService.readDiaryFullImage(diaryId));
     }
 
-
-    @GetMapping("/test")
-    public ResponseEntity<DiarySavedResponses> readDiariesByMember(
-            @RequestParam UUID memberId,
-            HttpServletResponse response,
-            @RequestParam(defaultValue = "0") int pageNumber,
-            @RequestParam(defaultValue = "10") int pageSize) {
-
-        DiarySavedResponses responses = DiarySavedResponses.of(diaryService.readDiariesByMemberId(memberId, pageNumber, pageSize));
-
-        Map<String, String> signedCookies = diaryService.generateSignedCookiesByMemberId(memberId);
-
-        signedCookies.forEach((cookieName, cookieValue) -> {
-            response.addHeader("Set-Cookie", String.format("%s=%s; Path=/; HttpOnly; Max-Age=3600", cookieName, cookieValue));
-        });
-        return ok(responses);
-    }
-
 }
