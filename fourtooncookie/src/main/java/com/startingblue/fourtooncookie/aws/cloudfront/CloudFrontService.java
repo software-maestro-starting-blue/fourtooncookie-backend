@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -28,7 +29,7 @@ public class CloudFrontService {
     @Value("${aws.cloudfront.privateKeyPath}")
     private String privateKeyPath;
 
-    private static final int SIGNED_COOKIE_EXPIRATION = 3600; // 1 시간
+    private static final int SIGNED_EXPIRATION = 3600; // 1 시간
     private static final String CLOUD_FRONT_POLICY = "CloudFront-Policy";
     private static final String CLOUD_FRONT_SIGNATURE = "CloudFront-Signature";
     private static final String CLOUD_FRONT_KEY_PAIR_ID = "CloudFront-Key-Pair-Id";
@@ -43,7 +44,7 @@ public class CloudFrontService {
             String resourcePath = String.format("https://%s/%s", cloudFrontDomainName, path);
 
             // 만료 시간 계산
-            Instant expirationTime = Instant.now().plus(SIGNED_COOKIE_EXPIRATION, ChronoUnit.SECONDS);
+            Instant expirationTime = Instant.now().plus(SIGNED_EXPIRATION, ChronoUnit.SECONDS);
 
             // 정책 생성 (리소스와 만료 시간에 대한 정책)
             String policy = createCannedPolicy(resourcePath, expirationTime);
@@ -97,4 +98,22 @@ public class CloudFrontService {
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_FACTORY_ALGORITHM);
         return keyFactory.generatePrivate(keySpec);
     }
+
+    public URL generateSignedUrl(String path) {
+        try {
+            String resourcePath = String.format("https://%s/%s", cloudFrontDomainName, path);
+            Instant expirationTime = Instant.now().plus(SIGNED_EXPIRATION, ChronoUnit.SECONDS);
+            String policy = createCannedPolicy(resourcePath, expirationTime);
+            PrivateKey privateKey = loadPrivateKey(privateKeyPath);
+            String signature = signPolicy(policy, privateKey);
+            String encodedSignature = Base64.getUrlEncoder().withoutPadding().encodeToString(signature.getBytes(StandardCharsets.UTF_8));
+            String signedUrl = String.format("%s?Expires=%d&Signature=%s&Key-Pair-Id=%s",
+                    resourcePath, expirationTime.getEpochSecond(), encodedSignature, keyPairId);
+
+            return new URL(signedUrl);
+        } catch (Exception e) {
+            throw new RuntimeException("Signed URL 생성 중 오류 발생", e);
+        }
+    }
+
 }

@@ -83,7 +83,7 @@ public class DiaryService {
         );
 
         return diaries.getContent().stream().map(savedDiary -> {
-            List<URL> preSignedUrls = generatePreSignedUrls(savedDiary.getId());
+            List<URL> preSignedUrls = generateSignedUrls(savedDiary.getId());
             savedDiary.updatePaintingImageUrls(preSignedUrls);
             return savedDiary;
         }).collect(Collectors.toList());
@@ -101,6 +101,20 @@ public class DiaryService {
                         return diaryS3Service.generatePresignedUrl(diaryId, imageGridPosition);
                     } catch (Exception e) {
                         log.error("Failed to generate pre-signed image URL for diaryId: {}", diaryId, e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    private List<URL> generateSignedUrls(Long diaryId) {
+        return IntStream.rangeClosed(MIN_PAINTING_IMAGE_POSITION, MAX_PAINTING_IMAGE_POSITION)
+                .mapToObj(imageGridPosition -> {
+                    try {
+                        return diaryCloudFrontService.generateSignedUrl(diaryId, imageGridPosition);
+                    } catch (Exception e) {
+                        log.error("Failed to generate signed image URL for diaryId: {}", diaryId, e);
                         return null;
                     }
                 })
