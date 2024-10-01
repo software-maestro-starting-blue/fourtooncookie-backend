@@ -34,14 +34,7 @@ public class CloudFrontService {
     @Value("${aws.cloudfront.privateKeyPath}")
     private String privateKeyPath;
 
-    @Value("${aws.diaryimage.bucket.name}")
-    private String bucketName;
-
-
     private static final int SIGNED_EXPIRATION = 3600; // 1 시간
-    private static final String CLOUD_FRONT_POLICY = "CloudFront-Policy";
-    private static final String CLOUD_FRONT_SIGNATURE = "CloudFront-Signature";
-    private static final String CLOUD_FRONT_KEY_PAIR_ID = "CloudFront-Key-Pair-Id";
     private static final String SIGNATURE_ALGORITHM = "SHA1withRSA";
     private static final String BEGIN_PRIVATE_KEY = "-----BEGIN PRIVATE KEY-----";
     private static final String END_PRIVATE_KEY = "-----END PRIVATE KEY-----";
@@ -49,18 +42,15 @@ public class CloudFrontService {
 
     public URL generateSignedUrl(String path) {
         try {
-            String resourcePath = String.format("https://%s/%s/%s", cloudFrontDomainName, bucketName, path);
+            String resourcePath = String.format("https://%s/%s", cloudFrontDomainName, path);
             log.info("resourcePath: {}", resourcePath);
             Instant expirationTime = Instant.now().plus(SIGNED_EXPIRATION, ChronoUnit.SECONDS);
             log.info("expirationTime: {}", expirationTime);
             String policy = createCannedPolicy(resourcePath, expirationTime);
             log.info("policy: {}", policy);
             PrivateKey privateKey = loadPrivateKey(privateKeyPath);
-            log.info("privateKey: {}", privateKey);
             byte[] signature = signPolicy(policy, privateKey);
-            log.info("signature: {}", signature);
             String encodedSignature = Base64.getUrlEncoder().withoutPadding().encodeToString(signature);
-            log.info("encodedSignature: {}", encodedSignature);
             String signedUrl = String.format("%s?Expires=%d&Signature=%s&Key-Pair-Id=%s",
                     resourcePath, expirationTime.getEpochSecond(), encodedSignature, keyPairId);
             log.info("signedUrl: {}", signedUrl);
@@ -71,8 +61,11 @@ public class CloudFrontService {
     }
 
     private String createCannedPolicy(String resourceUrl, Instant expirationTime) {
-        return String.format("{\"Statement\": [{\"Resource\":\"%s\",\"Condition\": {\"DateLessThan\":{\"AWS:EpochTime\": %d}}}]}",
+        String policy = String.format("{\"Statement\": [{\"Resource\":\"%s\",\"Condition\": {\"DateLessThan\":{\"AWS:EpochTime\": %d}}}]}",
                 resourceUrl, expirationTime.getEpochSecond());
+        String policyWithoutSpaces = policy.replaceAll("\\s+", "");
+        String base64EncodedPolicy = Base64.getEncoder().encodeToString(policyWithoutSpaces.getBytes(StandardCharsets.UTF_8));
+        return base64EncodedPolicy;
     }
 
     // RSA 개인 키로 정책에 서명
