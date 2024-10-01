@@ -83,8 +83,8 @@ public class DiaryService {
         );
 
         return diaries.getContent().stream().map(savedDiary -> {
-            List<URL> preSignedUrls = generateSignedUrls(savedDiary.getId());
-            savedDiary.updatePaintingImageUrls(preSignedUrls);
+            List<URL> signedUrls = generateSignedUrls(savedDiary.getId());
+            savedDiary.updatePaintingImageUrls(signedUrls);
             return savedDiary;
         }).collect(Collectors.toList());
     }
@@ -161,9 +161,4 @@ public class DiaryService {
     public void deleteDiaryByMemberId(UUID memberId) {
         diaryRepository.deleteByMemberId(memberId);
     }
-
-    public Map<String, String> generateSignedCookiesByMemberId(UUID memberId) {
-        return diaryCloudFrontService.generateSignedCookies(memberId);
-    }
-
 }
