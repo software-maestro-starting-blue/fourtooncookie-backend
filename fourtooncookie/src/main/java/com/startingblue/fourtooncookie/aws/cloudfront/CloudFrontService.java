@@ -1,11 +1,15 @@
 package com.startingblue.fourtooncookie.aws.cloudfront;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.Signature;
@@ -20,6 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CloudFrontService {
 
+    private static final Logger log = LoggerFactory.getLogger(CloudFrontService.class);
     @Value("${aws.cloudfront.domain.name}")
     private String cloudFrontDomainName;
 
@@ -88,7 +93,7 @@ public class CloudFrontService {
     // PEM 형식의 개인 키를 로드
     private PrivateKey loadPrivateKey(String privateKeyPath) throws Exception {
         // 개인 키 파일 로드 및 파싱
-        String privateKeyPEM = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(privateKeyPath)))
+        String privateKeyPEM = new String(Files.readAllBytes(Paths.get(privateKeyPath)))
                 .replace(BEGIN_PRIVATE_KEY, "")
                 .replace(END_PRIVATE_KEY, "")
                 .replaceAll("\\s", "");
@@ -102,14 +107,20 @@ public class CloudFrontService {
     public URL generateSignedUrl(String path) {
         try {
             String resourcePath = String.format("https://%s/%s", cloudFrontDomainName, path);
+            log.info("resourcePath: {}", resourcePath);
             Instant expirationTime = Instant.now().plus(SIGNED_EXPIRATION, ChronoUnit.SECONDS);
+            log.info("expirationTime: {}", expirationTime);
             String policy = createCannedPolicy(resourcePath, expirationTime);
+            log.info("policy: {}", policy);
             PrivateKey privateKey = loadPrivateKey(privateKeyPath);
+            log.info("privateKey: {}", privateKey);
             String signature = signPolicy(policy, privateKey);
+            log.info("signature: {}", signature);
             String encodedSignature = Base64.getUrlEncoder().withoutPadding().encodeToString(signature.getBytes(StandardCharsets.UTF_8));
+            log.info("encodedSignature: {}", encodedSignature);
             String signedUrl = String.format("%s?Expires=%d&Signature=%s&Key-Pair-Id=%s",
                     resourcePath, expirationTime.getEpochSecond(), encodedSignature, keyPairId);
-
+            log.info("signedUrl: {}", signedUrl);
             return new URL(signedUrl);
         } catch (Exception e) {
             throw new RuntimeException("Signed URL 생성 중 오류 발생", e);
