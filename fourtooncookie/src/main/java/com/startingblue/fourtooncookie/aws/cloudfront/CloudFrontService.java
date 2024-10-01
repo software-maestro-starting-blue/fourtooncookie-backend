@@ -34,6 +34,10 @@ public class CloudFrontService {
     @Value("${aws.cloudfront.privateKeyPath}")
     private String privateKeyPath;
 
+    @Value("${aws.diaryimage.bucket.name}")
+    private String bucketName;
+
+
     private static final int SIGNED_EXPIRATION = 3600; // 1 시간
     private static final String CLOUD_FRONT_POLICY = "CloudFront-Policy";
     private static final String CLOUD_FRONT_SIGNATURE = "CloudFront-Signature";
@@ -106,7 +110,7 @@ public class CloudFrontService {
 
     public URL generateSignedUrl(String path) {
         try {
-            String resourcePath = String.format("https://%s/%s", cloudFrontDomainName, path);
+            String resourcePath = String.format("https://%s/%s/%s", cloudFrontDomainName, bucketName, path);
             log.info("resourcePath: {}", resourcePath);
             Instant expirationTime = Instant.now().plus(SIGNED_EXPIRATION, ChronoUnit.SECONDS);
             log.info("expirationTime: {}", expirationTime);
