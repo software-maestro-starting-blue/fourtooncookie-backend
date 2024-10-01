@@ -64,8 +64,7 @@ public class CloudFrontService {
         String policy = String.format("{\"Statement\": [{\"Resource\":\"%s\",\"Condition\": {\"DateLessThan\":{\"AWS:EpochTime\": %d}}}]}",
                 resourceUrl, expirationTime.getEpochSecond());
         String policyWithoutSpaces = policy.replaceAll("\\s+", "");
-        String base64EncodedPolicy = Base64.getEncoder().encodeToString(policyWithoutSpaces.getBytes(StandardCharsets.UTF_8));
-        return base64EncodedPolicy;
+        return Base64.getEncoder().encodeToString(policyWithoutSpaces.getBytes(StandardCharsets.UTF_8));
     }
 
     // RSA 개인 키로 정책에 서명

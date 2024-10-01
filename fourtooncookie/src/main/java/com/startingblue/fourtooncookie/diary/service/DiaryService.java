@@ -93,21 +93,7 @@ public class DiaryService {
     public byte[] readDiaryFullImage(final Long diaryId) throws IOException {
         return diaryS3Service.getFullImageByDiaryId(diaryId);
     }
-
-    private List<URL> generatePreSignedUrls(Long diaryId) {
-        return IntStream.rangeClosed(MIN_PAINTING_IMAGE_POSITION, MAX_PAINTING_IMAGE_POSITION)
-                .mapToObj(imageGridPosition -> {
-                    try {
-                        return diaryS3Service.generatePresignedUrl(diaryId, imageGridPosition);
-                    } catch (Exception e) {
-                        log.error("Failed to generate pre-signed image URL for diaryId: {}", diaryId, e);
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .toList();
-    }
-
+    
     private List<URL> generateSignedUrls(Long diaryId) {
         return IntStream.rangeClosed(MIN_PAINTING_IMAGE_POSITION, MAX_PAINTING_IMAGE_POSITION)
                 .mapToObj(imageGridPosition -> {
