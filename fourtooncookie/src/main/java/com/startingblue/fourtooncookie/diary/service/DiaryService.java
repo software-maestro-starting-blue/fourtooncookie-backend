@@ -39,7 +39,7 @@ public class DiaryService {
     private final MemberService memberService;
     private final CharacterService characterService;
     private final DiaryS3Service diaryS3Service;
-    private final DiaryCloudFrontService diaryCloudFrontService;
+    private final DiaryPaintingImageCloudFrontService diaryPaintingImageCloudFrontService;
     private final DiaryLambdaService diaryImageGenerationLambdaInvoker;
 
     public Long createDiary(final DiarySaveRequest request, final UUID memberId) {
@@ -93,12 +93,12 @@ public class DiaryService {
     public byte[] readDiaryFullImage(final Long diaryId) throws IOException {
         return diaryS3Service.getFullImageByDiaryId(diaryId);
     }
-    
+
     private List<URL> generateSignedUrls(Long diaryId) {
         return IntStream.rangeClosed(MIN_PAINTING_IMAGE_POSITION, MAX_PAINTING_IMAGE_POSITION)
                 .mapToObj(imageGridPosition -> {
                     try {
-                        return diaryCloudFrontService.generateSignedUrl(diaryId, imageGridPosition);
+                        return diaryPaintingImageCloudFrontService.generateSignedUrl(diaryId, imageGridPosition);
                     } catch (Exception e) {
                         log.error("Failed to generate signed image URL for diaryId: {}", diaryId, e);
                         return null;
