@@ -1,11 +1,11 @@
 package com.startingblue.fourtooncookie.aws.cloudfront;
 
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -17,22 +17,11 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CloudFrontService {
-
-    private static final Logger log = LoggerFactory.getLogger(CloudFrontService.class);
-    @Value("${aws.cloudfront.domain.name}")
-    private String cloudFrontDomainName;
-
-    @Value("${aws.cloudfront.keyPairId}")
-    private String keyPairId;
-
-    @Value("${aws.cloudfront.privateKeyPath}")
-    private String privateKeyPath;
 
     private static final int SIGNED_EXPIRATION = 3600; // 1 시간
     private static final String SIGNATURE_ALGORITHM = "SHA1withRSA";
@@ -40,24 +29,36 @@ public class CloudFrontService {
     private static final String END_PRIVATE_KEY = "-----END PRIVATE KEY-----";
     private static final String KEY_FACTORY_ALGORITHM = "RSA";
 
-    public URL generateSignedUrl(String path) {
+    public URL generateSignedUrl(String path, String cloudFrontDomainName, String keyPairId, String privateKeyPath) {
         try {
-            String resourcePath = String.format("https://%s/%s", cloudFrontDomainName, path);
-            log.info("resourcePath: {}", resourcePath);
-            Instant expirationTime = Instant.now().plus(SIGNED_EXPIRATION, ChronoUnit.SECONDS);
-            log.info("expirationTime: {}", expirationTime);
+            String resourcePath = buildResourcePath(cloudFrontDomainName, path);
+            Instant expirationTime = calculateExpirationTime();
             String policy = createCannedPolicy(resourcePath, expirationTime);
-            log.info("policy: {}", policy);
             PrivateKey privateKey = loadPrivateKey(privateKeyPath);
-            byte[] signature = signPolicy(policy, privateKey);
-            String encodedSignature = Base64.getUrlEncoder().withoutPadding().encodeToString(signature);
-            String signedUrl = String.format("%s?Expires=%d&Signature=%s&Key-Pair-Id=%s",
-                    resourcePath, expirationTime.getEpochSecond(), encodedSignature, keyPairId);
-            log.info("signedUrl: {}", signedUrl);
+            String encodedSignature = signAndEncodePolicy(policy, privateKey);
+            String signedUrl = buildSignedUrl(resourcePath, expirationTime, encodedSignature, keyPairId);
             return new URL(signedUrl);
         } catch (Exception e) {
             throw new RuntimeException("Signed URL 생성 중 오류 발생", e);
         }
+    }
+
+    private String buildResourcePath(String cloudFrontDomainName, String path) {
+        return String.format("https://%s/%s", cloudFrontDomainName, path);
+    }
+
+    private Instant calculateExpirationTime() {
+        return Instant.now().plus(SIGNED_EXPIRATION, ChronoUnit.SECONDS);
+    }
+
+    private String signAndEncodePolicy(String policy, PrivateKey privateKey) throws Exception {
+        byte[] signature = signPolicy(policy, privateKey);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(signature);
+    }
+
+    private String buildSignedUrl(String resourcePath, Instant expirationTime, String encodedSignature, String keyPairId) {
+        return String.format("%s?Expires=%d&Signature=%s&Key-Pair-Id=%s",
+                resourcePath, expirationTime.getEpochSecond(), encodedSignature, keyPairId);
     }
 
     private String createCannedPolicy(String resourceUrl, Instant expirationTime) {
@@ -67,26 +68,38 @@ public class CloudFrontService {
         return Base64.getEncoder().encodeToString(policyWithoutSpaces.getBytes(StandardCharsets.UTF_8));
     }
 
-    // RSA 개인 키로 정책에 서명
+    private PrivateKey loadPrivateKey(String privateKeyPath) throws Exception {
+        String privateKeyPEM = readPrivateKeyFile(privateKeyPath);
+        privateKeyPEM = removeKeyHeadersAndWhitespace(privateKeyPEM);
+        byte[] encodedKey = decodePrivateKey(privateKeyPEM);
+        return generatePrivateKey(encodedKey);
+    }
+
+    private String readPrivateKeyFile(String privateKeyPath) throws IOException {
+        return new String(Files.readAllBytes(Paths.get(privateKeyPath)));
+    }
+
+    private String removeKeyHeadersAndWhitespace(String privateKeyPEM) {
+        return privateKeyPEM
+                .replace(BEGIN_PRIVATE_KEY, "")
+                .replace(END_PRIVATE_KEY, "")
+                .replaceAll("\\s", "");
+    }
+
+    private byte[] decodePrivateKey(String privateKeyPEM) {
+        return Base64.getDecoder().decode(privateKeyPEM);
+    }
+
+    private PrivateKey generatePrivateKey(byte[] encodedKey) throws Exception {
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encodedKey);
+        KeyFactory keyFactory = KeyFactory.getInstance(KEY_FACTORY_ALGORITHM);
+        return keyFactory.generatePrivate(keySpec);
+    }
+
     private byte[] signPolicy(String policy, PrivateKey privateKey) throws Exception {
         Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
         signature.initSign(privateKey);
         signature.update(policy.getBytes(StandardCharsets.UTF_8));
         return signature.sign();
     }
-
-    // PEM 형식의 개인 키를 로드
-    private PrivateKey loadPrivateKey(String privateKeyPath) throws Exception {
-        // 개인 키 파일 로드 및 파싱
-        String privateKeyPEM = new String(Files.readAllBytes(Paths.get(privateKeyPath)))
-                .replace(BEGIN_PRIVATE_KEY, "")
-                .replace(END_PRIVATE_KEY, "")
-                .replaceAll("\\s", "");
-        byte[] encodedKey = Base64.getDecoder().decode(privateKeyPEM);
-
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encodedKey);
-        KeyFactory keyFactory = KeyFactory.getInstance(KEY_FACTORY_ALGORITHM);
-        return keyFactory.generatePrivate(keySpec);
-    }
-
 }
