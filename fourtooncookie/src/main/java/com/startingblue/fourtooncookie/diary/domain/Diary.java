@@ -1,6 +1,7 @@
 package com.startingblue.fourtooncookie.diary.domain;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
+import com.startingblue.fourtooncookie.diary.domain.converter.DiaryPaintingImageGenerationStatusListConverter;
 import com.startingblue.fourtooncookie.global.domain.BaseEntity;
 import com.startingblue.fourtooncookie.global.converter.jpa.UrlListToStringConverter;
 import jakarta.persistence.*;
@@ -53,6 +54,10 @@ public final class Diary extends BaseEntity {
     @Builder.Default
     private DiaryStatus status = DiaryStatus.IN_PROGRESS;
 
+    @Convert(converter = DiaryPaintingImageGenerationStatusListConverter.class)
+    @Builder.Default
+    private List<DiaryPaintingImageGenerationStatus> paintingImageGenerationStatuses = new ArrayList<>();
+
     public static DiaryBuilder builder() {
         return new CustomDiaryBuilder();
     }
@@ -74,8 +79,16 @@ public final class Diary extends BaseEntity {
         this.paintingImageUrls = new ArrayList<>(paintingImageUrls);
     }
 
+    public void updatePaintingImageGenerationStatus(int index, DiaryPaintingImageGenerationStatus status) {
+        paintingImageGenerationStatuses.set(index, status);
+    }
+
     public void updateDiaryStatus(DiaryStatus status) {
         this.status = status;
+    }
+
+    public boolean isCompletedDiary() {
+        return status == DiaryStatus.COMPLETED;
     }
 
     public boolean isOwner(UUID memberId) {
@@ -111,6 +124,7 @@ public final class Diary extends BaseEntity {
                 Objects.equals(content, diary.content) &&
                 Objects.equals(diaryDate, diary.diaryDate) &&
                 Objects.equals(paintingImageUrls, diary.paintingImageUrls) &&
+                Objects.equals(paintingImageGenerationStatuses, diary.paintingImageGenerationStatuses) &&
                 Objects.equals(character, diary.character) &&
                 Objects.equals(memberId, diary.memberId) &&
                 Objects.equals(getCreatedDateTime(), diary.getCreatedDateTime()) &&
