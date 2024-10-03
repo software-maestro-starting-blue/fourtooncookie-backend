@@ -76,7 +76,8 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/software.amazon.awssdk/sqs
 	implementation group: 'software.amazon.awssdk', name: 'sqs', version: '2.28.13'
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws-messaging:2.2.6.RELEASE'
+	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1")
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
 
 }
 
