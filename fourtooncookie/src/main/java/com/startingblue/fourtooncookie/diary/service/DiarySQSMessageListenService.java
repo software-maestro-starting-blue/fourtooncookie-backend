@@ -65,6 +65,7 @@ public class DiarySQSMessageListenService {
 
         if (diary.isImageGenerationComplete()) {
             diary.updateDiaryStatus(DiaryStatus.COMPLETED);
+            diaryRepository.save(diary);
         }
     }
 
