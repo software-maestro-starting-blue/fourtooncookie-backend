@@ -57,10 +57,6 @@ public class AuthenticationFilter extends HttpFilter {
     }
 
     private boolean shouldBypassAuthentication(String requestURI, String method) {
-        if (DiarySQSMessageListener.isSqsRequest()) {
-            return true;
-        }
-
         return requestURI.startsWith("/h2-console") || requestURI.startsWith("/health") ||
                 (method.equalsIgnoreCase("GET") && (requestURI.startsWith("/character") || requestURI.startsWith("/artwork")));
     }

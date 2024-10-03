@@ -23,20 +23,9 @@ public class DiarySQSMessageListener {
     private final ObjectMapper objectMapper;
     private final DiaryRepository diaryRepository;
 
-    private static final ThreadLocal<Boolean> isSqsRequest = ThreadLocal.withInitial(() -> false);
-
-    public static void markAsSqsRequest() {
-        isSqsRequest.set(true);
-    }
-
-    public static boolean isSqsRequest() {
-        return isSqsRequest.get();
-    }
-
     @SqsListener(value = "fourtooncookie_image_response_sqs.fifo", factory = "defaultSqsListenerContainerFactory")
     public void handleSQSMessage(String message) {
         try {
-            markAsSqsRequest();
             DiaryImageResponseMessage response = objectMapper.readValue(message, DiaryImageResponseMessage.class);
 
             verifyJsonPayload(response);
