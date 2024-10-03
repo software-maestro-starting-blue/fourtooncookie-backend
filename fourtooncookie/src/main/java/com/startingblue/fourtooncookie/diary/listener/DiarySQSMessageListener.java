@@ -13,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static io.awspring.cloud.sqs.listener.acknowledgement.handler.AcknowledgementMode.ON_SUCCESS;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -35,7 +33,7 @@ public class DiarySQSMessageListener {
         return isSqsRequest.get();
     }
 
-    @SqsListener(value = "${aws.sqs.fourtooncookie.image.response.sqs.fifo}", factory = "defaultSqsListenerContainerFactory")
+    @SqsListener(value = "fourtooncookie_image_response_sqs.fifo", factory = "defaultSqsListenerContainerFactory")
     public void handleSQSMessage(String message) {
         try {
             markAsSqsRequest();
