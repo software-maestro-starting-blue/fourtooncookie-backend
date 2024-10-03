@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
 import org.springframework.stereotype.Service;
 
+import static org.springframework.cloud.aws.messaging.listener.SqsMessageDeletionPolicy.ON_SUCCESS;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -21,7 +23,7 @@ public class DiarySQSMessageListenService {
     @Value("${aws.sqs.fourtooncookie.image.response.sqs.fifo}")
     private String SQS_NAME;
 
-    @SqsListener("#{diarySQSMessageListenService.SQS_NAME}")
+    @SqsListener(value = "#{diarySQSMessageListenService.SQS_NAME}", deletionPolicy = ON_SUCCESS)
     private void handleSQSMessage(String message) {
         try {
             DiaryImageResponseMessage response = objectMapper.readValue(message, DiaryImageResponseMessage.class);
