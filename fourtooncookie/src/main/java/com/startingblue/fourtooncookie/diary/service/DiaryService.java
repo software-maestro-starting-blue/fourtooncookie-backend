@@ -3,7 +3,6 @@ package com.startingblue.fourtooncookie.diary.service;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.service.CharacterService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
-import com.startingblue.fourtooncookie.diary.domain.DiaryPaintingImageGenerationStatus;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
@@ -35,7 +34,6 @@ public class DiaryService {
 
     private static final int MIN_PAINTING_IMAGE_POSITION = 0;
     private static final int MAX_PAINTING_IMAGE_POSITION = 3;
-    private static final int MAX_PAINTING_IMAGE_SIZE = 4;
 
     private final DiaryRepository diaryRepository;
     private final MemberService memberService;
@@ -60,7 +58,6 @@ public class DiaryService {
                 .isFavorite(false)
                 .diaryDate(request.diaryDate())
                 .paintingImageUrls(Collections.emptyList())
-                .paintingImageGenerationStatuses(new ArrayList<>(Collections.nCopies(MAX_PAINTING_IMAGE_SIZE, DiaryPaintingImageGenerationStatus.GENERATING)))
                 .status(DiaryStatus.IN_PROGRESS)
                 .character(character)
                 .memberId(member.getId())
@@ -70,7 +67,9 @@ public class DiaryService {
     @Transactional(readOnly = true)
     public Diary readDiaryById(final Long diaryId) {
         Optional<Diary> foundDiary = diaryRepository.findById(diaryId);
-        applyPreSignedUrls(foundDiary.get());
+        List<URL> preSignedUrls = generatePreSignedUrls(foundDiary.get().getId());
+
+        foundDiary.get().updatePaintingImageUrls(preSignedUrls);
         return foundDiary.get();
     }
 
@@ -83,7 +82,8 @@ public class DiaryService {
         );
 
         return diaries.getContent().stream().map(savedDiary -> {
-            applyPreSignedUrls(savedDiary);
+            List<URL> preSignedUrls = generatePreSignedUrls(savedDiary.getId());
+            savedDiary.updatePaintingImageUrls(preSignedUrls);
             return savedDiary;
         }).collect(Collectors.toList());
     }
@@ -145,14 +145,6 @@ public class DiaryService {
 
     public void deleteDiaryByMemberId(UUID memberId) {
         diaryRepository.deleteByMemberId(memberId);
-    }
-
-    private void applyPreSignedUrls(Diary savedDiary) {
-        List<URL> paintingImageUrls = Collections.emptyList();
-        if (savedDiary.isCompletedDiary()) {
-            paintingImageUrls = generatePreSignedUrls(savedDiary.getId());
-        }
-        savedDiary.updatePaintingImageUrls(paintingImageUrls);
     }
 
 }
