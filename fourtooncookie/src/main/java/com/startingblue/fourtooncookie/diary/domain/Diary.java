@@ -86,11 +86,7 @@ public final class Diary extends BaseEntity {
     public void updateDiaryStatus(DiaryStatus status) {
         this.status = status;
     }
-
-    public boolean isCompletedDiary() {
-        return status == DiaryStatus.COMPLETED;
-    }
-
+    
     public boolean isOwner(UUID memberId) {
         return this.memberId.equals(memberId);
     }
