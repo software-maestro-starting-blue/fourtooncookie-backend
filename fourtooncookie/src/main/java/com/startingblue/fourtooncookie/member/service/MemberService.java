@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.member.service;
 
+import com.startingblue.fourtooncookie.diary.service.DiaryService;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
 import com.startingblue.fourtooncookie.member.domain.Role;
@@ -10,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -19,6 +19,7 @@ import java.util.UUID;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final DiaryService diaryService;
 
     public void save(UUID memberId, MemberSaveRequest memberSaveRequest) {
         if (verifyMemberExists(memberId)) {
@@ -40,6 +41,7 @@ public class MemberService {
     }
 
     public void hardDeleteById(UUID memberId) {
+        diaryService.deleteDiariesByMemberId(memberId);
         memberRepository.deleteById(memberId);
     }
 
@@ -56,5 +58,4 @@ public class MemberService {
         Member member = readById(memberId);
         return member.isAdmin();
     }
-
 }

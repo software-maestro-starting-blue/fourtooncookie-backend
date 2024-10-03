@@ -74,7 +74,7 @@ public class DiaryController {
 
     @DeleteMapping("/{diaryId}")
     public ResponseEntity<HttpStatus> deleteDiary(@PathVariable final Long diaryId) {
-        diaryService.deleteDiary(diaryId);
+        diaryService.deleteDiaryById(diaryId);
         return noContent().build();
     }
 

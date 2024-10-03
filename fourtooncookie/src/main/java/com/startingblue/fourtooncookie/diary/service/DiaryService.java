@@ -119,10 +119,18 @@ public class DiaryService {
         diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(existedDiary, character);
     }
 
-    public void deleteDiary(Long diaryId) {
+    public void deleteDiaryById(Long diaryId) {
         Diary foundDiary = readById(diaryId);
         diaryS3Service.deleteImagesByDiaryId(diaryId);
         diaryRepository.delete(foundDiary);
+    }
+
+    public void deleteDiariesByMemberId(UUID memberId) {
+        List<Long> diaryIds = diaryRepository.findDiaryIdsByMemberId(memberId);
+        for(Long diaryId : diaryIds) {
+            diaryS3Service.deleteImagesByDiaryId(diaryId);
+            diaryRepository.deleteById(diaryId);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -142,9 +150,5 @@ public class DiaryService {
     public boolean verifyDiaryOwner(UUID memberId, Long diaryId) {
         Diary foundDiary = readById(diaryId);
         return foundDiary.isOwner(memberId);
-    }
-
-    public void deleteDiaryByMemberId(UUID memberId) {
-        diaryRepository.deleteByMemberId(memberId);
     }
 }

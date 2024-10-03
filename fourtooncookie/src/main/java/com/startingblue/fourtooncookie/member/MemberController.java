@@ -33,7 +33,6 @@ public final class MemberController {
     @DeleteMapping("/member")
     public ResponseEntity<HttpStatus> hardDeleteMember(UUID memberId) {
         memberService.hardDeleteById(memberId);
-        diaryService.deleteDiaryByMemberId(memberId);
         return ResponseEntity
                 .noContent()
                 .build();

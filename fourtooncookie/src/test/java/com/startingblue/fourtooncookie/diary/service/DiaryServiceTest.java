@@ -81,13 +81,13 @@ class DiaryServiceTest {
 
     @DisplayName("저장된 일기를 삭제한다.")
     @Test
-    void deleteDiaryTest() throws MalformedURLException {
+    void deleteDiaryByIdTest() throws MalformedURLException {
         // given
         Diary diary = createDiary(LocalDate.of(2024, 7, 21), character, member);
         diaryRepository.save(diary);
 
         // when
-        diaryService.deleteDiary(diary.getId());
+        diaryService.deleteDiaryById(diary.getId());
 
         // then
         boolean exists = diaryRepository.existsById(diary.getId());
@@ -129,7 +129,7 @@ class DiaryServiceTest {
         Long notExistingId = -1L;
 
         // when & then
-        assertThatThrownBy(() -> diaryService.deleteDiary(notExistingId));
+        assertThatThrownBy(() -> diaryService.deleteDiaryById(notExistingId));
 
         boolean exists = diaryRepository.existsById(diary.getId());
         assertThat(exists).isTrue();
