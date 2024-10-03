@@ -7,13 +7,13 @@ import com.startingblue.fourtooncookie.diary.domain.DiaryPaintingImageGeneration
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
 import com.startingblue.fourtooncookie.diary.service.DiaryService;
+import io.awspring.cloud.sqs.annotation.SqsListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.cloud.aws.messaging.listener.SqsMessageDeletionPolicy.ON_SUCCESS;
+import static io.awspring.cloud.sqs.listener.acknowledgement.handler.AcknowledgementMode.ON_SUCCESS;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +35,7 @@ public class DiarySQSMessageListener {
         return isSqsRequest.get();
     }
 
-    @SqsListener(value = "fourtooncookie_image_response_sqs.fifo", deletionPolicy = ON_SUCCESS)
+    @SqsListener(value = "${aws.sqs.fourtooncookie.image.response.sqs.fifo}", factory = "defaultSqsListenerContainerFactory")
     public void handleSQSMessage(String message) {
         try {
             markAsSqsRequest();
