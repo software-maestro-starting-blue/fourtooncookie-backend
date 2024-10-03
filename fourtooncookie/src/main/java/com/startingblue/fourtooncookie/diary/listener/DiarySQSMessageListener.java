@@ -35,7 +35,7 @@ public class DiarySQSMessageListener {
         return isSqsRequest.get();
     }
 
-    @SqsListener(value = "${aws.sqs.fourtooncookie.image.response.sqs.fifo}", deletionPolicy = ON_SUCCESS)
+    @SqsListener(value = "fourtooncookie_image_response_sqs.fifo", deletionPolicy = ON_SUCCESS)
     public void handleSQSMessage(String message) {
         try {
             markAsSqsRequest();
