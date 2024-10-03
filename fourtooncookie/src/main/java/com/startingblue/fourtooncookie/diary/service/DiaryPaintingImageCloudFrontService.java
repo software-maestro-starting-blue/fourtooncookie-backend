@@ -31,7 +31,7 @@ public class DiaryPaintingImageCloudFrontService {
         return cloudFrontService.generateSignedUrl(path, cloudFrontDomainName, keyPairId, privateKeyPath);
     }
 
-    private String getPath(Long diaryId,  int imageGridPosition, String imageFormat) {
+    private String getPath(Long diaryId, int imageGridPosition, String imageFormat) {
         return String.format("%s/%s.%s", diaryId, imageGridPosition, imageFormat);
     }
 }
