@@ -1,6 +1,5 @@
 package com.startingblue.fourtooncookie.member.service;
 
-import com.startingblue.fourtooncookie.diary.service.DiaryService;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
 import com.startingblue.fourtooncookie.member.domain.Role;
@@ -19,12 +18,12 @@ import java.util.UUID;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final DiaryService diaryService;
+    private final MemberDiaryService memberDiaryService;
 
     public void save(UUID memberId, MemberSaveRequest memberSaveRequest) {
         if (verifyMemberExists(memberId)) {
             throw new MemberDuplicateException("Member with id " + memberId + " already exists");
-        };
+        }
 
         Member member = Member.builder()
                 .id(memberId)
@@ -37,11 +36,11 @@ public class MemberService {
     }
 
     public Member readById(UUID memberId) {
-        return  memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("member not found"));
+        return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("member not found"));
     }
 
     public void hardDeleteById(UUID memberId) {
-        diaryService.deleteDiariesByMemberId(memberId);
+        memberDiaryService.deleteDiariesByMemberId(memberId);
         memberRepository.deleteById(memberId);
     }
 

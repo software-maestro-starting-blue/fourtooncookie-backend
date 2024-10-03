@@ -125,14 +125,6 @@ public class DiaryService {
         diaryRepository.delete(foundDiary);
     }
 
-    public void deleteDiariesByMemberId(UUID memberId) {
-        List<Long> diaryIds = diaryRepository.findDiaryIdsByMemberId(memberId);
-        for(Long diaryId : diaryIds) {
-            diaryS3Service.deleteImagesByDiaryId(diaryId);
-            diaryRepository.deleteById(diaryId);
-        }
-    }
-
     @Transactional(readOnly = true)
     public Diary readById(final Long id) {
         return diaryRepository.findById(id)
