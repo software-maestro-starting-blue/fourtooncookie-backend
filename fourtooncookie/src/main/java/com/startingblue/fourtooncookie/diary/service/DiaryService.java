@@ -121,6 +121,7 @@ public class DiaryService {
 
     public void deleteDiary(Long diaryId) {
         Diary foundDiary = readById(diaryId);
+        diaryS3Service.deleteImagesByDiaryId(diaryId);
         diaryRepository.delete(foundDiary);
     }
 
@@ -146,5 +147,4 @@ public class DiaryService {
     public void deleteDiaryByMemberId(UUID memberId) {
         diaryRepository.deleteByMemberId(memberId);
     }
-
 }
