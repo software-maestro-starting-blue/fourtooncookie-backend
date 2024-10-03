@@ -1,5 +1,8 @@
 package com.startingblue.fourtooncookie.diary.service;
 
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryPaintingImageGenerationStatus;
@@ -24,13 +27,13 @@ public class DiarySQSMessageListenService {
     private final ObjectMapper objectMapper;
     private final DiaryRepository diaryRepository;
 
-    @Value("${aws.sqs.fourtooncookie.image.response.sqs.fifo}")
-    private String SQS_NAME;
-
-    @SqsListener(value = "#{diarySQSMessageListenService.SQS_NAME}", deletionPolicy = ON_SUCCESS)
-    private void handleSQSMessage(String message) {
+    @SqsListener(value = "${aws.sqs.fourtooncookie.image.response.sqs.fifo}", deletionPolicy = ON_SUCCESS)
+    public void handleSQSMessage(String message) {
         try {
             DiaryImageResponseMessage response = objectMapper.readValue(message, DiaryImageResponseMessage.class);
+
+            verifyJsonPayload(response);
+
             log.info("Received message: diaryId={}, gridPosition={}, isSuccess={}",
                     response.diaryId(),
                     response.gridPosition(),
@@ -43,8 +46,17 @@ public class DiarySQSMessageListenService {
             } else {
                 handleImageGenerationFailure(diary, response.gridPosition());
             }
+        }  catch (JacksonException e) {
+            log.error("Failed to parse message due to invalid format: {}", message, e);
         } catch (Exception e) {
-            log.error("Failed to parse message: {}", message, e);
+            log.error("An unexpected error occurred while processing the message: {}", message, e);
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    private static void verifyJsonPayload(DiaryImageResponseMessage response) {
+        if (response == null || response.diaryId() == null) {
+            throw new IllegalArgumentException("Diary ID is missing in the message.");
         }
     }
 
@@ -65,6 +77,6 @@ public class DiarySQSMessageListenService {
         diaryRepository.save(diary);
     }
 
-    private record DiaryImageResponseMessage(Long diaryId, int gridPosition, boolean isSuccess) {
+    public record DiaryImageResponseMessage(Long diaryId, int gridPosition, boolean isSuccess) {
     }
 }
