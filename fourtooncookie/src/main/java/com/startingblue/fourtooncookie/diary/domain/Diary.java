@@ -91,6 +91,16 @@ public final class Diary extends BaseEntity {
         return this.memberId.equals(memberId);
     }
 
+    public boolean isImageGenerationComplete() {
+        for (DiaryPaintingImageGenerationStatus paintingImageGenerationStatus : paintingImageGenerationStatuses) {
+            if (paintingImageGenerationStatus == DiaryPaintingImageGenerationStatus.GENERATING ||
+                paintingImageGenerationStatus == DiaryPaintingImageGenerationStatus.FAILURE) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void validate() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
@@ -126,7 +136,6 @@ public final class Diary extends BaseEntity {
                 Objects.equals(getCreatedDateTime(), diary.getCreatedDateTime()) &&
                 Objects.equals(getModifiedDateTime(), diary.getModifiedDateTime());
     }
-
 
     @Override
     public int hashCode() {
