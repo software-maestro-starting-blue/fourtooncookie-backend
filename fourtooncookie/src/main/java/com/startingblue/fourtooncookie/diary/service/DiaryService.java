@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
@@ -101,7 +102,7 @@ public class DiaryService {
                         return diaryPaintingImageCloudFrontService.generateSignedUrl(diaryId, imageGridPosition);
                     } catch (Exception e) {
                         log.error("Failed to generate signed image URL for diaryId: {}", diaryId, e);
-                        return null;
+                        throw new RuntimeException(e);
                     }
                 })
                 .filter(Objects::nonNull)
