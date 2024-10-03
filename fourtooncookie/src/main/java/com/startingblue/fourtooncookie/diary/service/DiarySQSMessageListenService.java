@@ -3,22 +3,26 @@ package com.startingblue.fourtooncookie.diary.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryPaintingImageGenerationStatus;
+import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.cloud.aws.messaging.listener.SqsMessageDeletionPolicy.ON_SUCCESS;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class DiarySQSMessageListenService {
 
     private final DiaryService diaryService;
     private final ObjectMapper objectMapper;
+    private final DiaryRepository diaryRepository;
 
     @Value("${aws.sqs.fourtooncookie.image.response.sqs.fifo}")
     private String SQS_NAME;
@@ -58,6 +62,7 @@ public class DiarySQSMessageListenService {
 
     private void updatePaintingImageGenerationStatus(Diary diary, int gridPosition, DiaryPaintingImageGenerationStatus status) {
         diary.updatePaintingImageGenerationStatus(gridPosition, status);
+        diaryRepository.save(diary);
     }
 
     private record DiaryImageResponseMessage(Long diaryId, int gridPosition, boolean isSuccess) {
