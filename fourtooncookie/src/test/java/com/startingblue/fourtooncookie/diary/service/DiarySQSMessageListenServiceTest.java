@@ -10,6 +10,7 @@ import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryPaintingImageGenerationStatus;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
+import com.startingblue.fourtooncookie.diary.listener.DiarySQSMessageListener;
 import com.startingblue.fourtooncookie.global.domain.PaymentType;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
@@ -39,7 +40,7 @@ import static org.mockito.Mockito.*;
 @ActiveProfiles("test")
 @SpringBootTest
 @Transactional
-class DiarySQSMessageListenServiceTest {
+class DiarySQSMessageListenerTest {
 
     @Mock
     private DiaryService diaryService;
@@ -51,7 +52,7 @@ class DiarySQSMessageListenServiceTest {
     private DiaryRepository diaryRepository;
 
     @InjectMocks
-    private DiarySQSMessageListenService diarySQSMessageListenService;
+    private DiarySQSMessageListener diarySQSMessageListener;
 
     @Autowired
     MemberRepository memberRepository;
@@ -94,14 +95,14 @@ class DiarySQSMessageListenServiceTest {
         // given
         String sqsMessage = "{\"diaryId\": 0, \"gridPosition\": 2, \"isSuccess\": true}";
 
-        DiarySQSMessageListenService.DiaryImageResponseMessage responseMessage =
-                new DiarySQSMessageListenService.DiaryImageResponseMessage(1L, 2, true);
-        when(objectMapper.readValue(sqsMessage, DiarySQSMessageListenService.DiaryImageResponseMessage.class))
+        DiarySQSMessageListener.DiaryImageResponseMessage responseMessage =
+                new DiarySQSMessageListener.DiaryImageResponseMessage(1L, 2, true);
+        when(objectMapper.readValue(sqsMessage, DiarySQSMessageListener.DiaryImageResponseMessage.class))
                 .thenReturn(responseMessage);
         when(diaryService.readById(1L)).thenReturn(diary);
 
         // when
-        diarySQSMessageListenService.handleSQSMessage(sqsMessage);
+        diarySQSMessageListener.handleSQSMessage(sqsMessage);
 
         // then
         verify(diaryService, times(1)).readById(1L);
@@ -115,15 +116,15 @@ class DiarySQSMessageListenServiceTest {
         // given
         String sqsMessage = "{\"diaryId\": 1, \"gridPosition\": 2, \"isSuccess\": false}";
 
-        DiarySQSMessageListenService.DiaryImageResponseMessage responseMessage =
-                new DiarySQSMessageListenService.DiaryImageResponseMessage(1L, 2, false);
+        DiarySQSMessageListener.DiaryImageResponseMessage responseMessage =
+                new DiarySQSMessageListener.DiaryImageResponseMessage(1L, 2, false);
         System.out.println(responseMessage);
-        when(objectMapper.readValue(sqsMessage, DiarySQSMessageListenService.DiaryImageResponseMessage.class))
+        when(objectMapper.readValue(sqsMessage, DiarySQSMessageListener.DiaryImageResponseMessage.class))
                 .thenReturn(responseMessage);
         when(diaryService.readById(1L)).thenReturn(diary);
 
         // when
-        diarySQSMessageListenService.handleSQSMessage(sqsMessage);
+        diarySQSMessageListener.handleSQSMessage(sqsMessage);
 
         // then
         verify(diaryService, times(1)).readById(1L);
@@ -137,19 +138,17 @@ class DiarySQSMessageListenServiceTest {
         // given
         String validMessage = "{\"\": , \"gridPosition\": 2, \"isSuccess\": true}";
 
-        DiarySQSMessageListenService.DiaryImageResponseMessage responseWithNullId = new DiarySQSMessageListenService.DiaryImageResponseMessage(null, 2, true);
-        when(objectMapper.readValue(validMessage, DiarySQSMessageListenService.DiaryImageResponseMessage.class))
+        DiarySQSMessageListener.DiaryImageResponseMessage responseWithNullId = new DiarySQSMessageListener.DiaryImageResponseMessage(null, 2, true);
+        when(objectMapper.readValue(validMessage, DiarySQSMessageListener.DiaryImageResponseMessage.class))
                 .thenReturn(responseWithNullId);
 
         // when & then
-        assertThatThrownBy(() -> diarySQSMessageListenService.handleSQSMessage(validMessage))
+        assertThatThrownBy(() -> diarySQSMessageListener.handleSQSMessage(validMessage))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Diary ID is missing in the message");
 
         verifyNoInteractions(diaryService, diaryRepository);
     }
-
-
 
     private Diary createDiary(LocalDate diaryDate, Character character, Member member) throws MalformedURLException {
         return Diary.builder()
@@ -157,7 +156,6 @@ class DiarySQSMessageListenServiceTest {
                 .diaryDate(diaryDate)
                 .isFavorite(false)
                 .paintingImageUrls(List.of(new URL("http://defaultImage.png")))
-                .paintingImageGenerationStatuses(new ArrayList<>())
                 .paintingImageGenerationStatuses(new ArrayList<>(Collections.nCopies(4, DiaryPaintingImageGenerationStatus.GENERATING)))
                 .status(DiaryStatus.IN_PROGRESS)
                 .character(character)
