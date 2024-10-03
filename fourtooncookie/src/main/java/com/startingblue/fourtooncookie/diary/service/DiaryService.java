@@ -3,6 +3,7 @@ package com.startingblue.fourtooncookie.diary.service;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.service.CharacterService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
+import com.startingblue.fourtooncookie.diary.domain.DiaryPaintingImageGenerationStatus;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
@@ -34,11 +36,13 @@ public class DiaryService {
 
     private static final int MIN_PAINTING_IMAGE_POSITION = 0;
     private static final int MAX_PAINTING_IMAGE_POSITION = 3;
+    private static final int MAX_PAINTING_IMAGE_SIZE = 4;
 
     private final DiaryRepository diaryRepository;
     private final MemberService memberService;
     private final CharacterService characterService;
     private final DiaryS3Service diaryS3Service;
+    private final DiaryPaintingImageCloudFrontService diaryPaintingImageCloudFrontService;
     private final DiaryLambdaService diaryImageGenerationLambdaInvoker;
 
     public Long createDiary(final DiarySaveRequest request, final UUID memberId) {
@@ -58,6 +62,7 @@ public class DiaryService {
                 .isFavorite(false)
                 .diaryDate(request.diaryDate())
                 .paintingImageUrls(Collections.emptyList())
+                .paintingImageGenerationStatuses(new ArrayList<>(Collections.nCopies(MAX_PAINTING_IMAGE_SIZE, DiaryPaintingImageGenerationStatus.GENERATING)))
                 .status(DiaryStatus.IN_PROGRESS)
                 .character(character)
                 .memberId(member.getId())
@@ -67,7 +72,7 @@ public class DiaryService {
     @Transactional(readOnly = true)
     public Diary readDiaryById(final Long diaryId) {
         Optional<Diary> foundDiary = diaryRepository.findById(diaryId);
-        List<URL> preSignedUrls = generatePreSignedUrls(foundDiary.get().getId());
+        List<URL> preSignedUrls = generateSignedUrls(foundDiary.get().getId());
 
         foundDiary.get().updatePaintingImageUrls(preSignedUrls);
         return foundDiary.get();
@@ -82,8 +87,8 @@ public class DiaryService {
         );
 
         return diaries.getContent().stream().map(savedDiary -> {
-            List<URL> preSignedUrls = generatePreSignedUrls(savedDiary.getId());
-            savedDiary.updatePaintingImageUrls(preSignedUrls);
+            List<URL> signedUrls = generateSignedUrls(savedDiary.getId());
+            savedDiary.updatePaintingImageUrls(signedUrls);
             return savedDiary;
         }).collect(Collectors.toList());
     }
@@ -93,14 +98,14 @@ public class DiaryService {
         return diaryS3Service.getFullImageByDiaryId(diaryId);
     }
 
-    private List<URL> generatePreSignedUrls(Long diaryId) {
+    private List<URL> generateSignedUrls(Long diaryId) {
         return IntStream.rangeClosed(MIN_PAINTING_IMAGE_POSITION, MAX_PAINTING_IMAGE_POSITION)
                 .mapToObj(imageGridPosition -> {
                     try {
-                        return diaryS3Service.generatePresignedUrl(diaryId, imageGridPosition);
+                        return diaryPaintingImageCloudFrontService.generateSignedUrl(diaryId, imageGridPosition);
                     } catch (Exception e) {
-                        log.error("Failed to generate pre-signed image URL for diaryId: {}", diaryId, e);
-                        return null;
+                        log.error("Failed to generate signed image URL for diaryId: {}", diaryId, e);
+                        throw new RuntimeException(e);
                     }
                 })
                 .filter(Objects::nonNull)
@@ -142,5 +147,9 @@ public class DiaryService {
     public boolean verifyDiaryOwner(UUID memberId, Long diaryId) {
         Diary foundDiary = readById(diaryId);
         return foundDiary.isOwner(memberId);
+    }
+  
+    public void deleteDiaryByMemberId(UUID memberId) {
+        diaryRepository.deleteByMemberId(memberId);
     }
 }

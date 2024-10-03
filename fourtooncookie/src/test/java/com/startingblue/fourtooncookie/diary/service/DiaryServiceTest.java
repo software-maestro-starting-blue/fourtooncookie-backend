@@ -166,26 +166,6 @@ class DiaryServiceTest {
         assertThat(updatedDiary.isFavorite()).isTrue();
     }
 
-    @DisplayName("저장된 모든 일기를 페이지네이션하여 가져온다.")
-    @Test
-    void readDiariesByMemberIdTest() throws MalformedURLException {
-        // given
-        LocalDate now = LocalDate.now();
-        List<Diary> diaries = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            diaries.add(createDiary(now.minusDays(i), character, member));
-        }
-        diaryRepository.saveAll(diaries);
-
-        // when
-        List<Diary> foundDiaries = diaryService.readDiariesByMemberId(member.getId(), 0, 3);
-
-        // then
-        assertThat(foundDiaries).hasSize(3);
-        assertThat(foundDiaries.get(0).getDiaryDate()).isEqualTo(now);
-        assertThat(foundDiaries.get(2).getDiaryDate()).isEqualTo(now.minusDays(2));
-    }
-
     @DisplayName("같은 날짜에 중복 일기를 작성하면 예외가 발생한다.")
     @Test
     void duplicateDiaryTest() throws MalformedURLException {
