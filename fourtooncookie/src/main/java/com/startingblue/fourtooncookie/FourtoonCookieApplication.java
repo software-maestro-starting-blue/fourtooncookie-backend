@@ -10,7 +10,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaAuditing
 @EnableScheduling
 @EnableAsync
-@EnableSqs
 @SpringBootApplication
 public class FourtoonCookieApplication {
 
