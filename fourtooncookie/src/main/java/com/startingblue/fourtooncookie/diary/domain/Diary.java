@@ -92,13 +92,8 @@ public final class Diary extends BaseEntity {
     }
 
     public boolean isImageGenerationComplete() {
-        for (DiaryPaintingImageGenerationStatus paintingImageGenerationStatus : paintingImageGenerationStatuses) {
-            if (paintingImageGenerationStatus == DiaryPaintingImageGenerationStatus.GENERATING ||
-                paintingImageGenerationStatus == DiaryPaintingImageGenerationStatus.FAILURE) {
-                return false;
-            }
-        }
-        return true;
+        return paintingImageGenerationStatuses.stream()
+                .allMatch(DiaryPaintingImageGenerationStatus.SUCCESS::equals);
     }
 
     private void validate() {
