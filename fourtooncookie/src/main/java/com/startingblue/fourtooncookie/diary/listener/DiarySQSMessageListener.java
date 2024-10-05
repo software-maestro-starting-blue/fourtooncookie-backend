@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -26,23 +28,16 @@ public class DiarySQSMessageListener {
         } catch (JacksonException e) {
             log.error("Failed to parse message due to invalid format: {}", message, e);
         } catch (IllegalArgumentException e) {
-            log.error("Invalid payload in message: {}", message, e);
+            throw e;
         } catch (Exception e) {
-            log.error("An unexpected error occurred while processing the message: {}", message, e);
-            throw new RuntimeException(e);
+            throw new RuntimeException("Unexpected error occurred", e);
         }
     }
 
     private DiaryImageResponseMessage parseMessage(String message) throws JacksonException {
-        DiaryImageResponseMessage response = objectMapper.readValue(message, DiaryImageResponseMessage.class);
-        verifyJsonPayload(response);
-        return response;
-    }
-
-    private static void verifyJsonPayload(DiaryImageResponseMessage response) {
-        if (response == null || response.diaryId() == null) {
-            throw new IllegalArgumentException("Diary ID is missing in the message.");
-        }
+        return Optional.ofNullable(objectMapper.readValue(message, DiaryImageResponseMessage.class))
+                .filter(response -> response.diaryId() != null)
+                .orElseThrow(() -> new IllegalArgumentException("Diary ID is missing in the message."));
     }
 
     public record DiaryImageResponseMessage(Long diaryId, int gridPosition, boolean isSuccess) {
