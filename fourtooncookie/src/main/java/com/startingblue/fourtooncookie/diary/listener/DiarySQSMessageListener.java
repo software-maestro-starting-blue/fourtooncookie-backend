@@ -23,7 +23,7 @@ public class DiarySQSMessageListener {
     private final ObjectMapper objectMapper;
     private final DiaryRepository diaryRepository;
 
-    @SqsListener(value = "fourtooncookie_image_response_sqs.fifo", factory = "defaultSqsListenerContainerFactory")
+    @SqsListener(value = "${aws.sqs.fourtooncookie.image.response.sqs.fifo}", factory = "defaultSqsListenerContainerFactory")
     public void handleSQSMessage(String message) {
         try {
             DiaryImageResponseMessage response = objectMapper.readValue(message, DiaryImageResponseMessage.class);
