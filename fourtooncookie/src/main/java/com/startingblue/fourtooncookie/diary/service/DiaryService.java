@@ -156,8 +156,13 @@ public class DiaryService {
     }
 
     @Transactional
+    public boolean existsById(Long diaryId) {
+        return diaryRepository.existsById(diaryId);
+    }
+
+    @Transactional
     public void processImageGenerationResponse(DiaryImageResponseMessage response) {
-        Diary diary = diaryRepository.findById(response.diaryId()).orElseThrow(DiaryNotFoundException::new);
+        Diary diary = diaryRepository.findById(response.diaryId()).get();
 
         diary.updatePaintingImageGenerationStatus(response.gridPosition(), response.isSuccess());
 

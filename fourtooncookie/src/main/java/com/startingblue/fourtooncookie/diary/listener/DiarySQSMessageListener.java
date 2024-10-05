@@ -26,11 +26,14 @@ public class DiarySQSMessageListener {
             try {
                 DiaryImageResponseMessage response = parseMessage(message);
                 log.info("received message: {}", response);
+                if (!diaryService.existsById(response.diaryId())) {
+                    log.info("Diary ID {} does not exist. Message will be ignored.", response.diaryId());
+                    // 다이어리 ID가 없을 경우 처리를 하지 않음 (메시지 삭제)
+                    return;
+                }
                 diaryService.processImageGenerationResponse(response);
             } catch (JacksonException e) {
                 log.error("Failed to parse message due to invalid format: {}", message, e);
-            } catch (IllegalArgumentException e) {
-                throw e;
             } catch (Exception e) {
                 throw new RuntimeException("Unexpected error occurred", e);
             }
@@ -43,9 +46,6 @@ public class DiarySQSMessageListener {
 
     private DiaryImageResponseMessage parseMessage(String message) throws JacksonException {
         DiaryImageResponseMessage response = objectMapper.readValue(message, DiaryImageResponseMessage.class);
-        if (response.diaryId() == null) {
-            throw new IllegalArgumentException("Diary ID is missing in the message.");
-        }
         return response;
     }
 
