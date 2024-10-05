@@ -50,14 +50,14 @@ public class DiaryExceptionControllerAdvice {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleIllegalArgumentException(IllegalArgumentException e) {
-        log.error("Invalid argument: {}", e.getMessage(), e);
+        log.error("Invalid argument: {}", e.getMessage());
         return "Invalid argument provided";
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleException(Exception e) {
-        log.error("Unexpected error: {}", e.getMessage(), e);
+        log.error("Unexpected error: {}", e.getMessage());
         return "An unexpected error occurred";
     }
 }
