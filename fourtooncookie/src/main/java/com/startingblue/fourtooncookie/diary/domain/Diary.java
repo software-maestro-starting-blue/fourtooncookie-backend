@@ -79,7 +79,11 @@ public final class Diary extends BaseEntity {
         this.paintingImageUrls = new ArrayList<>(paintingImageUrls);
     }
 
-    public void updatePaintingImageGenerationStatus(int index, DiaryPaintingImageGenerationStatus status) {
+    public void updatePaintingImageGenerationStatus(int index, boolean isImageGenerationSuccess) {
+        DiaryPaintingImageGenerationStatus status = isImageGenerationSuccess
+                ? DiaryPaintingImageGenerationStatus.SUCCESS
+                : DiaryPaintingImageGenerationStatus.FAILURE;
+
         paintingImageGenerationStatuses.set(index, status);
     }
 

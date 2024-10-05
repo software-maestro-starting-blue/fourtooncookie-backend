@@ -10,6 +10,7 @@ import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
+import com.startingblue.fourtooncookie.diary.listener.DiarySQSMessageListener;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static com.startingblue.fourtooncookie.diary.listener.DiarySQSMessageListener.*;
 
 @Service
 @RequiredArgsConstructor
@@ -150,5 +153,16 @@ public class DiaryService {
 
     public void deleteDiaryByMemberId(UUID memberId) {
         diaryRepository.deleteByMemberId(memberId);
+    }
+
+    @Transactional
+    public void processImageGenerationResponse(DiaryImageResponseMessage response) {
+        Diary diary = readDiaryById(response.diaryId());
+
+        diary.updatePaintingImageGenerationStatus(response.gridPosition(), response.isSuccess());
+
+        if (diary.isImageGenerationComplete()) {
+            diary.updateDiaryStatus(DiaryStatus.COMPLETED);
+        }
     }
 }
