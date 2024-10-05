@@ -13,12 +13,14 @@ import java.time.Duration;
 @Configuration
 public class SQSConfig {
 
-    private static final Region region = Region.AP_NORTHEAST_2;
+    private static final Region REGION = Region.AP_NORTHEAST_2;
+    private static final Duration ACKNOWLEDGEMENT_INTERVAL = Duration.ofSeconds(5);
+    private static final int ACKNOWLEDGEMENT_THRESHOLD = 4;
 
     @Bean
     public SqsAsyncClient sqsAsyncClient() {
         return SqsAsyncClient.builder()
-                .region(region)
+                .region(REGION)
                 .build();
     }
 
@@ -28,12 +30,11 @@ public class SQSConfig {
                 .builder()
                 .configure(options -> options
                         .acknowledgementMode(AcknowledgementMode.ON_SUCCESS)
-                        .acknowledgementInterval(Duration.ofSeconds(5))
-                        .acknowledgementThreshold(4)
+                        .acknowledgementInterval(ACKNOWLEDGEMENT_INTERVAL)
+                        .acknowledgementThreshold(ACKNOWLEDGEMENT_THRESHOLD)
                         .acknowledgementOrdering(AcknowledgementOrdering.ORDERED)
                 )
                 .sqsAsyncClient(sqsAsyncClient())
                 .build();
     }
-
 }
