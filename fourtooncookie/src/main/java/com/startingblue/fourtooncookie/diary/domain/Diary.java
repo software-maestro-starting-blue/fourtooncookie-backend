@@ -80,12 +80,11 @@ public final class Diary extends BaseEntity {
     }
 
     public void updatePaintingImageGenerationStatus(int index, boolean isImageGenerationSuccess) {
-        DiaryPaintingImageGenerationStatus status = isImageGenerationSuccess
-                ? DiaryPaintingImageGenerationStatus.SUCCESS
-                : DiaryPaintingImageGenerationStatus.FAILURE;
-
-        paintingImageGenerationStatuses.set(index, status);
+        paintingImageGenerationStatuses = new ArrayList<>(paintingImageGenerationStatuses);
+        paintingImageGenerationStatuses.set(index,
+                isImageGenerationSuccess ? DiaryPaintingImageGenerationStatus.SUCCESS : DiaryPaintingImageGenerationStatus.FAILURE);
     }
+
 
     public void updateDiaryStatus(DiaryStatus status) {
         this.status = status;
