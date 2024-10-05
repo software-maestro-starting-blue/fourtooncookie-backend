@@ -6,6 +6,7 @@ import com.startingblue.fourtooncookie.diary.service.DiaryService;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,23 +21,18 @@ public class DiarySQSMessageListener {
     private final DiaryService diaryService;
     private final ObjectMapper objectMapper;
 
-    @SqsListener(value = "${aws.sqs.fourtooncookie.image.response.sqs.fifo}", factory = "defaultSqsListenerContainerFactory")
-    public CompletableFuture<Void> handleSQSMessage(String message) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                DiaryImageResponseMessage response = parseMessage(message);
-                diaryService.processImageGenerationResponse(response);
-            } catch (JacksonException e) {
-                log.error("Failed to parse message due to invalid format: {}", message, e);
-                throw new RuntimeException("Failed to process message: " + message, e);
-            } catch (IllegalArgumentException e) {
-                log.error("Invalid argument: {}", e.getMessage());
-                throw e;
-            } catch (Exception e) {
-                log.error("Unexpected error occurred while processing message: {}", message, e);
-                throw new RuntimeException("Unexpected error occurred", e);
-            }
-        });
+    @SqsListener(value = "${aws.sqs.fourtooncookie.image.response.sqs.fifo}")
+    public void handleSQSMessage(String message) {
+        try {
+            DiaryImageResponseMessage response = parseMessage(message);
+            diaryService.processImageGenerationResponse(response);
+        } catch (JacksonException e) {
+            log.error("Failed to parse message due to invalid format: {}", message, e);
+        } catch (IllegalArgumentException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected error occurred", e);
+        }
     }
 
     private DiaryImageResponseMessage parseMessage(String message) throws JacksonException {
