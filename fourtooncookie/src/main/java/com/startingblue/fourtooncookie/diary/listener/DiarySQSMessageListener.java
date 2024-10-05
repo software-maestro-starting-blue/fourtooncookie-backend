@@ -6,11 +6,8 @@ import com.startingblue.fourtooncookie.diary.service.DiaryService;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +22,7 @@ public class DiarySQSMessageListener {
     public void handleSQSMessage(String message) {
         try {
             DiaryImageResponseMessage response = parseMessage(message);
+            log.info("received message: {}", response);
             diaryService.processImageGenerationResponse(response);
         } catch (JacksonException e) {
             log.error("Failed to parse message due to invalid format: {}", message, e);

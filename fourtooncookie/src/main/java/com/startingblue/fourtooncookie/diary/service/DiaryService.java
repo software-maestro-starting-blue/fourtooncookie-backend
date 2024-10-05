@@ -157,7 +157,7 @@ public class DiaryService {
 
     @Transactional
     public void processImageGenerationResponse(DiaryImageResponseMessage response) {
-        Diary diary = readDiaryById(response.diaryId());
+        Diary diary = diaryRepository.findById(response.diaryId()).orElseThrow(DiaryNotFoundException::new);
 
         diary.updatePaintingImageGenerationStatus(response.gridPosition(), response.isSuccess());
 
