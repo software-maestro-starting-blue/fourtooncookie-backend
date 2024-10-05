@@ -35,7 +35,7 @@ public class DiarySQSMessageListener {
             } catch (JacksonException e) {
                 log.error("Failed to parse message due to invalid format: {}", message, e);
             } catch (Exception e) {
-                throw new RuntimeException("Unexpected error occurred", e);
+                throw new RuntimeException("Unexpected error occurred");
             }
         }).exceptionally(ex -> {
             log.error("Error handling SQS message", ex);
