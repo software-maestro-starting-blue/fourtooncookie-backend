@@ -157,6 +157,7 @@ public class DiaryService {
 
     @Transactional
     public boolean existsById(Long diaryId) {
+        if (diaryId == null) return false;
         return diaryRepository.existsById(diaryId);
     }
 
