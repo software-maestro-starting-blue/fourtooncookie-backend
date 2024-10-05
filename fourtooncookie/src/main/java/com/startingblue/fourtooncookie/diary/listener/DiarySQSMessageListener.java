@@ -6,6 +6,7 @@ import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryPaintingImageGenerationStatus;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
+import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
 import com.startingblue.fourtooncookie.diary.service.DiaryService;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DiarySQSMessageListener {
 
-    private final DiaryService diaryService;
     private final ObjectMapper objectMapper;
     private final DiaryRepository diaryRepository;
 
@@ -35,7 +35,8 @@ public class DiarySQSMessageListener {
                     response.gridPosition(),
                     response.isSuccess());
 
-            Diary diary = diaryService.readById(response.diaryId());
+            Diary diary = diaryRepository.findById(response.diaryId())
+                    .orElseThrow(DiaryNotFoundException::new);
 
             if (response.isSuccess()) {
                 handleImageGenerationSuccess(diary, response.gridPosition());
