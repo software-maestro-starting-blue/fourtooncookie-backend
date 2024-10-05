@@ -56,7 +56,7 @@ public class DiarySQSMessageListener {
         }
     }
 
-    private void handleImageGenerationSuccess(Diary diary, int gridPosition) {
+    protected void handleImageGenerationSuccess(Diary diary, int gridPosition) {
         updatePaintingImageGenerationStatus(diary, gridPosition, DiaryPaintingImageGenerationStatus.SUCCESS);
 
         if (diary.isImageGenerationComplete()) {
@@ -65,11 +65,11 @@ public class DiarySQSMessageListener {
         }
     }
 
-    private void handleImageGenerationFailure(Diary diary, int gridPosition) {
+    protected void handleImageGenerationFailure(Diary diary, int gridPosition) {
         updatePaintingImageGenerationStatus(diary, gridPosition, DiaryPaintingImageGenerationStatus.FAILURE);
     }
 
-    private void updatePaintingImageGenerationStatus(Diary diary, int gridPosition, DiaryPaintingImageGenerationStatus status) {
+    protected void updatePaintingImageGenerationStatus(Diary diary, int gridPosition, DiaryPaintingImageGenerationStatus status) {
         diary.updatePaintingImageGenerationStatus(gridPosition, status);
         diaryRepository.save(diary);
     }
