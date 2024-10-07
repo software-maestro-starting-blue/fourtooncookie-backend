@@ -9,4 +9,6 @@ public interface FcmRepository extends JpaRepository<FcmToken, Long> {
 
     @Query("SELECT f FROM FcmToken f JOIN f.diaries d WHERE d.id = :diaryId")
     Optional<FcmToken> findByDiaryId(Long diaryId);
+
+    Optional<FcmToken> findByFcmToken(String token);
 }
