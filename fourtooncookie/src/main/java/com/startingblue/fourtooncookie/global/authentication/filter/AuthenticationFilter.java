@@ -1,6 +1,5 @@
 package com.startingblue.fourtooncookie.global.authentication.filter;
 
-import com.startingblue.fourtooncookie.diary.listener.DiarySQSMessageListener;
 import com.startingblue.fourtooncookie.global.authentication.jwt.JwtExtractor;
 import com.startingblue.fourtooncookie.member.service.MemberService;
 import io.jsonwebtoken.Claims;
