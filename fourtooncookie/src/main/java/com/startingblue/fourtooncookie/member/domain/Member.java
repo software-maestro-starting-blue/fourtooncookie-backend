@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.member.domain;
 
+import com.startingblue.fourtooncookie.fcm.domain.FcmToken;
 import com.startingblue.fourtooncookie.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,6 +38,10 @@ public class Member extends BaseEntity {
 
     @Column(name = "deleted_date_time")
     private LocalDateTime deletedDateTime;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "fcm_token_id")
+    private FcmToken fcmToken;
 
     public void update(String name, LocalDate birth, Gender gender) {
         this.name = name;
