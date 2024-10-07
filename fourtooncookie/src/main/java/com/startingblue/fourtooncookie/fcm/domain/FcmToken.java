@@ -1,13 +1,11 @@
 package com.startingblue.fourtooncookie.fcm.domain;
 
-import com.startingblue.fourtooncookie.diary.domain.Diary;
+import com.startingblue.fourtooncookie.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.Set;
 
 @Entity
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -17,12 +15,16 @@ public class FcmToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "fcm_token_id")
     private Long id;
 
-    @OneToMany(mappedBy = "fcmToken", fetch = FetchType.LAZY)
-    private Set<Diary> diaries;
-
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String fcmToken;
+
+    @OneToOne(mappedBy = "fcmToken")
+    private Member member;
+
+    public FcmToken(String fcmToken, Member member) {
+        this.fcmToken = fcmToken;
+        this.member = member;
+    }
 }

@@ -5,10 +5,15 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.startingblue.fourtooncookie.fcm.domain.FcmToken;
 import com.startingblue.fourtooncookie.fcm.domain.FcmRepository;
-import com.startingblue.fourtooncookie.fcm.dto.FcmRequest;
+import com.startingblue.fourtooncookie.member.domain.Member;
+import com.startingblue.fourtooncookie.member.domain.MemberRepository;
+import com.startingblue.fourtooncookie.member.exception.MemberNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +21,17 @@ import org.springframework.stereotype.Service;
 public class FcmService {
 
     private final FcmRepository fcmRepository;
+    private final MemberRepository memberRepository;
+
+    public void saveFcmToken(String token, UUID memberId) {
+        Member member = memberRepository.findById(memberId).get();
+
+        fcmRepository.findByFcmToken(token)
+                .orElseGet(() -> {
+                    FcmToken newToken = new FcmToken(token, member);
+                    return fcmRepository.save(newToken);
+                });
+    }
 
     public void sendFcmMessage(Long diaryId) {
         createFcmRequest();
