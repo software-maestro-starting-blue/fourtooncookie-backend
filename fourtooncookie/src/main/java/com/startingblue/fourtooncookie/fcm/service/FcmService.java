@@ -1,70 +1,43 @@
 package com.startingblue.fourtooncookie.fcm.service;
 
-
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
+import com.startingblue.fourtooncookie.fcm.domain.FcmToken;
+import com.startingblue.fourtooncookie.fcm.domain.FcmRepository;
 import com.startingblue.fourtooncookie.fcm.dto.FcmRequest;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.*;
-import org.springframework.http.converter.StringHttpMessageConverter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class FcmService {
 
-    public int sendMessageTo(FcmRequest fcmSendDto) throws IOException {
+    private final FcmRepository fcmRepository;
 
-        String message = makeMessage(fcmSendDto);
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.getMessageConverters()
-                .add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+    public void sendFcmMessage(Long diaryId) {
+        createFcmRequest();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + getAccessToken());
+        fcmRepository.findByDiaryId(diaryId).ifPresentOrElse(fcmToken -> {
+            try {
+                Message message = Message.builder()
+                        .setToken(fcmToken.getFcmToken()) // 조회한 FCM 토큰 설정
+                        .setNotification(Notification.builder()
+                                .setTitle(diaryId + "님 알림도착했습니다!")
+                                .setBody(diaryId + "일기가 완성됐습니다. 지금 당장 확인하세요!")
+                                .build())
+                        .build();
+                String response = FirebaseMessaging.getInstance().send(message);
+                log.info("FCM message sent successfully: {}", response);
 
-        HttpEntity entity = new HttpEntity<>(message, headers);
-
-        String API_URL = "<https://fcm.googleapis.com/v1/projects/adjh54-a0189/messages:send>";
-        ResponseEntity response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
-
-        System.out.println(response.getStatusCode());
-
-        return response.getStatusCode() == HttpStatus.OK ? 1 : 0;
+            } catch (Exception e) {
+                log.error("Error sending FCM message: {}", e.getMessage());
+            }
+        }, () -> log.warn("No FCM token found for Diary ID: " + diaryId));
     }
 
-    private String getAccessToken() throws IOException {
-        String firebaseConfigPath = "firebase/adjh54-dev-firebase-key.json";
-
-        GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
-                .createScoped(List.of("<https://www.googleapis.com/auth/cloud-platform>"));
-
-        googleCredentials.refreshIfExpired();
-        return googleCredentials.getAccessToken().getTokenValue();
-    }
-
-    /**
-     * FCM 전송 정보를 기반으로 메시지를 구성합니다. (Object -> String)
-     *
-     * @param fcmSendDto FcmSendDto
-     * @return String
-     */
-    private String makeMessage(FcmRequest fcmSendDto) {
-
-        ObjectMapper om = new ObjectMapper();
-        FcmMessageDto fcmMessageDto = FcmMessageDto.builder()
-                .message(FcmMessageDto.Message.builder()
-                        .token(fcmSendDto.getToken())
-                        .notification(FcmMessageDto.Notification.builder()
-                                .title(fcmSendDto.getTitle())
-                                .body(fcmSendDto.getBody())
-                                .image(null)
-                                .build()
-                        ).build()).validateOnly(false).build();
-
-        return om.writeValueAsString(fcmMessageDto);
+    private void createFcmRequest() {
     }
 }
