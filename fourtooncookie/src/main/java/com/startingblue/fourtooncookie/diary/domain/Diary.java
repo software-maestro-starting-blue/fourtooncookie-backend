@@ -2,6 +2,7 @@ package com.startingblue.fourtooncookie.diary.domain;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.diary.domain.converter.DiaryPaintingImageGenerationStatusListConverter;
+import com.startingblue.fourtooncookie.fcm.domain.FcmToken;
 import com.startingblue.fourtooncookie.global.domain.BaseEntity;
 import com.startingblue.fourtooncookie.global.converter.jpa.UrlListToStringConverter;
 import jakarta.persistence.*;
@@ -57,6 +58,10 @@ public final class Diary extends BaseEntity {
     @Convert(converter = DiaryPaintingImageGenerationStatusListConverter.class)
     @Builder.Default
     private List<DiaryPaintingImageGenerationStatus> paintingImageGenerationStatuses = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fcm_token_id")
+    private FcmToken fcmToken;
 
     public static DiaryBuilder builder() {
         return new CustomDiaryBuilder();
