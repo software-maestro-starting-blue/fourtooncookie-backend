@@ -81,7 +81,7 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/com.google.firebase/firebase-messaging
 	implementation group: 'com.google.firebase', name: 'firebase-messaging', version: '24.0.2'
-
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
 }
 
 tasks.named('test') {
