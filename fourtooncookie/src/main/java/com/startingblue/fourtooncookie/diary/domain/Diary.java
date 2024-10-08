@@ -63,11 +63,10 @@ public final class Diary extends BaseEntity {
     }
 
     public void update(String content,
-                       Character character,
-                       DiaryStatus status) {
+                       Character character) {
         this.content = content;
         this.character = character;
-        this.status = status;
+        this.status = DiaryStatus.IN_PROGRESS;
         paintingImageGenerationStatuses = new ArrayList<>(
                 Collections.nCopies(paintingImageGenerationStatuses.size(), DiaryPaintingImageGenerationStatus.GENERATING)
         );

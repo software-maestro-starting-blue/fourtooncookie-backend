@@ -123,7 +123,7 @@ public class DiaryService {
     public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
         Diary existedDiary = readById(diaryId);
         Character character = characterService.readById(request.characterId());
-        existedDiary.update(request.content(), character, DiaryStatus.IN_PROGRESS);
+        existedDiary.update(request.content(), character);
         diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(existedDiary, character);
     }
 
