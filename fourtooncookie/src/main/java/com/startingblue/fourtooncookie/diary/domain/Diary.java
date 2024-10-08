@@ -68,6 +68,9 @@ public final class Diary extends BaseEntity {
         this.content = content;
         this.character = character;
         this.status = status;
+        paintingImageGenerationStatuses = new ArrayList<>(
+                Collections.nCopies(paintingImageGenerationStatuses.size(), DiaryPaintingImageGenerationStatus.GENERATING)
+        );
         validate();
     }
 
