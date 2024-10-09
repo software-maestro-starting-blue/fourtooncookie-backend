@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.diary.service;
 
-import com.startingblue.fourtooncookie.aws.cloudfront.CloudFrontService;
+import com.startingblue.fourtooncookie.aws.cloudfront.service.CloudFrontService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

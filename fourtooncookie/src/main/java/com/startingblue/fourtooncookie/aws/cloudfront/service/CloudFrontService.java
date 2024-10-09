@@ -1,8 +1,7 @@
-package com.startingblue.fourtooncookie.aws.cloudfront;
+package com.startingblue.fourtooncookie.aws.cloudfront.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.cloudfront.CloudFrontClient;
 import software.amazon.awssdk.services.cloudfront.model.CreateInvalidationRequest;
