@@ -21,10 +21,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -147,9 +151,5 @@ public class DiaryService {
     public boolean verifyDiaryOwner(UUID memberId, Long diaryId) {
         Diary foundDiary = readById(diaryId);
         return foundDiary.isOwner(memberId);
-    }
-  
-    public void deleteDiaryByMemberId(UUID memberId) {
-        diaryRepository.deleteByMemberId(memberId);
     }
 }
