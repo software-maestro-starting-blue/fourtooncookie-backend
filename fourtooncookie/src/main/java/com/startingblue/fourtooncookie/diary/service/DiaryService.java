@@ -88,8 +88,10 @@ public class DiaryService {
         );
 
         return diaries.getContent().stream().map(savedDiary -> {
-            List<URL> signedUrls = generateSignedUrls(savedDiary.getId());
-            savedDiary.updatePaintingImageUrls(signedUrls);
+            if (savedDiary.isImageGenerationComplete()) {
+                List<URL> signedUrls = generateSignedUrls(savedDiary.getId());
+                savedDiary.updatePaintingImageUrls(signedUrls);
+            }
             return savedDiary;
         }).collect(Collectors.toList());
     }
