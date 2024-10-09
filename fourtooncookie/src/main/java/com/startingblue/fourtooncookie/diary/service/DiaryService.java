@@ -124,8 +124,9 @@ public class DiaryService {
         diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(existedDiary, character);
     }
 
-    public void deleteDiary(Long diaryId) {
+    public void deleteDiaryById(Long diaryId) {
         Diary foundDiary = readById(diaryId);
+        diaryS3Service.deleteImagesByDiaryId(diaryId);
         diaryRepository.delete(foundDiary);
     }
 
@@ -147,7 +148,7 @@ public class DiaryService {
         Diary foundDiary = readById(diaryId);
         return foundDiary.isOwner(memberId);
     }
-
+  
     public void deleteDiaryByMemberId(UUID memberId) {
         diaryRepository.deleteByMemberId(memberId);
     }

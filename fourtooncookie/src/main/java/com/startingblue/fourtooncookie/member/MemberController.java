@@ -1,13 +1,16 @@
 package com.startingblue.fourtooncookie.member;
 
-import com.startingblue.fourtooncookie.diary.service.DiaryService;
 import com.startingblue.fourtooncookie.member.dto.request.MemberSaveRequest;
 import com.startingblue.fourtooncookie.member.dto.response.MemberSavedResponse;
 import com.startingblue.fourtooncookie.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
@@ -16,7 +19,6 @@ import java.util.UUID;
 public final class MemberController {
 
     private final MemberService memberService;
-    private final DiaryService diaryService;
 
     @GetMapping("/member")
     public ResponseEntity<MemberSavedResponse> readMember(UUID memberId) {
@@ -33,7 +35,6 @@ public final class MemberController {
     @DeleteMapping("/member")
     public ResponseEntity<HttpStatus> hardDeleteMember(UUID memberId) {
         memberService.hardDeleteById(memberId);
-        diaryService.deleteDiaryByMemberId(memberId);
         return ResponseEntity
                 .noContent()
                 .build();

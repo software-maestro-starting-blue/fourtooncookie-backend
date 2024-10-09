@@ -1,22 +1,30 @@
 package com.startingblue.fourtooncookie.aws.s3.service;
 
-import com.startingblue.fourtooncookie.aws.s3.exception.*;
+import com.startingblue.fourtooncookie.aws.s3.exception.S3Exception;
+import com.startingblue.fourtooncookie.aws.s3.exception.S3PathNotFoundException;
+import com.startingblue.fourtooncookie.aws.s3.exception.S3PreSignUrlException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.Delete;
+import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
+import software.amazon.awssdk.services.s3.model.S3Object;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.net.URL;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -97,4 +105,40 @@ public class S3Service {
         }
     }
 
+    public void deleteObjectsInFolder(String bucketName, String folderKey) {
+        try {
+            if (!folderKey.endsWith("/")) {
+                folderKey += "/";
+            }
+
+            ListObjectsV2Request listObjectsRequest = ListObjectsV2Request.builder()
+                    .bucket(bucketName)
+                    .prefix(folderKey)
+                    .build();
+
+            ListObjectsV2Response listObjectsResponse = s3Client.listObjectsV2(listObjectsRequest);
+            List<S3Object> objectList = listObjectsResponse.contents();
+
+            List<ObjectIdentifier> objectIdentifiers = objectList.stream()
+                    .map(s3Object -> ObjectIdentifier.builder()
+                            .key(s3Object.key())
+                            .build())
+                    .collect(Collectors.toList());
+
+            if (!objectIdentifiers.isEmpty()) {
+                DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
+                        .bucket(bucketName)
+                        .delete(Delete.builder().objects(objectIdentifiers).build())
+                        .build();
+
+                s3Client.deleteObjects(deleteObjectsRequest);
+            }
+        } catch (NoSuchBucketException e) {
+            throw new S3PathNotFoundException("S3에 버킷이 존재하지 않습니다.");
+        } catch (NoSuchKeyException e) {
+            throw new S3PathNotFoundException(String.format("S3에 키가 존재하지 않습니다. Key: %s", folderKey));
+        } catch (Exception e) {
+            throw new S3Exception(String.format("S3에서 삭제 중 오류가 발생했습니다. Key: %s", folderKey), e);
+        }
+    }
 }
