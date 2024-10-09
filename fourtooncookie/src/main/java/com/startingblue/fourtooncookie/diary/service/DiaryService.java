@@ -73,7 +73,7 @@ public class DiaryService {
     @Transactional(readOnly = true)
     public Diary readDiaryById(final Long diaryId) {
         Optional<Diary> foundDiary = diaryRepository.findById(diaryId);
-        if (foundDiary.get().isImageGenerationComplete()) {
+        if (foundDiary.get().isCompleted()) {
             List<URL> signedUrls = generateSignedUrls(foundDiary.get().getId());
             foundDiary.get().updatePaintingImageUrls(signedUrls);
         }
@@ -89,7 +89,7 @@ public class DiaryService {
         );
 
         return diaries.getContent().stream().map(savedDiary -> {
-            if (savedDiary.isImageGenerationComplete()) {
+            if (savedDiary.isCompleted()) {
                 List<URL> signedUrls = generateSignedUrls(savedDiary.getId());
                 savedDiary.updatePaintingImageUrls(signedUrls);
             }
@@ -125,8 +125,8 @@ public class DiaryService {
         Diary existedDiary = readById(diaryId);
         Character character = characterService.readById(request.characterId());
         existedDiary.update(request.content(), character);
-        diaryPaintingImageCloudFrontService.invalidateCache(diaryId);
         diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(existedDiary, character);
+        diaryPaintingImageCloudFrontService.invalidateCache(diaryId);
     }
 
     public void deleteDiary(Long diaryId) {

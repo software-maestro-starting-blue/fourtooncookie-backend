@@ -101,6 +101,10 @@ public final class Diary extends BaseEntity {
                 .allMatch(DiaryPaintingImageGenerationStatus.SUCCESS::equals);
     }
 
+    public boolean isCompleted() {
+        return status == DiaryStatus.COMPLETED;
+    }
+
     private void validate() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
