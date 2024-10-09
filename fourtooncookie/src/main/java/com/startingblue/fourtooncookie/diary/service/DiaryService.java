@@ -75,7 +75,9 @@ public class DiaryService {
         Optional<Diary> foundDiary = diaryRepository.findById(diaryId);
         List<URL> preSignedUrls = generateSignedUrls(foundDiary.get().getId());
 
-        foundDiary.get().updatePaintingImageUrls(preSignedUrls);
+        if (foundDiary.get().isImageGenerationComplete()) {
+            foundDiary.get().updatePaintingImageUrls(preSignedUrls);
+        }
         return foundDiary.get();
     }
 
