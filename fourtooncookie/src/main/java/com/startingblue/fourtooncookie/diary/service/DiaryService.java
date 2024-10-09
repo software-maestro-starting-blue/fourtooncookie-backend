@@ -1,6 +1,5 @@
 package com.startingblue.fourtooncookie.diary.service;
 
-import com.startingblue.fourtooncookie.aws.cloudfront.CloudFrontService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.service.CharacterService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
@@ -11,7 +10,6 @@ import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
-import com.startingblue.fourtooncookie.diary.listener.DiarySQSMessageListener;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +45,6 @@ public class DiaryService {
     private final DiaryS3Service diaryS3Service;
     private final DiaryPaintingImageCloudFrontService diaryPaintingImageCloudFrontService;
     private final DiaryLambdaService diaryImageGenerationLambdaInvoker;
-    private final CloudFrontService cloudFrontService;
 
     public Long createDiary(final DiarySaveRequest request, final UUID memberId) {
         Member member = memberService.readById(memberId);
@@ -125,7 +122,7 @@ public class DiaryService {
         Diary existedDiary = readById(diaryId);
         Character character = characterService.readById(request.characterId());
         existedDiary.update(request.content(), character);
-        cloudFrontService.invalidateCache(diaryId + "/");
+        diaryPaintingImageCloudFrontService.invalidateCache(diaryId);
         diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(existedDiary, character);
     }
 

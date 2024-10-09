@@ -34,9 +34,6 @@ public class CloudFrontService {
     private static final String END_PRIVATE_KEY = "-----END PRIVATE KEY-----";
     private static final String KEY_FACTORY_ALGORITHM = "RSA";
 
-    @Value("${cloudfront.distribution.id}")
-    private String distributionId;
-
     public URL generateSignedUrl(String path, String cloudFrontDomainName, String keyPairId, String privateKeyPath) {
         try {
             String resourcePath = buildResourcePath(cloudFrontDomainName, path);
@@ -51,7 +48,7 @@ public class CloudFrontService {
         }
     }
 
-    public void invalidateCache(String filePath) {
+    public void invalidateCache(String distributionId, String filePath) {
         try (CloudFrontClient cloudFrontClient = CloudFrontClient.builder().build()) {
             builder().build();
             InvalidationBatch invalidationBatch = InvalidationBatch.builder()
