@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.diary.service;
 
+import com.startingblue.fourtooncookie.aws.cloudfront.CloudFrontService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.service.CharacterService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
@@ -47,6 +47,7 @@ public class DiaryService {
     private final DiaryS3Service diaryS3Service;
     private final DiaryPaintingImageCloudFrontService diaryPaintingImageCloudFrontService;
     private final DiaryLambdaService diaryImageGenerationLambdaInvoker;
+    private final CloudFrontService cloudFrontService;
 
     public Long createDiary(final DiarySaveRequest request, final UUID memberId) {
         Member member = memberService.readById(memberId);
@@ -124,6 +125,7 @@ public class DiaryService {
         Diary existedDiary = readById(diaryId);
         Character character = characterService.readById(request.characterId());
         existedDiary.update(request.content(), character);
+        cloudFrontService.invalidateCache(diaryId + "/");
         diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(existedDiary, character);
     }
 
