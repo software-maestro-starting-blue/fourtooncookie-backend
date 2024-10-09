@@ -43,6 +43,6 @@ public class DiaryPaintingImageCloudFrontService {
     }
 
     private String getFolderPath(Long diaryId) {
-        return String.format("%s/*", diaryId);
+        return String.format("/%s/*", diaryId);
     }
 }
