@@ -34,6 +34,8 @@ public class CloudFrontService {
     private static final String END_PRIVATE_KEY = "-----END PRIVATE KEY-----";
     private static final String KEY_FACTORY_ALGORITHM = "RSA";
 
+    private final CloudFrontClient cloudFrontClient;
+
     public URL generateSignedUrl(String path, String cloudFrontDomainName, String keyPairId, String privateKeyPath) {
         try {
             String resourcePath = buildResourcePath(cloudFrontDomainName, path);
@@ -49,11 +51,10 @@ public class CloudFrontService {
     }
 
     public void invalidateCache(String distributionId, String filePath) {
-        try (CloudFrontClient cloudFrontClient = CloudFrontClient.builder().build()) {
-            builder().build();
+        try {
             InvalidationBatch invalidationBatch = InvalidationBatch.builder()
                     .paths(builder().items(filePath).quantity(1).build())
-                    .callerReference(String.valueOf(System.currentTimeMillis())) // 고유 참조값
+                    .callerReference(String.valueOf(System.currentTimeMillis())) // Unique reference
                     .build();
 
             CreateInvalidationRequest invalidationRequest = CreateInvalidationRequest.builder()
@@ -62,11 +63,12 @@ public class CloudFrontService {
                     .build();
 
             cloudFrontClient.createInvalidation(invalidationRequest);
-            log.info("CloudFront 캐시 무효화 완료: {}", filePath);
+            log.info("CloudFront cache invalidation completed for: {}", filePath);
         } catch (Exception e) {
-            log.error("CloudFront 캐시 무효화 중 오류 발생: {}", e.getMessage());
+            log.error("Error occurred during CloudFront cache invalidation: {}", e.getMessage());
         }
     }
+
 
     private String buildResourcePath(String cloudFrontDomainName, String path) {
         return String.format("https://%s/%s", cloudFrontDomainName, path);
