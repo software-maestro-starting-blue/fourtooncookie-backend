@@ -73,10 +73,10 @@ public class DiaryService {
     @Transactional(readOnly = true)
     public Diary readDiaryById(final Long diaryId) {
         Optional<Diary> foundDiary = diaryRepository.findById(diaryId);
-        List<URL> preSignedUrls = generateSignedUrls(foundDiary.get().getId());
+        List<URL> signedUrls = generateSignedUrls(foundDiary.get().getId());
 
         if (foundDiary.get().isImageGenerationComplete()) {
-            foundDiary.get().updatePaintingImageUrls(preSignedUrls);
+            foundDiary.get().updatePaintingImageUrls(signedUrls);
         }
         return foundDiary.get();
     }
