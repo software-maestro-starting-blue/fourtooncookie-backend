@@ -146,10 +146,6 @@ public class DiaryService {
                 .orElseThrow(DiaryNotFoundException::new);
     }
 
-    public void deleteDiaryByMemberId(UUID memberId) {
-        diaryRepository.deleteByMemberId(memberId);
-    }
-    
     @Transactional(readOnly = true)
     public void verifyUniqueDiary(UUID memberId, LocalDate diaryDate) {
         if (diaryRepository.existsByMemberIdAndDiaryDate(memberId, diaryDate)) {
