@@ -7,6 +7,7 @@ import com.startingblue.fourtooncookie.diary.dto.response.DiaryCreatedResponse;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
 import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponses;
 import com.startingblue.fourtooncookie.diary.service.DiaryService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.springframework.http.ResponseEntity.*;
@@ -74,7 +76,7 @@ public class DiaryController {
 
     @DeleteMapping("/{diaryId}")
     public ResponseEntity<HttpStatus> deleteDiary(@PathVariable final Long diaryId) {
-        diaryService.deleteDiary(diaryId);
+        diaryService.deleteDiaryById(diaryId);
         return noContent().build();
     }
 

@@ -14,7 +14,11 @@ jobs:
       JWT_ISSUER_URI: ""
       AWS_DIARYIMAGE_BUCKET_NAME: ""
       AWS_DIARYIMAGE_PRESIGNEDURL_DURATION: ""
-
+      AWS_CLOUDFRONT_DOMAIN_NAME: ""
+      AWS_CLOUDFRONT_KEYPAIRID: ""
+      AWS_CLOUDFRONT_PRIVATEKEYPATH: ""
+      AWS_SQS_FOURTOONCOOKIE_IMAGE_RESPONSE_SQS_FIFO: ""
+      
     defaults:
       run:
         working-directory: fourtooncookie

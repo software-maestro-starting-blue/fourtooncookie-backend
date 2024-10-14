@@ -1,6 +1,7 @@
 package com.startingblue.fourtooncookie.diary.domain;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
+import com.startingblue.fourtooncookie.diary.domain.converter.DiaryPaintingImageGenerationStatusListConverter;
 import com.startingblue.fourtooncookie.global.domain.BaseEntity;
 import com.startingblue.fourtooncookie.global.converter.jpa.UrlListToStringConverter;
 import jakarta.persistence.*;
@@ -53,16 +54,22 @@ public final class Diary extends BaseEntity {
     @Builder.Default
     private DiaryStatus status = DiaryStatus.IN_PROGRESS;
 
+    @Convert(converter = DiaryPaintingImageGenerationStatusListConverter.class)
+    @Builder.Default
+    private List<DiaryPaintingImageGenerationStatus> paintingImageGenerationStatuses = new ArrayList<>();
+
     public static DiaryBuilder builder() {
         return new CustomDiaryBuilder();
     }
 
     public void update(String content,
-                       Character character,
-                       DiaryStatus status) {
+                       Character character) {
         this.content = content;
         this.character = character;
-        this.status = status;
+        this.status = DiaryStatus.IN_PROGRESS;
+        paintingImageGenerationStatuses = new ArrayList<>(
+                Collections.nCopies(paintingImageGenerationStatuses.size(), DiaryPaintingImageGenerationStatus.GENERATING)
+        );
         validate();
     }
 
@@ -74,12 +81,28 @@ public final class Diary extends BaseEntity {
         this.paintingImageUrls = new ArrayList<>(paintingImageUrls);
     }
 
+    public void updatePaintingImageGenerationStatus(int index, boolean isImageGenerationSuccess) {
+        paintingImageGenerationStatuses = new ArrayList<>(paintingImageGenerationStatuses);
+        paintingImageGenerationStatuses.set(index,
+                isImageGenerationSuccess ? DiaryPaintingImageGenerationStatus.SUCCESS : DiaryPaintingImageGenerationStatus.FAILURE);
+    }
+
+
     public void updateDiaryStatus(DiaryStatus status) {
         this.status = status;
     }
-
+    
     public boolean isOwner(UUID memberId) {
         return this.memberId.equals(memberId);
+    }
+
+    public boolean isImageGenerationComplete() {
+        return paintingImageGenerationStatuses.stream()
+                .allMatch(DiaryPaintingImageGenerationStatus.SUCCESS::equals);
+    }
+
+    public boolean isCompleted() {
+        return status == DiaryStatus.COMPLETED;
     }
 
     private void validate() {
@@ -111,12 +134,12 @@ public final class Diary extends BaseEntity {
                 Objects.equals(content, diary.content) &&
                 Objects.equals(diaryDate, diary.diaryDate) &&
                 Objects.equals(paintingImageUrls, diary.paintingImageUrls) &&
+                Objects.equals(paintingImageGenerationStatuses, diary.paintingImageGenerationStatuses) &&
                 Objects.equals(character, diary.character) &&
                 Objects.equals(memberId, diary.memberId) &&
                 Objects.equals(getCreatedDateTime(), diary.getCreatedDateTime()) &&
                 Objects.equals(getModifiedDateTime(), diary.getModifiedDateTime());
     }
-
 
     @Override
     public int hashCode() {

@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -19,11 +18,12 @@ import java.util.UUID;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final MemberDiaryService memberDiaryService;
 
     public void save(UUID memberId, MemberSaveRequest memberSaveRequest) {
         if (verifyMemberExists(memberId)) {
             throw new MemberDuplicateException("Member with id " + memberId + " already exists");
-        };
+        }
 
         Member member = Member.builder()
                 .id(memberId)
@@ -36,10 +36,11 @@ public class MemberService {
     }
 
     public Member readById(UUID memberId) {
-        return  memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("member not found"));
+        return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("member not found"));
     }
 
     public void hardDeleteById(UUID memberId) {
+        memberDiaryService.deleteDiariesByMemberId(memberId);
         memberRepository.deleteById(memberId);
     }
 
@@ -56,5 +57,4 @@ public class MemberService {
         Member member = readById(memberId);
         return member.isAdmin();
     }
-
 }
