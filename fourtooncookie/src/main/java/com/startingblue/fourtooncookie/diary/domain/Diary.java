@@ -86,17 +86,17 @@ public final class Diary extends BaseEntity {
         paintingImageGenerationStatuses.set(index,
                 isImageGenerationSuccess ? DiaryPaintingImageGenerationStatus.SUCCESS : DiaryPaintingImageGenerationStatus.FAILURE);
 
-        determineIfPaintingImageGenerationFailed(isImageGenerationSuccess);
-        determineIfPaintingImageGenerationCompleted();
+        determineDiaryStatusIfPaintingImageGenerationFailed(isImageGenerationSuccess);
+        determineDiaryStatusIfPaintingImageGenerationCompleted();
     }
 
-    private void determineIfPaintingImageGenerationFailed(boolean isImageGenerationSuccess) {
+    private void determineDiaryStatusIfPaintingImageGenerationFailed(boolean isImageGenerationSuccess) {
         if (!isImageGenerationSuccess) {
             this.status = DiaryStatus.FAILED;
         }
     }
 
-    private void determineIfPaintingImageGenerationCompleted() {
+    private void determineDiaryStatusIfPaintingImageGenerationCompleted() {
         if (paintingImageGenerationStatuses.stream()
                 .allMatch(DiaryPaintingImageGenerationStatus.SUCCESS::equals)) {
             this.status = DiaryStatus.COMPLETED;
