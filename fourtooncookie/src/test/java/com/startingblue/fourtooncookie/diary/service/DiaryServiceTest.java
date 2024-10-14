@@ -5,12 +5,12 @@ import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
-import com.startingblue.fourtooncookie.global.domain.PaymentType;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
+import com.startingblue.fourtooncookie.global.domain.PaymentType;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.domain.MemberRepository;
@@ -18,19 +18,23 @@ import com.startingblue.fourtooncookie.member.domain.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -52,12 +56,17 @@ class DiaryServiceTest {
     @Autowired
     ArtworkRepository artworkRepository;
 
+    @MockBean
+    private DiaryS3Service diaryS3Service;
+
     private Member member;
     private Character character;
     private Artwork artwork;
 
     @BeforeEach
     void setUp() throws MalformedURLException {
+        MockitoAnnotations.openMocks(this);
+
         diaryRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
         characterRepository.deleteAllInBatch();
@@ -81,13 +90,14 @@ class DiaryServiceTest {
 
     @DisplayName("저장된 일기를 삭제한다.")
     @Test
-    void deleteDiaryTest() throws MalformedURLException {
+    void deleteDiaryByIdTest() throws MalformedURLException {
         // given
         Diary diary = createDiary(LocalDate.of(2024, 7, 21), character, member);
         diaryRepository.save(diary);
+        doNothing().when(diaryS3Service).deleteImagesByDiaryId(anyLong());
 
         // when
-        diaryService.deleteDiary(diary.getId());
+        diaryService.deleteDiaryById(diary.getId());
 
         // then
         boolean exists = diaryRepository.existsById(diary.getId());
@@ -129,7 +139,7 @@ class DiaryServiceTest {
         Long notExistingId = -1L;
 
         // when & then
-        assertThatThrownBy(() -> diaryService.deleteDiary(notExistingId));
+        assertThatThrownBy(() -> diaryService.deleteDiaryById(notExistingId));
 
         boolean exists = diaryRepository.existsById(diary.getId());
         assertThat(exists).isTrue();

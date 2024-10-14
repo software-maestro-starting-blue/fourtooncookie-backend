@@ -1,7 +1,6 @@
 package com.startingblue.fourtooncookie.diary.service;
 
 import com.startingblue.fourtooncookie.aws.s3.service.S3Service;
-import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.global.converter.image.ImageConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,8 +42,11 @@ public class DiaryS3Service {
         return s3Service.getImageFromS3(bucketName, getKeyName(diaryId, gridPosition, IMAGE_PNG_FORMAT));
     }
 
-    private String getKeyName(Long diaryId,  int gridPosition, String imageFormat) {
+    private String getKeyName(Long diaryId, int gridPosition, String imageFormat) {
         return String.format("%s/%s.%s", diaryId, gridPosition, imageFormat);
     }
 
+    public void deleteImagesByDiaryId(Long diaryId) {
+        s3Service.deleteObjectsInFolder(bucketName, String.valueOf(diaryId));
+    }
 }

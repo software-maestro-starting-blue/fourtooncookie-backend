@@ -23,7 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -129,8 +134,9 @@ public class DiaryService {
         diaryPaintingImageCloudFrontService.invalidateCache(diaryId);
     }
 
-    public void deleteDiary(Long diaryId) {
+    public void deleteDiaryById(Long diaryId) {
         Diary foundDiary = readById(diaryId);
+        diaryS3Service.deleteImagesByDiaryId(diaryId);
         diaryRepository.delete(foundDiary);
     }
 
@@ -173,4 +179,5 @@ public class DiaryService {
             diary.updateDiaryStatus(DiaryStatus.COMPLETED);
         }
     }
+
 }
