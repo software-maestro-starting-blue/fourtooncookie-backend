@@ -1,9 +1,11 @@
-package com.startingblue.fourtooncookie.aws.cloudfront;
+package com.startingblue.fourtooncookie.aws.cloudfront.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.cloudfront.CloudFrontClient;
+import software.amazon.awssdk.services.cloudfront.model.CreateInvalidationRequest;
+import software.amazon.awssdk.services.cloudfront.model.InvalidationBatch;
 
 import java.io.IOException;
 import java.net.URL;
@@ -18,6 +20,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 
+import static software.amazon.awssdk.services.cloudfront.model.Paths.builder;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -28,6 +32,8 @@ public class CloudFrontService {
     private static final String BEGIN_PRIVATE_KEY = "-----BEGIN PRIVATE KEY-----";
     private static final String END_PRIVATE_KEY = "-----END PRIVATE KEY-----";
     private static final String KEY_FACTORY_ALGORITHM = "RSA";
+
+    private final CloudFrontClient cloudFrontClient;
 
     public URL generateSignedUrl(String path, String cloudFrontDomainName, String keyPairId, String privateKeyPath) {
         try {
@@ -42,6 +48,26 @@ public class CloudFrontService {
             throw new RuntimeException("Signed URL 생성 중 오류 발생", e);
         }
     }
+
+    public void invalidateCache(String distributionId, String filePath) {
+        try {
+            InvalidationBatch invalidationBatch = InvalidationBatch.builder()
+                    .paths(builder().items(filePath).quantity(1).build())
+                    .callerReference(String.valueOf(System.currentTimeMillis())) // Unique reference
+                    .build();
+
+            CreateInvalidationRequest invalidationRequest = CreateInvalidationRequest.builder()
+                    .distributionId(distributionId)
+                    .invalidationBatch(invalidationBatch)
+                    .build();
+
+            cloudFrontClient.createInvalidation(invalidationRequest);
+            log.info("CloudFront cache invalidation completed for: {}", filePath);
+        } catch (Exception e) {
+            log.error("Error occurred during CloudFront cache invalidation: {}", e.getMessage());
+        }
+    }
+
 
     private String buildResourcePath(String cloudFrontDomainName, String path) {
         return String.format("https://%s/%s", cloudFrontDomainName, path);

@@ -32,6 +32,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.startingblue.fourtooncookie.diary.listener.DiarySQSMessageListener.*;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -76,9 +78,10 @@ public class DiaryService {
     @Transactional(readOnly = true)
     public Diary readDiaryById(final Long diaryId) {
         Optional<Diary> foundDiary = diaryRepository.findById(diaryId);
-        List<URL> preSignedUrls = generateSignedUrls(foundDiary.get().getId());
-
-        foundDiary.get().updatePaintingImageUrls(preSignedUrls);
+        if (foundDiary.get().isCompleted()) {
+            List<URL> signedUrls = generateSignedUrls(foundDiary.get().getId());
+            foundDiary.get().updatePaintingImageUrls(signedUrls);
+        }
         return foundDiary.get();
     }
 
@@ -91,8 +94,10 @@ public class DiaryService {
         );
 
         return diaries.getContent().stream().map(savedDiary -> {
-            List<URL> signedUrls = generateSignedUrls(savedDiary.getId());
-            savedDiary.updatePaintingImageUrls(signedUrls);
+            if (savedDiary.isCompleted()) {
+                List<URL> signedUrls = generateSignedUrls(savedDiary.getId());
+                savedDiary.updatePaintingImageUrls(signedUrls);
+            }
             return savedDiary;
         }).collect(Collectors.toList());
     }
@@ -124,8 +129,9 @@ public class DiaryService {
     public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
         Diary existedDiary = readById(diaryId);
         Character character = characterService.readById(request.characterId());
-        existedDiary.update(request.content(), character, DiaryStatus.IN_PROGRESS);
+        existedDiary.update(request.content(), character);
         diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(existedDiary, character);
+        diaryPaintingImageCloudFrontService.invalidateCache(diaryId);
     }
 
     public void deleteDiaryById(Long diaryId) {
@@ -152,4 +158,26 @@ public class DiaryService {
         Diary foundDiary = readById(diaryId);
         return foundDiary.isOwner(memberId);
     }
+
+    public void deleteDiaryByMemberId(UUID memberId) {
+        diaryRepository.deleteByMemberId(memberId);
+    }
+
+    @Transactional
+    public boolean existsById(Long diaryId) {
+        if (diaryId == null) return false;
+        return diaryRepository.existsById(diaryId);
+    }
+
+    @Transactional
+    public void processImageGenerationResponse(DiaryImageResponseMessage response) {
+        Diary diary = diaryRepository.findById(response.diaryId()).get();
+
+        diary.updatePaintingImageGenerationStatus(response.gridPosition(), response.isSuccess());
+
+        if (diary.isImageGenerationComplete()) {
+            diary.updateDiaryStatus(DiaryStatus.COMPLETED);
+        }
+    }
+
 }
