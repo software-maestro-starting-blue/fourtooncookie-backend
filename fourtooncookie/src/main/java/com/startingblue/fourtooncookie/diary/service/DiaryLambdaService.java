@@ -38,9 +38,9 @@ public class DiaryLambdaService {
             lambdaService.invokeLambda(lambdaClient, IMAGE_GENERATION_FUNCTION_NAME, INVOCATION_TYPE, serializePayload);
         } catch (Exception e) {
             log.error("Lambda 호출 중 오류 발생: {}", e.getMessage());
-            status = DiaryStatus.FAILED;
+            diary.updateDiaryStatus();
         } finally {
-            handleLambdaResult(diary, status);
+            handleLambdaResult(diary);
         }
     }
 
@@ -61,8 +61,8 @@ public class DiaryLambdaService {
         );
     }
 
-    private void handleLambdaResult(Diary diary, DiaryStatus status) {
-        diary.updateDiaryStatus(status);
+    private void handleLambdaResult(Diary diary) {
+        diary.updateDiaryStatus();
         diaryRepository.save(diary);
     }
 

@@ -88,10 +88,13 @@ public final class Diary extends BaseEntity {
     }
 
 
-    public void updateDiaryStatus(DiaryStatus status) {
-        this.status = status;
+    public void updateDiaryStatus() {
+        this.status = paintingImageGenerationStatuses.stream()
+                .anyMatch(status -> status == DiaryPaintingImageGenerationStatus.FAILURE)
+                ? DiaryStatus.FAILED
+                : DiaryStatus.COMPLETED;
     }
-    
+
     public boolean isOwner(UUID memberId) {
         return this.memberId.equals(memberId);
     }

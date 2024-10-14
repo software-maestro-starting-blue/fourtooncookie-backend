@@ -146,6 +146,10 @@ public class DiaryService {
                 .orElseThrow(DiaryNotFoundException::new);
     }
 
+    public void deleteDiaryByMemberId(UUID memberId) {
+        diaryRepository.deleteByMemberId(memberId);
+    }
+    
     @Transactional(readOnly = true)
     public void verifyUniqueDiary(UUID memberId, LocalDate diaryDate) {
         if (diaryRepository.existsByMemberIdAndDiaryDate(memberId, diaryDate)) {
@@ -157,10 +161,6 @@ public class DiaryService {
     public boolean verifyDiaryOwner(UUID memberId, Long diaryId) {
         Diary foundDiary = readById(diaryId);
         return foundDiary.isOwner(memberId);
-    }
-
-    public void deleteDiaryByMemberId(UUID memberId) {
-        diaryRepository.deleteByMemberId(memberId);
     }
 
     @Transactional
@@ -176,7 +176,7 @@ public class DiaryService {
         diary.updatePaintingImageGenerationStatus(response.gridPosition(), response.isSuccess());
 
         if (diary.isImageGenerationComplete()) {
-            diary.updateDiaryStatus(DiaryStatus.COMPLETED);
+            diary.updateDiaryStatus();
         }
     }
 
