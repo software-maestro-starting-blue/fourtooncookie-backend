@@ -81,31 +81,41 @@ public final class Diary extends BaseEntity {
         this.paintingImageUrls = new ArrayList<>(paintingImageUrls);
     }
 
-    public void updatePaintingImageGenerationStatus(int index, boolean isImageGenerationSuccess) {
+    public void updateImageGenerationStatusAtIndex(int index, boolean isImageGenerationSuccess) {
         paintingImageGenerationStatuses = new ArrayList<>(paintingImageGenerationStatuses);
         paintingImageGenerationStatuses.set(index,
                 isImageGenerationSuccess ? DiaryPaintingImageGenerationStatus.SUCCESS : DiaryPaintingImageGenerationStatus.FAILURE);
+
+        determineIfPaintingImageGenerationFailed(isImageGenerationSuccess);
+        determineIfPaintingImageGenerationCompleted();
     }
 
+    private void determineIfPaintingImageGenerationFailed(boolean isImageGenerationSuccess) {
+        if (!isImageGenerationSuccess) {
+            this.status = DiaryStatus.FAILED;
+        }
+    }
 
-    public void updateDiaryStatus() {
-        this.status = paintingImageGenerationStatuses.stream()
-                .anyMatch(status -> status == DiaryPaintingImageGenerationStatus.FAILURE)
-                ? DiaryStatus.FAILED
-                : DiaryStatus.COMPLETED;
+    private void determineIfPaintingImageGenerationCompleted() {
+        if (paintingImageGenerationStatuses.stream()
+                .allMatch(DiaryPaintingImageGenerationStatus.SUCCESS::equals)) {
+            this.status = DiaryStatus.COMPLETED;
+        }
     }
 
     public boolean isOwner(UUID memberId) {
         return this.memberId.equals(memberId);
     }
 
-    public boolean isImageGenerationComplete() {
-        return paintingImageGenerationStatuses.stream()
-                .allMatch(DiaryPaintingImageGenerationStatus.SUCCESS::equals);
-    }
-
     public boolean isCompleted() {
         return status == DiaryStatus.COMPLETED;
+    }
+
+    public void updateDiaryStatusFailed() {
+        this.status = DiaryStatus.FAILED;
+        paintingImageGenerationStatuses = paintingImageGenerationStatuses.stream()
+                .map(status -> DiaryPaintingImageGenerationStatus.FAILURE)
+                .toList();
     }
 
     private void validate() {

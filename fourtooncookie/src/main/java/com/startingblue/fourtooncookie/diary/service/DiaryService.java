@@ -168,12 +168,7 @@ public class DiaryService {
     @Transactional
     public void processImageGenerationResponse(DiaryImageResponseMessage response) {
         Diary diary = diaryRepository.findById(response.diaryId()).get();
-
-        diary.updatePaintingImageGenerationStatus(response.gridPosition(), response.isSuccess());
-
-        if (diary.isImageGenerationComplete()) {
-            diary.updateDiaryStatus();
-        }
+        diary.updateImageGenerationStatusAtIndex(response.gridPosition(), response.isSuccess());
     }
 
 }
