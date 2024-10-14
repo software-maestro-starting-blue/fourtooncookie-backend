@@ -113,9 +113,9 @@ public final class Diary extends BaseEntity {
 
     public void updateDiaryStatusFailed() {
         this.status = DiaryStatus.FAILED;
-        paintingImageGenerationStatuses = paintingImageGenerationStatuses.stream()
-                .map(status -> DiaryPaintingImageGenerationStatus.FAILURE)
-                .toList();
+        paintingImageGenerationStatuses = new ArrayList<>(
+                Collections.nCopies(paintingImageGenerationStatuses.size(), DiaryPaintingImageGenerationStatus.FAILURE)
+        );
     }
 
     private void validate() {
