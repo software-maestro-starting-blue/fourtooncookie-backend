@@ -113,8 +113,9 @@ public final class Diary extends BaseEntity {
 
     public void updateDiaryStatusFailed() {
         this.status = DiaryStatus.FAILED;
+        int paintingImageGenerationStatusesSize = paintingImageGenerationStatuses.size();
         paintingImageGenerationStatuses = new ArrayList<>(
-                Collections.nCopies(paintingImageGenerationStatuses.size(), DiaryPaintingImageGenerationStatus.FAILURE)
+                Collections.nCopies(paintingImageGenerationStatusesSize, DiaryPaintingImageGenerationStatus.FAILURE)
         );
     }
 
