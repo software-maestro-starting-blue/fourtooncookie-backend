@@ -81,28 +81,42 @@ public final class Diary extends BaseEntity {
         this.paintingImageUrls = new ArrayList<>(paintingImageUrls);
     }
 
-    public void updatePaintingImageGenerationStatus(int index, boolean isImageGenerationSuccess) {
+    public void updateImageGenerationStatusAtIndex(int index, boolean isImageGenerationSuccess) {
         paintingImageGenerationStatuses = new ArrayList<>(paintingImageGenerationStatuses);
         paintingImageGenerationStatuses.set(index,
                 isImageGenerationSuccess ? DiaryPaintingImageGenerationStatus.SUCCESS : DiaryPaintingImageGenerationStatus.FAILURE);
+
+        determineDiaryStatusIfPaintingImageGenerationFailed(isImageGenerationSuccess);
+        determineDiaryStatusIfPaintingImageGenerationCompleted();
     }
 
-
-    public void updateDiaryStatus(DiaryStatus status) {
-        this.status = status;
+    private void determineDiaryStatusIfPaintingImageGenerationFailed(boolean isImageGenerationSuccess) {
+        if (!isImageGenerationSuccess) {
+            this.status = DiaryStatus.FAILED;
+        }
     }
-    
+
+    private void determineDiaryStatusIfPaintingImageGenerationCompleted() {
+        if (paintingImageGenerationStatuses.stream()
+                .allMatch(DiaryPaintingImageGenerationStatus.SUCCESS::equals)) {
+            this.status = DiaryStatus.COMPLETED;
+        }
+    }
+
     public boolean isOwner(UUID memberId) {
         return this.memberId.equals(memberId);
     }
 
-    public boolean isImageGenerationComplete() {
-        return paintingImageGenerationStatuses.stream()
-                .allMatch(DiaryPaintingImageGenerationStatus.SUCCESS::equals);
-    }
-
     public boolean isCompleted() {
         return status == DiaryStatus.COMPLETED;
+    }
+
+    public void updateDiaryStatusFailed() {
+        this.status = DiaryStatus.FAILED;
+        int paintingImageGenerationStatusesSize = paintingImageGenerationStatuses.size();
+        paintingImageGenerationStatuses = new ArrayList<>(
+                Collections.nCopies(paintingImageGenerationStatusesSize, DiaryPaintingImageGenerationStatus.FAILURE)
+        );
     }
 
     private void validate() {

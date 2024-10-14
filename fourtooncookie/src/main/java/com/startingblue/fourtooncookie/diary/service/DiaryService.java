@@ -159,10 +159,6 @@ public class DiaryService {
         return foundDiary.isOwner(memberId);
     }
 
-    public void deleteDiaryByMemberId(UUID memberId) {
-        diaryRepository.deleteByMemberId(memberId);
-    }
-
     @Transactional
     public boolean existsById(Long diaryId) {
         if (diaryId == null) return false;
@@ -172,12 +168,7 @@ public class DiaryService {
     @Transactional
     public void processImageGenerationResponse(DiaryImageResponseMessage response) {
         Diary diary = diaryRepository.findById(response.diaryId()).get();
-
-        diary.updatePaintingImageGenerationStatus(response.gridPosition(), response.isSuccess());
-
-        if (diary.isImageGenerationComplete()) {
-            diary.updateDiaryStatus(DiaryStatus.COMPLETED);
-        }
+        diary.updateImageGenerationStatusAtIndex(response.gridPosition(), response.isSuccess());
     }
 
 }
