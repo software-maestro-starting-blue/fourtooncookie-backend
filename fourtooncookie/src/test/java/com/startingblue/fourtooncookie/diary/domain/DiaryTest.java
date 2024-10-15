@@ -6,9 +6,9 @@ import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.global.domain.PaymentType;
-import com.startingblue.fourtooncookie.member.domain.Gender;
+import com.startingblue.fourtooncookie.member.domain.GenderEnum;
 import com.startingblue.fourtooncookie.member.domain.Member;
-import com.startingblue.fourtooncookie.member.domain.MemberRepository;
+import com.startingblue.fourtooncookie.member.MemberRepository;
 import com.startingblue.fourtooncookie.member.domain.Role;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
@@ -58,7 +58,7 @@ public class DiaryTest {
                 .id(UUID.randomUUID())
                 .name("John Doe")
                 .birth(LocalDate.of(1990, 1, 1))
-                .gender(Gender.MALE)
+                .genderEnum(GenderEnum.MALE)
                 .role(Role.MEMBER)
                 .build();
         member = memberRepository.save(member);

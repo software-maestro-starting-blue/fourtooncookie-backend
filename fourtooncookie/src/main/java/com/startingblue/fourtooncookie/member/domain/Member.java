@@ -28,8 +28,8 @@ public class Member extends BaseEntity {
     private LocalDate birth;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "gender")
-    private Gender gender;
+    @Column(name = "genderEnum")
+    private GenderEnum genderEnum;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
@@ -38,10 +38,10 @@ public class Member extends BaseEntity {
     @Column(name = "deleted_date_time")
     private LocalDateTime deletedDateTime;
 
-    public void update(String name, LocalDate birth, Gender gender) {
+    public void update(String name, LocalDate birth, GenderEnum genderEnum) {
         this.name = name;
         this.birth = birth;
-        this.gender = gender;
+        this.genderEnum = genderEnum;
     }
 
     public boolean isAdmin() {

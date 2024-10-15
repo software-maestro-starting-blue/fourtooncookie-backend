@@ -1,9 +1,8 @@
 package com.startingblue.fourtooncookie.member;
 
-import com.startingblue.fourtooncookie.member.dto.request.MemberSaveRequest;
-import com.startingblue.fourtooncookie.member.dto.response.MemberSavedResponse;
-import com.startingblue.fourtooncookie.member.service.MemberService;
-import lombok.RequiredArgsConstructor;
+import com.startingblue.fourtooncookie.member.domain.Member;
+import com.startingblue.fourtooncookie.member.dto.MemberSaveRequest;
+import com.startingblue.fourtooncookie.member.dto.MemberSavedResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,10 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequiredArgsConstructor
 public final class MemberController {
 
     private final MemberService memberService;
+
+    public MemberController(MemberService memberService) {
+        this.memberService = memberService;
+    }
 
     @GetMapping("/member")
     public ResponseEntity<MemberSavedResponse> readMember(UUID memberId) {
@@ -40,3 +42,6 @@ public final class MemberController {
                 .build();
     }
 }
+/**
+ * get, add
+ */

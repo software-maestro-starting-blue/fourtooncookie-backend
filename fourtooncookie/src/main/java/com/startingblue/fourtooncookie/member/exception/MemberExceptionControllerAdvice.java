@@ -12,16 +12,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class MemberExceptionControllerAdvice {
 
     @ExceptionHandler({ EntityNotFoundException.class, MemberNotFoundException.class})
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleEntityNotFoundExceptionException(EntityNotFoundException e) {
+    public void handleEntityNotFoundExceptionException(EntityNotFoundException e) {
         log.error(e.getMessage(), e);
-        return "Member Not Found";
     }
 
     @ExceptionHandler(MemberDuplicateException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public String handleMemberDuplicateException(MemberDuplicateException e) {
+    public void handleMemberDuplicateException(MemberDuplicateException e) {
         log.error(e.getMessage(), e);
-        return "Member Exists";
     }
 }

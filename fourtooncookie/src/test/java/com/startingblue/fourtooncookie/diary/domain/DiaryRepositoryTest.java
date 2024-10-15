@@ -6,9 +6,9 @@ import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.global.domain.PaymentType;
-import com.startingblue.fourtooncookie.member.domain.Gender;
+import com.startingblue.fourtooncookie.member.domain.GenderEnum;
 import com.startingblue.fourtooncookie.member.domain.Member;
-import com.startingblue.fourtooncookie.member.domain.MemberRepository;
+import com.startingblue.fourtooncookie.member.MemberRepository;
 import com.startingblue.fourtooncookie.member.domain.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -173,7 +173,7 @@ class DiaryRepositoryTest {
                 .id(UUID.randomUUID())
                 .name("testUser")
                 .birth(LocalDate.of(2024, 7, 23))
-                .gender(Gender.OTHER)
+                .genderEnum(GenderEnum.OTHER)
                 .role(Role.MEMBER)
                 .build();
         return memberRepository.save(member);

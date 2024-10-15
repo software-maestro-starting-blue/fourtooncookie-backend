@@ -5,15 +5,16 @@ import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
+import com.startingblue.fourtooncookie.diary.DiaryService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
 import com.startingblue.fourtooncookie.global.domain.PaymentType;
-import com.startingblue.fourtooncookie.member.domain.Gender;
+import com.startingblue.fourtooncookie.member.domain.GenderEnum;
 import com.startingblue.fourtooncookie.member.domain.Member;
-import com.startingblue.fourtooncookie.member.domain.MemberRepository;
+import com.startingblue.fourtooncookie.member.MemberRepository;
 import com.startingblue.fourtooncookie.member.domain.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -84,7 +85,7 @@ class DiaryServiceTest {
                 .build();
         characterRepository.save(character);
 
-        member = createMember("민서", LocalDate.of(2000, 5, 31), Gender.MALE);
+        member = createMember("민서", LocalDate.of(2000, 5, 31), GenderEnum.MALE);
         memberRepository.save(member);
     }
 
@@ -210,7 +211,7 @@ class DiaryServiceTest {
         Diary diary = createDiary(LocalDate.now(), character, member);
         diaryRepository.save(diary);
 
-        Member otherMember = createMember("다른 사람", LocalDate.of(1995, 1, 1), Gender.FEMALE);
+        Member otherMember = createMember("다른 사람", LocalDate.of(1995, 1, 1), GenderEnum.FEMALE);
         memberRepository.save(otherMember);
 
         // when
@@ -232,12 +233,12 @@ class DiaryServiceTest {
                 .build();
     }
 
-    private Member createMember(String name, LocalDate birthDate, Gender gender) {
+    private Member createMember(String name, LocalDate birthDate, GenderEnum genderEnum) {
         return Member.builder()
                 .id(UUID.randomUUID())
                 .name(name)
                 .birth(birthDate)
-                .gender(gender)
+                .genderEnum(genderEnum)
                 .role(Role.MEMBER)
                 .build();
     }

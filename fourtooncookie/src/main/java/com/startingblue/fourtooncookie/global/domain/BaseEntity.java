@@ -20,3 +20,5 @@ public abstract class BaseEntity {
     @LastModifiedDate
     private LocalDateTime modifiedDateTime;
 }
+
+// 다 따로 넣기(고민)

@@ -1,7 +1,7 @@
 package com.startingblue.fourtooncookie.diary.authorization;
 
-import com.startingblue.fourtooncookie.diary.service.DiaryService;
-import com.startingblue.fourtooncookie.global.authorization.diary.DiaryOwnerAuthorizationInterceptor;
+import com.startingblue.fourtooncookie.diary.DiaryService;
+import com.startingblue.fourtooncookie.web.interceptor.DiaryOwnerAuthorizationInterceptor;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
