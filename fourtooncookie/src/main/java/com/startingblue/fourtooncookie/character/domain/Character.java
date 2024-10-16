@@ -65,8 +65,15 @@ public class Character {
         return this;
     }
 
-    public void localizeCharacterName(String localizedName) {
-        this.name = localizedName;
+    public Character localizeCharacter(String localizedName, Artwork localizedArtwork ) {
+        return Character.builder()
+                .characterVisionType(characterVisionType)
+                .paymentType(paymentType)
+                .name(localizedName)
+                .artwork(localizedArtwork)
+                .selectionThumbnailUrl(selectionThumbnailUrl)
+                .basePrompt(basePrompt)
+                .build();
     }
 
     private void validate() {
