@@ -65,7 +65,7 @@ public class Character {
         return this;
     }
 
-    public Character localizeCharacter(String localizedName, Artwork localizedArtwork ) {
+    public Character characterWithNameChangeAndArtworkChange(String localizedName, Artwork localizedArtwork ) {
         return Character.builder()
                 .id(id)
                 .characterVisionType(characterVisionType)

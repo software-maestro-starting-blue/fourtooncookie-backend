@@ -12,8 +12,6 @@ import com.startingblue.fourtooncookie.character.dto.request.CharacterUpdateRequ
 import com.startingblue.fourtooncookie.character.exception.CharacterDuplicateException;
 import com.startingblue.fourtooncookie.character.exception.CharacterNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -86,10 +84,10 @@ public class CharacterService {
 
     private Character localizeCharacter(Character character, Locale locale) {
         String localizedArtworkTitle = getLocalizedArtworkTitle(character.getArtwork().getId(), locale);
-        Artwork localizedArtwork = character.getArtwork().localizeArtwork(localizedArtworkTitle);
+        Artwork localizedArtwork = character.getArtwork().artworkWithNameChange(localizedArtworkTitle);
 
         String localizedCharacterName = getLocalizedCharacterName(character.getId(), locale);
-        return character.localizeCharacter(localizedCharacterName, localizedArtwork);
+        return character.characterWithNameChangeAndArtworkChange(localizedCharacterName, localizedArtwork);
     }
 
     private CharacterVisionType findByCharacterVisionType(CharacterVisionType characterVisionType) {

@@ -10,8 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cglib.core.Local;
-import org.springframework.context.MessageSource;
 
 import java.net.URL;
 import java.util.Objects;
@@ -49,7 +47,7 @@ public class Artwork {
         validate();
     }
 
-    public Artwork localizeArtwork(String localizedTitle) {
+    public Artwork artworkWithNameChange(String localizedTitle) {
         return new Artwork(id, localizedTitle, thumbnailUrl);
     }
 
