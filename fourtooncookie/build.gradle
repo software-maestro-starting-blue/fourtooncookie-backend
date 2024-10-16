@@ -11,15 +11,6 @@ plugins {
 	id "io.sentry.jvm.gradle" version "4.11.0"
 }
 
-sourceSets {
-	main {
-		resources {
-			srcDir 'src/main/resources'
-			include 'messages/**'
-		}
-	}
-}
-
 sentry {
 	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
 	// This enables source context, allowing you to see your source
