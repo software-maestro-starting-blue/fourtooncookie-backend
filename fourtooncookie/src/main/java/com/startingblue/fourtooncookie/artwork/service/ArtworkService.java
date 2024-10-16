@@ -58,11 +58,4 @@ public class ArtworkService {
         }
     }
 
-    public void getLocalArtwork(Long artworkId, Locale locale) {
-        Artwork artwork = readById(artworkId);
-
-
-    }
 }
-
-
