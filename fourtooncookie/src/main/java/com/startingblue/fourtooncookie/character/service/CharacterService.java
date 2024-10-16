@@ -5,18 +5,21 @@ import com.startingblue.fourtooncookie.artwork.service.ArtworkService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
+import com.startingblue.fourtooncookie.global.config.XmlMessageSource;
 import com.startingblue.fourtooncookie.global.domain.PaymentType;
 import com.startingblue.fourtooncookie.character.dto.request.CharacterSaveRequest;
 import com.startingblue.fourtooncookie.character.dto.request.CharacterUpdateRequest;
 import com.startingblue.fourtooncookie.character.exception.CharacterDuplicateException;
 import com.startingblue.fourtooncookie.character.exception.CharacterNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Transactional
@@ -25,7 +28,8 @@ public class CharacterService {
 
     private final CharacterRepository characterRepository;
     private final ArtworkService artworkService;
-    private final MessageSource messageSource;
+
+    private final XmlMessageSource messageSource;
 
     public void createCharacter(final CharacterSaveRequest request) {
         CharacterVisionType visionType = findByCharacterVisionType(request.characterVisionType());
@@ -46,7 +50,7 @@ public class CharacterService {
     @Transactional(readOnly = true)
     public List<Character> readAllCharacters(Locale locale) {
         return characterRepository.findAll().stream()
-                .peek(character -> localizeCharacter(character, locale))
+                .map(character -> localizeCharacter(character, locale))
                 .toList();
     }
 
@@ -71,7 +75,7 @@ public class CharacterService {
     @Transactional(readOnly = true)
     public Character readById(Long characterId) {
         return characterRepository.findById(characterId)
-                        .orElseThrow(() -> new CharacterNotFoundException("Character with ID " + characterId + " not found"));
+                .orElseThrow(() -> new CharacterNotFoundException("Character with ID " + characterId + " not found"));
     }
 
     @Transactional(readOnly = true)
@@ -104,10 +108,10 @@ public class CharacterService {
     }
 
     public String getLocalizedCharacterName(Long characterId, Locale locale) {
-        return messageSource.getMessage("character.name." + characterId, null, locale);
+        return Objects.requireNonNull(messageSource.resolveCode("character.name." + characterId, locale)).format(null);
     }
 
     public String getLocalizedArtworkTitle(Long artworkId, Locale locale) {
-        return messageSource.getMessage("artwork.name." + artworkId, null, locale);
+        return Objects.requireNonNull(messageSource.resolveCode("artwork.name." + artworkId, locale)).format(null);
     }
 }
