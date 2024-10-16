@@ -13,7 +13,7 @@ public class MessageConfig {
     @Bean
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasenames("messages");
+        messageSource.setBasenames("classpath:messages/messages");
         messageSource.setFallbackToSystemLocale(false);
         messageSource.setAlwaysUseMessageFormat(true);
         messageSource.setDefaultLocale(Locale.ENGLISH);
