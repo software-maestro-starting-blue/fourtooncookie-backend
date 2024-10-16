@@ -67,6 +67,7 @@ public class Character {
 
     public Character localizeCharacter(String localizedName, Artwork localizedArtwork ) {
         return Character.builder()
+                .id(id)
                 .characterVisionType(characterVisionType)
                 .paymentType(paymentType)
                 .name(localizedName)

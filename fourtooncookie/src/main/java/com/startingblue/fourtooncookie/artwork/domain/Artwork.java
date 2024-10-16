@@ -50,7 +50,7 @@ public class Artwork {
     }
 
     public Artwork localizeArtwork(String localizedTitle) {
-        return new Artwork(localizedTitle, thumbnailUrl);
+        return new Artwork(id, localizedTitle, thumbnailUrl);
     }
 
     private void validate() {
