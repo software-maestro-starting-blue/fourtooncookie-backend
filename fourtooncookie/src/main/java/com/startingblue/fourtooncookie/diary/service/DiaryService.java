@@ -45,22 +45,24 @@ public class DiaryService {
     private static final int MAX_PAINTING_IMAGE_SIZE = 4;
 
     private final DiaryRepository diaryRepository;
+    private final MemberService memberService;
     private final CharacterService characterService;
     private final DiaryS3Service diaryS3Service;
     private final DiaryPaintingImageCloudFrontService diaryPaintingImageCloudFrontService;
     private final DiaryLambdaService diaryImageGenerationLambdaInvoker;
 
     public Long createDiary(final DiarySaveRequest request, final UUID memberId) {
+        Member member = memberService.readById(memberId);
         Character character = characterService.readById(request.characterId());
         verifyUniqueDiary(memberId, request.diaryDate());
 
-        Diary diary = buildDiary(request, memberId, character);
+        Diary diary = buildDiary(request, member, character);
         diaryRepository.save(diary);
         diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(diary, character);
         return diary.getId();
     }
 
-    private Diary buildDiary(DiarySaveRequest request, UUID memberId, Character character) {
+    private Diary buildDiary(DiarySaveRequest request, Member member, Character character) {
         return Diary.builder()
                 .content(request.content())
                 .isFavorite(false)
@@ -69,7 +71,7 @@ public class DiaryService {
                 .paintingImageGenerationStatuses(new ArrayList<>(Collections.nCopies(MAX_PAINTING_IMAGE_SIZE, DiaryPaintingImageGenerationStatus.GENERATING)))
                 .status(DiaryStatus.IN_PROGRESS)
                 .character(character)
-                .memberId(memberId)
+                .memberId(member.getId())
                 .build();
     }
 
@@ -85,8 +87,9 @@ public class DiaryService {
 
     @Transactional(readOnly = true)
     public List<Diary> readDiariesByMemberId(final UUID memberId, final int pageNumber, final int pageSize) {
+        Member foundMember = memberService.readById(memberId);
         Page<Diary> diaries = diaryRepository.findAllByMemberIdOrderByDiaryDateDesc(
-                memberId,
+                foundMember.getId(),
                 PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "diaryDate"))
         );
 
