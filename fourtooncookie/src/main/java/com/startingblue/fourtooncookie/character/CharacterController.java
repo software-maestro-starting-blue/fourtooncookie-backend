@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Locale;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/character")
@@ -27,15 +29,15 @@ public final class CharacterController {
     }
 
     @GetMapping
-    public ResponseEntity<CharacterSavedResponses> readAllCharacters() {
-        CharacterSavedResponses responses = CharacterSavedResponses.of(characterService.readAllCharacters());
+    public ResponseEntity<CharacterSavedResponses> readAllCharacters(Locale locale) {
+        CharacterSavedResponses responses = CharacterSavedResponses.of(characterService.readAllCharacters(locale));
         return ResponseEntity
                 .ok(responses);
     }
 
     @GetMapping("/{characterId}")
-    public ResponseEntity<CharacterSavedResponse> readCharacter(@PathVariable final Long characterId) {
-        CharacterSavedResponse response = CharacterSavedResponse.of(characterService.readById(characterId));
+    public ResponseEntity<CharacterSavedResponse> readCharacter(@PathVariable final Long characterId, Locale locale) {
+        CharacterSavedResponse response = CharacterSavedResponse.of(characterService.readById(characterId, locale));
         return ResponseEntity
                 .ok(response);
     }

@@ -11,10 +11,12 @@ import com.startingblue.fourtooncookie.character.dto.request.CharacterUpdateRequ
 import com.startingblue.fourtooncookie.character.exception.CharacterDuplicateException;
 import com.startingblue.fourtooncookie.character.exception.CharacterNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
 
 @RequiredArgsConstructor
 @Transactional
@@ -23,6 +25,7 @@ public class CharacterService {
 
     private final CharacterRepository characterRepository;
     private final ArtworkService artworkService;
+    private final MessageSource messageSource;
 
     public void createCharacter(final CharacterSaveRequest request) {
         CharacterVisionType visionType = findByCharacterVisionType(request.characterVisionType());
@@ -41,8 +44,10 @@ public class CharacterService {
     }
 
     @Transactional(readOnly = true)
-    public List<Character> readAllCharacters() {
-        return characterRepository.findAll();
+    public List<Character> readAllCharacters(Locale locale) {
+        return characterRepository.findAll().stream()
+                .peek(character -> character.localizeCharacterName(getLocalizedCharacterName(character.getId(), locale)))
+                .toList();
     }
 
     public void updateCharacter(final Long characterId, final CharacterUpdateRequest request) {
@@ -69,6 +74,13 @@ public class CharacterService {
                         .orElseThrow(() -> new CharacterNotFoundException("Character with ID " + characterId + " not found"));
     }
 
+    @Transactional(readOnly = true)
+    public Character readById(Long characterId, Locale locale) {
+        Character foundCharacter = readById(characterId);
+        foundCharacter.localizeCharacterName(getLocalizedCharacterName(foundCharacter.getId(), locale));
+        return foundCharacter;
+    }
+
     private CharacterVisionType findByCharacterVisionType(CharacterVisionType characterVisionType) {
         return CharacterVisionType.valueOf(characterVisionType.name());
     }
@@ -82,5 +94,9 @@ public class CharacterService {
         if (isDuplicate) {
             throw new CharacterDuplicateException("중복된 캐릭터입니다. 동일한 이름, 작품, 결제 유형, 캐릭터 비전 유형을 가진 캐릭터가 이미 존재합니다.");
         }
+    }
+
+    public String getLocalizedCharacterName(Long characterId, Locale locale) {
+        return messageSource.getMessage("character.name." + characterId, null, locale);
     }
 }
