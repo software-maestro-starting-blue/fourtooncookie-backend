@@ -46,7 +46,7 @@ public class CharacterService {
     @Transactional(readOnly = true)
     public List<Character> readAllCharacters(Locale locale) {
         return characterRepository.findAll().stream()
-                .peek(character -> character.localizeCharacterName(getLocalizedCharacterName(character.getId(), locale)))
+                .peek(character -> localizeCharacter(character, locale))
                 .toList();
     }
 
@@ -77,8 +77,15 @@ public class CharacterService {
     @Transactional(readOnly = true)
     public Character readById(Long characterId, Locale locale) {
         Character foundCharacter = readById(characterId);
-        foundCharacter.localizeCharacterName(getLocalizedCharacterName(foundCharacter.getId(), locale));
-        return foundCharacter;
+        return localizeCharacter(foundCharacter, locale);
+    }
+
+    private Character localizeCharacter(Character character, Locale locale) {
+        String localizedArtworkTitle = getLocalizedArtworkTitle(character.getArtwork().getId(), locale);
+        Artwork localizedArtwork = character.getArtwork().localizeArtwork(localizedArtworkTitle);
+
+        String localizedCharacterName = getLocalizedCharacterName(character.getId(), locale);
+        return character.localizeCharacter(localizedCharacterName, localizedArtwork);
     }
 
     private CharacterVisionType findByCharacterVisionType(CharacterVisionType characterVisionType) {
@@ -98,5 +105,9 @@ public class CharacterService {
 
     public String getLocalizedCharacterName(Long characterId, Locale locale) {
         return messageSource.getMessage("character.name." + characterId, null, locale);
+    }
+
+    public String getLocalizedArtworkTitle(Long artworkId, Locale locale) {
+        return messageSource.getMessage("artwork.name." + artworkId, null, locale);
     }
 }
