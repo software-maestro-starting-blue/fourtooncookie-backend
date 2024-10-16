@@ -16,7 +16,7 @@ public class MessageConfig {
         messageSource.setBasenames("messages");
         messageSource.setFallbackToSystemLocale(false);
         messageSource.setAlwaysUseMessageFormat(true);
-        messageSource.setDefaultLocale(Locale.KOREA);
+        messageSource.setDefaultLocale(Locale.ENGLISH);
         messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
     }
