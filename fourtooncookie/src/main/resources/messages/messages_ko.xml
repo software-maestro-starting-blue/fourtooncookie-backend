@@ -4,4 +4,6 @@
     <entry key="character.name.1">랜덤</entry>
     <entry key="character.name.2">말랑</entry>
     <entry key="artwork.name.2">말랑</entry>
+    <entry key="paymentType.free.name">무료</entry>
+    <entry key="paymentType.paid.name">유료</entry>
 </messages>
