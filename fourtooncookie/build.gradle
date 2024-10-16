@@ -11,6 +11,13 @@ plugins {
 	id "io.sentry.jvm.gradle" version "4.11.0"
 }
 
+tasks.named('processResources') {
+	duplicatesStrategy = DuplicatesStrategy.INCLUDE
+	from('src/main/resources') {
+		include '**/*.xml'
+	}
+}
+
 sentry {
 	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
 	// This enables source context, allowing you to see your source
