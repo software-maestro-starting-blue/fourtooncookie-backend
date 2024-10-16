@@ -11,8 +11,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URL;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Slf4j
@@ -64,6 +63,10 @@ public class Character {
         this.basePrompt = basePrompt;
         validate();
         return this;
+    }
+
+    public void localizeCharacterName(String localizedName) {
+        this.name = localizedName;
     }
 
     private void validate() {
