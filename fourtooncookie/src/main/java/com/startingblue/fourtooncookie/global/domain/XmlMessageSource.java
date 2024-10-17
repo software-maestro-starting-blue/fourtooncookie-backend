@@ -3,7 +3,6 @@ package com.startingblue.fourtooncookie.global.domain;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.AbstractMessageSource;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
