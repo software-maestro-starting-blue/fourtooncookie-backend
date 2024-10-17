@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.aws.cloudfront.service;
+package com.startingblue.fourtooncookie.aws.cloudfront;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
