@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.global.config;
+package com.startingblue.fourtooncookie.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.global.config;
+package com.startingblue.fourtooncookie.config;
 
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;

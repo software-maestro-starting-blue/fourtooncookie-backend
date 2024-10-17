@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.global.config;
+package com.startingblue.fourtooncookie.config;
 
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;

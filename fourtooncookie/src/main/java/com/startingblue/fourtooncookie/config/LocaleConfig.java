@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.global.config;
+package com.startingblue.fourtooncookie.config;
 
 import com.startingblue.fourtooncookie.web.interceptor.CustomLocaleChangeInterceptor;
 import lombok.RequiredArgsConstructor;
