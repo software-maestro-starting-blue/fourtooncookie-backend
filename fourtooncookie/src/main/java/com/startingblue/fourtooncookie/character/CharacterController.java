@@ -4,7 +4,6 @@ import com.startingblue.fourtooncookie.character.dto.request.CharacterSaveReques
 import com.startingblue.fourtooncookie.character.dto.request.CharacterUpdateRequest;
 import com.startingblue.fourtooncookie.character.dto.response.CharacterSavedResponse;
 import com.startingblue.fourtooncookie.character.dto.response.CharacterSavedResponses;
-import com.startingblue.fourtooncookie.character.service.CharacterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
