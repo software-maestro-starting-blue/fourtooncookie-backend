@@ -22,7 +22,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Transactional
 @Service
-public class CharacterService {
+public class    CharacterService {
 
     private final CharacterRepository characterRepository;
     private final ArtworkService artworkService;
@@ -51,7 +51,7 @@ public class CharacterService {
 
     @Transactional(readOnly = true)
     public List<Character> readAllCharacters(Locale locale) {
-        return characterRepository.findAll().stream()
+        return readAllCharacters().stream()
                 .map(character -> localizeCharacter(character, locale))
                 .toList();
     }

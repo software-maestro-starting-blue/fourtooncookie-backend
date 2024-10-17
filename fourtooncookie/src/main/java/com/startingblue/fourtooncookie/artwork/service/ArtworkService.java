@@ -30,9 +30,13 @@ public class ArtworkService {
     }
 
     @Transactional(readOnly = true)
+    public List<Artwork> readAllArtworks() {
+        return artworkRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
     public List<Artwork> readAllArtworks(Locale locale) {
-        return artworkRepository.findAll()
-                .stream()
+        return readAllArtworks().stream()
                 .map(artwork -> getArtworkWithNameChange(artwork, locale))
                 .toList();
     }
