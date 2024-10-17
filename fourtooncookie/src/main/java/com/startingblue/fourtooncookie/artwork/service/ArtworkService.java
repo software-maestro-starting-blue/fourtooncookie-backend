@@ -6,12 +6,16 @@ import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkSaveRequest;
 import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkUpdateRequest;
 import com.startingblue.fourtooncookie.artwork.exception.ArtworkDuplicateException;
 import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
+import com.startingblue.fourtooncookie.global.config.XmlMessageSource;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +23,7 @@ import java.util.List;
 public class ArtworkService {
 
     private final ArtworkRepository artworkRepository;
+    private final XmlMessageSource messageSource;
 
     public void createArtwork(ArtworkSaveRequest request) {
         verifyUniqueArtwork(request.title(), request.thumbnailUrl());
@@ -55,6 +60,14 @@ public class ArtworkService {
         if (artworkRepository.existsByThumbnailUrl(thumbnailUrl)) {
             throw new ArtworkDuplicateException("Artwork with thumbnail URL '" + thumbnailUrl + "' already exists.");
         }
+    }
+
+    public Artwork getArtworkWithNameChange(Artwork artwork, Locale locale) {
+        return new Artwork(getLocalizedArtworkTitle(artwork.getId(), locale), artwork.getThumbnailUrl());
+    }
+
+    public String getLocalizedArtworkTitle(Long artworkId, Locale locale) {
+        return Objects.requireNonNull(messageSource.resolveCode("artwork.name." + artworkId, locale)).format(null);
     }
 
 }

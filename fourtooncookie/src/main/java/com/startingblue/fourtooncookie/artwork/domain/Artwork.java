@@ -47,10 +47,6 @@ public class Artwork {
         validate();
     }
 
-    public Artwork artworkWithNameChange(String localizedTitle) {
-        return new Artwork(id, localizedTitle, thumbnailUrl);
-    }
-
     private void validate() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
