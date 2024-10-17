@@ -22,7 +22,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Transactional
 @Service
-public class    CharacterService {
+public class CharacterService {
 
     private final CharacterRepository characterRepository;
     private final ArtworkService artworkService;
