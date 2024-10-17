@@ -1,5 +1,6 @@
-package com.startingblue.fourtooncookie.artwork.domain;
+package com.startingblue.fourtooncookie.artwork;
 
+import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.net.URL;

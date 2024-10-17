@@ -1,7 +1,6 @@
 package com.startingblue.fourtooncookie.artwork;
 
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
-import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
 import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkSaveRequest;
 import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkUpdateRequest;
 import com.startingblue.fourtooncookie.artwork.exception.ArtworkDuplicateException;

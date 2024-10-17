@@ -2,7 +2,7 @@ package com.startingblue.fourtooncookie.artwork.service;
 
 import com.startingblue.fourtooncookie.artwork.ArtworkService;
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
-import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
+import com.startingblue.fourtooncookie.artwork.ArtworkRepository;
 import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkSaveRequest;
 import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkUpdateRequest;
 import com.startingblue.fourtooncookie.artwork.dto.response.ArtworkSavedResponses;

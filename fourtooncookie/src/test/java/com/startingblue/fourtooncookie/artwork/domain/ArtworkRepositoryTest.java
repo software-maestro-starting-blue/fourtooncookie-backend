@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.artwork.domain;
 
+import com.startingblue.fourtooncookie.artwork.ArtworkRepository;
 import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkSaveRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
