@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
