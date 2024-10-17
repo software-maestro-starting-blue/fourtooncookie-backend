@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.global.config;
+package com.startingblue.fourtooncookie.global.domain;
 
 import org.springframework.context.support.AbstractMessageSource;
 import org.w3c.dom.Document;
