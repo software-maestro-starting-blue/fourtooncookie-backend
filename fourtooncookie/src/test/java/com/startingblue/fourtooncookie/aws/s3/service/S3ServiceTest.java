@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.aws.s3.service;
 
+import com.startingblue.fourtooncookie.aws.s3.S3Service;
 import com.startingblue.fourtooncookie.aws.s3.exception.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

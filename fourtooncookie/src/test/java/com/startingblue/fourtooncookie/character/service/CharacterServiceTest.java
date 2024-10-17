@@ -2,8 +2,9 @@ package com.startingblue.fourtooncookie.character.service;
 
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.artwork.service.ArtworkService;
+import com.startingblue.fourtooncookie.character.CharacterService;
 import com.startingblue.fourtooncookie.character.domain.Character;
-import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
+import com.startingblue.fourtooncookie.character.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.global.domain.PaymentType;
 import com.startingblue.fourtooncookie.character.dto.request.CharacterSaveRequest;
@@ -17,11 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.context.MessageSource;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.net.MalformedURLException;
 import java.net.URL;

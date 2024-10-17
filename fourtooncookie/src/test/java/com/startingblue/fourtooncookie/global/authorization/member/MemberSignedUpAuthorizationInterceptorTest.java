@@ -1,6 +1,7 @@
 package com.startingblue.fourtooncookie.global.authorization.member;
 
-import com.startingblue.fourtooncookie.member.service.MemberService;
+import com.startingblue.fourtooncookie.member.MemberService;
+import com.startingblue.fourtooncookie.web.interceptor.MemberSignedUpAuthorizationInterceptor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.DisplayName;
