@@ -1,6 +1,6 @@
-package com.startingblue.fourtooncookie.global.authentication.jwt;
+package com.startingblue.fourtooncookie.web.filter.jwt;
 
-import com.startingblue.fourtooncookie.global.authentication.filter.AuthenticationException;
+import com.startingblue.fourtooncookie.web.exception.AuthenticationException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;

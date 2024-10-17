@@ -2,7 +2,7 @@ package com.startingblue.fourtooncookie.global.exception;
 
 import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
 import com.startingblue.fourtooncookie.character.exception.CharacterNotFoundException;
-import com.startingblue.fourtooncookie.global.authentication.filter.AuthenticationException;
+import com.startingblue.fourtooncookie.web.exception.AuthenticationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;

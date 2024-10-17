@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.global.authentication.filter;
+package com.startingblue.fourtooncookie.web.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

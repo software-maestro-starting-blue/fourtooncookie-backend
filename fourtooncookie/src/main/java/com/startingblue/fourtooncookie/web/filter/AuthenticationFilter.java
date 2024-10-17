@@ -1,7 +1,8 @@
-package com.startingblue.fourtooncookie.global.authentication.filter;
+package com.startingblue.fourtooncookie.web.filter;
 
-import com.startingblue.fourtooncookie.global.authentication.jwt.JwtExtractor;
+import com.startingblue.fourtooncookie.web.exception.AuthenticationException;
 import com.startingblue.fourtooncookie.member.service.MemberService;
+import com.startingblue.fourtooncookie.web.filter.jwt.JwtExtractor;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
