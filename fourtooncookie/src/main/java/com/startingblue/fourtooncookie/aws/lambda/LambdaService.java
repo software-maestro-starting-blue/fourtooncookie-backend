@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.aws.lambda.service;
+package com.startingblue.fourtooncookie.aws.lambda;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

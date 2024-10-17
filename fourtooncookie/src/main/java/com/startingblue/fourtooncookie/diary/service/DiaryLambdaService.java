@@ -2,7 +2,7 @@ package com.startingblue.fourtooncookie.diary.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.startingblue.fourtooncookie.aws.lambda.service.LambdaService;
+import com.startingblue.fourtooncookie.aws.lambda.LambdaService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
