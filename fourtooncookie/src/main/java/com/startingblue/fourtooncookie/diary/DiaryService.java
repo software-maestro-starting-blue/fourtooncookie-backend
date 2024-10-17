@@ -1,15 +1,17 @@
-package com.startingblue.fourtooncookie.diary.service;
+package com.startingblue.fourtooncookie.diary;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.CharacterService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryPaintingImageGenerationStatus;
-import com.startingblue.fourtooncookie.diary.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
+import com.startingblue.fourtooncookie.diary.service.DiaryLambdaService;
+import com.startingblue.fourtooncookie.diary.service.DiaryPaintingImageCloudFrontService;
+import com.startingblue.fourtooncookie.diary.service.DiaryS3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

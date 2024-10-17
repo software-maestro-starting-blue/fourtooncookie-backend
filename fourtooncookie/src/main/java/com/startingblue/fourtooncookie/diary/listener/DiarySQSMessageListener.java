@@ -2,7 +2,7 @@ package com.startingblue.fourtooncookie.diary.listener;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.startingblue.fourtooncookie.diary.service.DiaryService;
+import com.startingblue.fourtooncookie.diary.DiaryService;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

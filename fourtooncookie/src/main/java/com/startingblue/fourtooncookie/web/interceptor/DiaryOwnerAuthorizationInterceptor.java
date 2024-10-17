@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.web.interceptor;
 
-import com.startingblue.fourtooncookie.diary.service.DiaryService;
+import com.startingblue.fourtooncookie.diary.DiaryService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

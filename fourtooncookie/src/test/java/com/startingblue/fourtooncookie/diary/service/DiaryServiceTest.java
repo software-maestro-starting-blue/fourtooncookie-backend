@@ -5,6 +5,7 @@ import com.startingblue.fourtooncookie.artwork.ArtworkRepository;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
+import com.startingblue.fourtooncookie.diary.DiaryService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
