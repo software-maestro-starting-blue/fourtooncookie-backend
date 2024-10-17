@@ -45,6 +45,11 @@ public class CharacterService {
     }
 
     @Transactional(readOnly = true)
+    public List<Character> readAllCharacters() {
+        return characterRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
     public List<Character> readAllCharacters(Locale locale) {
         return characterRepository.findAll().stream()
                 .map(character -> localizeCharacter(character, locale))
