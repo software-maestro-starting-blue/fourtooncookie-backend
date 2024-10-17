@@ -3,7 +3,6 @@ package com.startingblue.fourtooncookie.global.config;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
@@ -18,7 +17,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
+public class LocaleConfig implements WebMvcConfigurer {
 
     private static final List<String> SUPPORTED_LANGUAGES = Arrays.asList("ko", "en");
 
