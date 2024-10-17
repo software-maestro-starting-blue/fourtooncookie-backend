@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.web.interceptor;
 
-import com.startingblue.fourtooncookie.member.service.MemberService;
+import com.startingblue.fourtooncookie.member.MemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

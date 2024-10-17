@@ -3,7 +3,7 @@ package com.startingblue.fourtooncookie.config.authentication;
 import com.startingblue.fourtooncookie.web.exception.AuthenticationException;
 import com.startingblue.fourtooncookie.web.filter.AuthenticationFilter;
 import com.startingblue.fourtooncookie.web.filter.jwt.JwtExtractor;
-import com.startingblue.fourtooncookie.member.service.MemberService;
+import com.startingblue.fourtooncookie.member.MemberService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

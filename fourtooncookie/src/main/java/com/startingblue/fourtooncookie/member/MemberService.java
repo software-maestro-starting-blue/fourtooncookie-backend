@@ -1,11 +1,11 @@
-package com.startingblue.fourtooncookie.member.service;
+package com.startingblue.fourtooncookie.member;
 
 import com.startingblue.fourtooncookie.member.domain.Member;
-import com.startingblue.fourtooncookie.member.MemberRepository;
 import com.startingblue.fourtooncookie.member.domain.Role;
 import com.startingblue.fourtooncookie.member.dto.request.MemberSaveRequest;
 import com.startingblue.fourtooncookie.member.exception.MemberDuplicateException;
 import com.startingblue.fourtooncookie.member.exception.MemberNotFoundException;
+import com.startingblue.fourtooncookie.member.service.MemberDiaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

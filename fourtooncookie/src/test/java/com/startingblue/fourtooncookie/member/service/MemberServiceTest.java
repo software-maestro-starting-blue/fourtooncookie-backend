@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.member.service;
 
+import com.startingblue.fourtooncookie.member.MemberService;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
 import com.startingblue.fourtooncookie.member.MemberRepository;
