@@ -105,6 +105,10 @@ public class    CharacterService {
                 .build();
     }
 
+    public String getLocalizedCharacterName(Long characterId, Locale locale) {
+        return Objects.requireNonNull(xmlMessageSource.getMessage("character.name." + characterId, null, locale));
+    }
+
     private CharacterVisionType findByCharacterVisionType(CharacterVisionType characterVisionType) {
         return CharacterVisionType.valueOf(characterVisionType.name());
     }
@@ -118,10 +122,6 @@ public class    CharacterService {
         if (isDuplicate) {
             throw new CharacterDuplicateException("중복된 캐릭터입니다. 동일한 이름, 작품, 결제 유형, 캐릭터 비전 유형을 가진 캐릭터가 이미 존재합니다.");
         }
-    }
-
-    public String getLocalizedCharacterName(Long characterId, Locale locale) {
-        return Objects.requireNonNull(xmlMessageSource.getMessage("character.name." + characterId, null, locale));
     }
 
 }
