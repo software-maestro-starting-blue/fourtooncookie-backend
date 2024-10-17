@@ -1,5 +1,6 @@
-package com.startingblue.fourtooncookie.diary.domain;
+package com.startingblue.fourtooncookie.diary;
 
+import com.startingblue.fourtooncookie.diary.domain.Diary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
