@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.global.config;
 
-import com.startingblue.fourtooncookie.global.interceptor.CustomLocaleChangeInterceptor;
+import com.startingblue.fourtooncookie.web.interceptor.CustomLocaleChangeInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

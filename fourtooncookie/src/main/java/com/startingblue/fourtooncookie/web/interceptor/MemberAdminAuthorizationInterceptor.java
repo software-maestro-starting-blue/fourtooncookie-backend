@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.global.authorization.member;
+package com.startingblue.fourtooncookie.web.interceptor;
 
 import com.startingblue.fourtooncookie.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;

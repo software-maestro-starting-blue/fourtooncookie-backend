@@ -1,8 +1,8 @@
-package com.startingblue.fourtooncookie.global.authorization;
+package com.startingblue.fourtooncookie.config;
 
-import com.startingblue.fourtooncookie.global.authorization.diary.DiaryOwnerAuthorizationInterceptor;
-import com.startingblue.fourtooncookie.global.authorization.member.MemberAdminAuthorizationInterceptor;
-import com.startingblue.fourtooncookie.global.authorization.member.MemberSignedUpAuthorizationInterceptor;
+import com.startingblue.fourtooncookie.web.interceptor.DiaryOwnerAuthorizationInterceptor;
+import com.startingblue.fourtooncookie.web.interceptor.MemberAdminAuthorizationInterceptor;
+import com.startingblue.fourtooncookie.web.interceptor.MemberSignedUpAuthorizationInterceptor;
 import com.startingblue.fourtooncookie.member.dto.MemberArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

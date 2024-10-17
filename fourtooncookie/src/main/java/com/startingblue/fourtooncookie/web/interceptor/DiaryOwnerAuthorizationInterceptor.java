@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.global.authorization.diary;
+package com.startingblue.fourtooncookie.web.interceptor;
 
 import com.startingblue.fourtooncookie.diary.service.DiaryService;
 import jakarta.servlet.http.HttpServletRequest;
