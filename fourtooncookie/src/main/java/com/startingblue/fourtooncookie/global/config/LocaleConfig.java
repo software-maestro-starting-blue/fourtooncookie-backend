@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.LocaleResolver;
@@ -38,11 +37,10 @@ public class LocaleConfig implements WebMvcConfigurer {
             @Override
             public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws ServletException {
                 String language = request.getHeader(HttpHeaders.ACCEPT_LANGUAGE);
-                Locale locale = DEFAULT_LANGUAGE; // 기본 로케일 설정
+                Locale locale = DEFAULT_LANGUAGE;
 
                 if (StringUtils.hasText(language)) {
                     language = language.split(",")[0];
-                    System.out.println(language);
                     if (SUPPORTED_LANGUAGES.containsKey(language)) {
                         locale = Locale.forLanguageTag(SUPPORTED_LANGUAGES.get(language));
                     }
