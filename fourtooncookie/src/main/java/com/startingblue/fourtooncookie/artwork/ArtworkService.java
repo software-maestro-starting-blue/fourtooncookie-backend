@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.artwork.service;
+package com.startingblue.fourtooncookie.artwork;
 
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
