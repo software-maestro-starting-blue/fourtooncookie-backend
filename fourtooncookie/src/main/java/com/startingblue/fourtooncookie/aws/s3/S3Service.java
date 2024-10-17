@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.aws.s3.service;
+package com.startingblue.fourtooncookie.aws.s3;
 
 import com.startingblue.fourtooncookie.aws.s3.exception.S3Exception;
 import com.startingblue.fourtooncookie.aws.s3.exception.S3PathNotFoundException;
