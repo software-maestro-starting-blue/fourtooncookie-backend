@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.member.dto;
+package com.startingblue.fourtooncookie.web;
 
 import com.startingblue.fourtooncookie.web.exception.AuthenticationException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +13,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import java.util.UUID;
 
 @Component
-public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
+public class ArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {

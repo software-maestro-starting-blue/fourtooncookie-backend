@@ -3,7 +3,7 @@ package com.startingblue.fourtooncookie.config;
 import com.startingblue.fourtooncookie.web.interceptor.DiaryOwnerAuthorizationInterceptor;
 import com.startingblue.fourtooncookie.web.interceptor.MemberAdminAuthorizationInterceptor;
 import com.startingblue.fourtooncookie.web.interceptor.MemberSignedUpAuthorizationInterceptor;
-import com.startingblue.fourtooncookie.member.dto.MemberArgumentResolver;
+import com.startingblue.fourtooncookie.web.ArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -19,7 +19,7 @@ public class AuthorizationConfig implements WebMvcConfigurer {
     private final MemberSignedUpAuthorizationInterceptor memberSignedUpAuthorizationInterceptor;
     private final MemberAdminAuthorizationInterceptor memberAdminAuthorizationInterceptor;
     private final DiaryOwnerAuthorizationInterceptor diaryOwnerAuthorizationInterceptor;
-    private final MemberArgumentResolver memberArgumentResolver;
+    private final ArgumentResolver argumentResolver;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -38,6 +38,6 @@ public class AuthorizationConfig implements WebMvcConfigurer {
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(memberArgumentResolver);
+        resolvers.add(argumentResolver);
     }
 }
