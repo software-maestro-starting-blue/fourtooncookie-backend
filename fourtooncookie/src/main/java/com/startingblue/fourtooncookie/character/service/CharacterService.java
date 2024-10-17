@@ -83,11 +83,22 @@ public class CharacterService {
     }
 
     private Character localizeCharacter(Character character, Locale locale) {
-        String localizedArtworkTitle = getLocalizedArtworkTitle(character.getArtwork().getId(), locale);
-        Artwork localizedArtwork = character.getArtwork().artworkWithNameChange(localizedArtworkTitle);
+        Artwork localizedArtwork = artworkService.getArtworkWithNameChange(character.getArtwork(), locale);
 
         String localizedCharacterName = getLocalizedCharacterName(character.getId(), locale);
-        return character.characterWithNameChangeAndArtworkChange(localizedCharacterName, localizedArtwork);
+        return getCharacterWithNameChangeAndArtworkChange(character, localizedCharacterName, localizedArtwork);
+    }
+
+    private Character getCharacterWithNameChangeAndArtworkChange(Character character, String localizedName, Artwork localizedArtwork ) {
+        return Character.builder()
+                .id(character.getId())
+                .characterVisionType(character.getCharacterVisionType())
+                .paymentType(character.getPaymentType())
+                .name(localizedName)
+                .artwork(localizedArtwork)
+                .selectionThumbnailUrl(character.getSelectionThumbnailUrl())
+                .basePrompt(character.getBasePrompt())
+                .build();
     }
 
     private CharacterVisionType findByCharacterVisionType(CharacterVisionType characterVisionType) {
@@ -109,7 +120,4 @@ public class CharacterService {
         return Objects.requireNonNull(messageSource.resolveCode("character.name." + characterId, locale)).format(null);
     }
 
-    public String getLocalizedArtworkTitle(Long artworkId, Locale locale) {
-        return Objects.requireNonNull(messageSource.resolveCode("artwork.name." + artworkId, locale)).format(null);
-    }
 }

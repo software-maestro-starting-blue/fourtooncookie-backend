@@ -65,18 +65,6 @@ public class Character {
         return this;
     }
 
-    public Character characterWithNameChangeAndArtworkChange(String localizedName, Artwork localizedArtwork ) {
-        return Character.builder()
-                .id(id)
-                .characterVisionType(characterVisionType)
-                .paymentType(paymentType)
-                .name(localizedName)
-                .artwork(localizedArtwork)
-                .selectionThumbnailUrl(selectionThumbnailUrl)
-                .basePrompt(basePrompt)
-                .build();
-    }
-
     private void validate() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
