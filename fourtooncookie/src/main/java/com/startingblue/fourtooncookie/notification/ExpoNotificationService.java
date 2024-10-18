@@ -62,7 +62,7 @@ public class ExpoNotificationService implements NotificationService {
         }
     }
 
-    @Scheduled(cron = "0 0 14 * * ?")
+    @Scheduled(cron = "0 10 14 * * ?")
     @Transactional
     public void cleanupOldRecords() {
         notificationTokenRepository.deleteByModifiedDateTimeBefore(LocalDateTime.now().minusMinutes(1));
