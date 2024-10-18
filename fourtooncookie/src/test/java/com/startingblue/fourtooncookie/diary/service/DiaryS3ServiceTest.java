@@ -1,7 +1,6 @@
 package com.startingblue.fourtooncookie.diary.service;
 
-import com.startingblue.fourtooncookie.aws.s3.service.S3Service;
-import com.startingblue.fourtooncookie.global.converter.image.ImageConverter;
+import com.startingblue.fourtooncookie.aws.s3.S3Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,9 +28,6 @@ class DiaryS3ServiceTest {
 
     @InjectMocks
     private DiaryS3Service diaryS3Service;
-
-    @Mock
-    private ImageConverter imageConverter;
 
     static String bucketName = "bucketName";
     static long diaryId = 1;
@@ -67,7 +63,7 @@ class DiaryS3ServiceTest {
         byte[] mergedImage = new byte[]{10, 11, 12, 5};
 
         when(s3Service.getImageFromS3(eq(bucketName), eq(keyName))).thenReturn(mockImageData);
-        when(imageConverter.mergeImagesIntoGrid(any(List.class))).thenReturn(mergedImage);
+        when(diaryS3Service.mergeImagesIntoGrid(any(List.class))).thenReturn(mergedImage);
 
         // when
         byte[] result = diaryS3Service.getFullImageByDiaryId(1L);
@@ -76,7 +72,7 @@ class DiaryS3ServiceTest {
         assertNotNull(result);
         assertArrayEquals(mergedImage, result);
         verify(s3Service, times(4)).getImageFromS3(any(String.class), any(String.class));
-        verify(imageConverter).mergeImagesIntoGrid(any(List.class));
+        verify(diaryS3Service).mergeImagesIntoGrid(any(List.class));
     }
 
 }

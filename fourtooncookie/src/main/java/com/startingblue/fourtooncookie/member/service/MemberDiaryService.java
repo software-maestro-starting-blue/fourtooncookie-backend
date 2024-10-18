@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.member.service;
 
-import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
+import com.startingblue.fourtooncookie.diary.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.service.DiaryS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
 package com.startingblue.fourtooncookie.converter;
 
-import com.startingblue.fourtooncookie.global.converter.exception.ConversionException;
-import com.startingblue.fourtooncookie.global.converter.jpa.LongListToStringConverter;
+import com.startingblue.fourtooncookie.diary.domain.converter.DiaryLongListToStringConverter;
+import com.startingblue.fourtooncookie.diary.exception.DiaryConversionException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.*;
 
 class LongListToStringConverterTest {
 
-    private final LongListToStringConverter converter = new LongListToStringConverter();
+    private final DiaryLongListToStringConverter converter = new DiaryLongListToStringConverter();
 
     @Test
     @DisplayName("List<Long>을 String으로 변환 (값 포함)")
@@ -79,7 +79,7 @@ class LongListToStringConverterTest {
         String input = "1,2,abc";
         assertThatThrownBy(() -> {
             converter.convertToEntityAttribute(input);
-        }).isInstanceOf(ConversionException.class)
+        }).isInstanceOf(DiaryConversionException.class)
                 .hasMessageContaining("Error converting String to List<Long>");
     }
 }

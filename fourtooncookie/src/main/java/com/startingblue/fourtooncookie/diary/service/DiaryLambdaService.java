@@ -2,11 +2,12 @@ package com.startingblue.fourtooncookie.diary.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.startingblue.fourtooncookie.aws.lambda.service.LambdaService;
+import com.startingblue.fourtooncookie.aws.lambda.LambdaService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
-import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
+import com.startingblue.fourtooncookie.diary.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
+import com.startingblue.fourtooncookie.diary.exception.DiaryLambdaInvocationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -26,19 +27,17 @@ public class DiaryLambdaService {
     private final LambdaService lambdaService;
     private final LambdaClient lambdaClient;
     private final ObjectMapper objectMapper;
-    private final DiaryRepository diaryRepository;
 
     @Async
     @Transactional
     public void invokeDiaryImageGenerationLambda(Diary diary, Character character) {
-        DiaryStatus status = DiaryStatus.IN_PROGRESS;
         try {
             DiaryImageGenerationLambdaPayload diaryImageGenerationLambdaPayload = buildPayload(diary, character);
             String serializePayload = serializePayload(diaryImageGenerationLambdaPayload);
             lambdaService.invokeLambda(lambdaClient, IMAGE_GENERATION_FUNCTION_NAME, INVOCATION_TYPE, serializePayload);
         } catch (Exception e) {
-            log.error("Lambda 호출 중 오류 발생: {}", e.getMessage());
             diary.updateDiaryStatusFailed();
+            throw new DiaryLambdaInvocationException("Lambda invocation failed", e);
         }
     }
 

@@ -1,7 +1,6 @@
 package com.startingblue.fourtooncookie.character.domain;
 
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
-import com.startingblue.fourtooncookie.global.domain.PaymentType;
 import jakarta.persistence.*;
 import jakarta.validation.*;
 import jakarta.validation.constraints.NotBlank;
@@ -11,8 +10,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URL;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Slf4j

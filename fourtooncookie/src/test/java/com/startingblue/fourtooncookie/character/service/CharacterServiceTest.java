@@ -1,15 +1,16 @@
 package com.startingblue.fourtooncookie.character.service;
 
+import com.startingblue.fourtooncookie.artwork.ArtworkService;
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
-import com.startingblue.fourtooncookie.artwork.service.ArtworkService;
+import com.startingblue.fourtooncookie.character.CharacterService;
 import com.startingblue.fourtooncookie.character.domain.Character;
-import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
+import com.startingblue.fourtooncookie.character.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
-import com.startingblue.fourtooncookie.global.domain.PaymentType;
-import com.startingblue.fourtooncookie.character.dto.request.CharacterSaveRequest;
-import com.startingblue.fourtooncookie.character.dto.request.CharacterUpdateRequest;
-import com.startingblue.fourtooncookie.character.dto.response.CharacterSavedResponse;
-import com.startingblue.fourtooncookie.character.dto.response.CharacterSavedResponses;
+import com.startingblue.fourtooncookie.character.domain.PaymentType;
+import com.startingblue.fourtooncookie.character.dto.CharacterSaveRequest;
+import com.startingblue.fourtooncookie.character.dto.CharacterUpdateRequest;
+import com.startingblue.fourtooncookie.character.dto.CharacterSavedResponse;
+import com.startingblue.fourtooncookie.character.dto.CharacterSavedResponses;
 import com.startingblue.fourtooncookie.character.exception.CharacterNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,11 +18,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.context.MessageSource;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,6 +35,9 @@ import static org.mockito.Mockito.*;
 
 @ActiveProfiles("test")
 class CharacterServiceTest {
+
+    @Mock
+    MessageSource messageSource;
 
     @Mock
     private CharacterRepository characterRepository;
@@ -127,27 +133,31 @@ class CharacterServiceTest {
     void showAllCharacters() throws MalformedURLException {
         // given
         Character character1 = Character.builder()
+                .id(1L)
                 .characterVisionType(CharacterVisionType.DALL_E_3)
                 .paymentType(PaymentType.FREE)
                 .artwork(new Artwork("Test Artwork", new URL("https://test.png")))
-                .name("멍멍이")
+                .name("랜덤")
                 .selectionThumbnailUrl(new URL("https://test.png"))
                 .basePrompt("This is a base prompt")
                 .build();
 
         Character character2 = Character.builder()
+                .id(2L)
                 .characterVisionType(CharacterVisionType.STABLE_DIFFUSION)
                 .paymentType(PaymentType.FREE)
                 .artwork(new Artwork("Test2 Artwork", new URL("https://test2.png")))
-                .name("멍멍이2")
+                .name("말랑")
                 .selectionThumbnailUrl(new URL("https://test2.png"))
                 .basePrompt("This is a base prompt2")
                 .build();
 
+        when(messageSource.getMessage(eq("character.name." + character1.getId()), any(), any())).thenReturn(character1.getName());
+        when(messageSource.getMessage(eq("character.name." + character2.getId()), any(), any())).thenReturn(character2.getName());
         when(characterRepository.findAll()).thenReturn(List.of(character1, character2));
 
         // when
-        CharacterSavedResponses characterSavedResponses = CharacterSavedResponses.of(characterService.readAllCharacters());
+        CharacterSavedResponses characterSavedResponses = CharacterSavedResponses.of(characterService.readAllCharacters(Locale.KOREAN));
 
         // then
         assertThat(characterSavedResponses.characterSavedResponses()).hasSize(2);

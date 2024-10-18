@@ -1,21 +1,24 @@
 package com.startingblue.fourtooncookie.artwork.service;
 
+import com.startingblue.fourtooncookie.artwork.ArtworkService;
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
-import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
-import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkSaveRequest;
-import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkUpdateRequest;
-import com.startingblue.fourtooncookie.artwork.dto.response.ArtworkSavedResponses;
+import com.startingblue.fourtooncookie.artwork.ArtworkRepository;
+import com.startingblue.fourtooncookie.artwork.dto.ArtworkSaveRequest;
+import com.startingblue.fourtooncookie.artwork.dto.ArtworkUpdateRequest;
+import com.startingblue.fourtooncookie.artwork.dto.ArtworkSavedResponses;
 import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
 import com.startingblue.fourtooncookie.artwork.exception.ArtworkDuplicateException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.MessageSource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,13 +35,16 @@ class ArtworkServiceTest {
     @Autowired
     private ArtworkRepository artworkRepository;
 
+    @Autowired
+    MessageSource messageSource;
+
     @DisplayName("저장된 모든 작품을 가져온다.")
     @Test
     public void readAllArtworks() throws MalformedURLException {
         // Given
-        String title1 = "Title 1";
+        String title1 = "랜덤";
         URL url1 = new URL("http://test.com/image1.jpg");
-        String title2 = "Title 2";
+        String title2 = "말랑";
         URL url2 = new URL("http://test.com/image2.jpg");
         Artwork artwork1 = new Artwork(title1, url1);
         Artwork artwork2 = new Artwork(title2, url2);
@@ -46,7 +52,7 @@ class ArtworkServiceTest {
         artworkRepository.save(artwork2);
 
         // When
-        ArtworkSavedResponses responses = ArtworkSavedResponses.of(artworkService.readAllArtworks());
+        ArtworkSavedResponses responses = ArtworkSavedResponses.of(artworkService.readAllArtworks(Locale.KOREA));
 
         // Then
         assertThat(responses.artworks()).hasSize(2);

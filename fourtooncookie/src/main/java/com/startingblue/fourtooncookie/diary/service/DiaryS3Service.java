@@ -1,11 +1,15 @@
 package com.startingblue.fourtooncookie.diary.service;
 
-import com.startingblue.fourtooncookie.aws.s3.service.S3Service;
-import com.startingblue.fourtooncookie.global.converter.image.ImageConverter;
+import com.startingblue.fourtooncookie.aws.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -18,7 +22,6 @@ public class DiaryS3Service {
     private static final String IMAGE_PNG_FORMAT = "png";
 
     private final S3Service s3Service;
-    private final ImageConverter imageConverter;
 
     @Value("${aws.diaryimage.bucket.name}")
     private String bucketName;
@@ -35,7 +38,7 @@ public class DiaryS3Service {
             downloadedImages.add(imageData);
         }
 
-        return imageConverter.mergeImagesIntoGrid(downloadedImages);
+        return mergeImagesIntoGrid(downloadedImages);
     }
 
     private byte[] getImageByDiaryIdAndGridPosition(Long diaryId, int gridPosition) {
@@ -48,5 +51,51 @@ public class DiaryS3Service {
 
     public void deleteImagesByDiaryId(Long diaryId) {
         s3Service.deleteObjectsInFolder(bucketName, String.valueOf(diaryId));
+    }
+
+    byte[] mergeImagesIntoGrid(List<byte[]> images) throws IOException {
+        validateImageCount(images);
+
+        BufferedImage[] bufferedImages = convertToBufferedImages(images);
+        BufferedImage combinedImage = createCombinedImage(bufferedImages);
+
+        return convertBufferedImageToByteArray(combinedImage);
+    }
+
+    private void validateImageCount(List<byte[]> images) {
+        if (images.size() < 4) {
+            throw new IllegalArgumentException("4개의 이미지가 필요합니다.");
+        }
+    }
+
+    private BufferedImage[] convertToBufferedImages(List<byte[]> images) throws IOException {
+        BufferedImage[] bufferedImages = new BufferedImage[4];
+        for (int i = 0; i < 4; i++) {
+            ByteArrayInputStream bais = new ByteArrayInputStream(images.get(i));
+            bufferedImages[i] = ImageIO.read(bais);
+        }
+        return bufferedImages;
+    }
+
+    private BufferedImage createCombinedImage(BufferedImage[] images) {
+        int width = images[0].getWidth();
+        int height = images[0].getHeight();
+
+        BufferedImage combinedImage = new BufferedImage(width * 2, height * 2, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = combinedImage.createGraphics();
+
+        g.drawImage(images[0], 0, 0, null);
+        g.drawImage(images[1], width, 0, null);
+        g.drawImage(images[2], 0, height, null);
+        g.drawImage(images[3], width, height, null);
+        g.dispose();
+
+        return combinedImage;
+    }
+
+    private byte[] convertBufferedImageToByteArray(BufferedImage image) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", baos);
+        return baos.toByteArray();
     }
 }
