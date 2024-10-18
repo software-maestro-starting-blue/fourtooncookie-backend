@@ -1,7 +1,6 @@
 package com.startingblue.fourtooncookie.config;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
@@ -16,7 +15,7 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class LocaleConfig implements WebMvcConfigurer {
 
-    private static final List<Locale> SUPPORTED_LOCALES = List.of(Locale.KOREAN, Locale.KOREA);
+    private static final List<Locale> SUPPORTED_LOCALES = List.of(Locale.KOREAN);
 
     @Bean
     public LocaleResolver localeResolver() {
