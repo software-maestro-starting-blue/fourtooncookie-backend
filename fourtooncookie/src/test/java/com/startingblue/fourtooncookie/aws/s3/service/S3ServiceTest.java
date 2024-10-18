@@ -54,37 +54,5 @@ public class S3ServiceTest {
         ReflectionTestUtils.setField(s3Service, "preSignedUrlDurationInMinutes", preSignedUrlDurationInMinutes);
     }
 
-    @Test
-    @DisplayName("프리사인 URL 생성 성공 테스트")
-    void testGeneratePresignedUrlSuccess() throws Exception {
-        // given
-        URL expectedUrl = URI.create("http://example.com").toURL();
-        when(presignedGetObjectRequest.url()).thenReturn(expectedUrl);
-        when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class))).thenReturn(presignedGetObjectRequest);
-
-        // when
-        URL actualUrl = s3Service.generatePresignedUrl(bucketName, path);
-
-        // then
-        assertEquals(expectedUrl, actualUrl);
-        verify(s3Client).headObject(any(HeadObjectRequest.class));
-        verify(s3Presigner).presignGetObject(any(GetObjectPresignRequest.class));
-    }
-
-    @Test
-    @DisplayName("프리사인 URL 생성 중 오류 발생 시 S3PreSignUrlException 발생 테스트")
-    void testGeneratePresignedUrlPreSignError() {
-        // given
-        when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class)))
-                .thenThrow(new RuntimeException("Presign error"));
-
-        // when & then
-        S3PreSignUrlException exception = assertThrows(S3PreSignUrlException.class, () ->
-                s3Service.generatePresignedUrl(any(String.class), path)
-        );
-
-        assertFalse(exception.getMessage().contains("S3에서 프리사인 URL 생성 중 오류가 발생했습니다. Key: " + keyName));
-        verify(s3Presigner).presignGetObject(any(GetObjectPresignRequest.class));
-    }
 
 }

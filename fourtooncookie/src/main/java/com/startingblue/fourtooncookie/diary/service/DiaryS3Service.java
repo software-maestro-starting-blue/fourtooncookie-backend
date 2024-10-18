@@ -11,7 +11,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,11 +24,7 @@ public class DiaryS3Service {
 
     @Value("${aws.diaryimage.bucket.name}")
     private String bucketName;
-
-    public URL generatePresignedUrl(Long diaryId, int gridPosition) {
-        return s3Service.generatePresignedUrl(bucketName, getKeyName(diaryId, gridPosition, IMAGE_PNG_FORMAT));
-    }
-
+    
     public byte[] getFullImageByDiaryId(Long diaryId) throws IOException {
         List<byte[]> downloadedImages = new ArrayList<>();
 
