@@ -46,13 +46,13 @@ class ArtworkServiceTest {
         URL url1 = new URL("http://test.com/image1.jpg");
         String title2 = "말랑";
         URL url2 = new URL("http://test.com/image2.jpg");
-        Artwork artwork1 = new Artwork(title1, url1);
-        Artwork artwork2 = new Artwork(title2, url2);
+        Artwork artwork1 = new Artwork(0L, title1, url1);
+        Artwork artwork2 = new Artwork(1L, title2, url2);
         artworkRepository.save(artwork1);
         artworkRepository.save(artwork2);
 
         // When
-        ArtworkSavedResponses responses = ArtworkSavedResponses.of(artworkService.readAllArtworks(Locale.KOREA));
+        ArtworkSavedResponses responses = ArtworkSavedResponses.of(artworkService.readAllArtworks(Locale.KOREAN));
 
         // Then
         assertThat(responses.artworks()).hasSize(2);
