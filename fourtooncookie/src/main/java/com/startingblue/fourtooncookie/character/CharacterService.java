@@ -2,6 +2,7 @@ package com.startingblue.fourtooncookie.character;
 
 import com.startingblue.fourtooncookie.artwork.ArtworkService;
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
+import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.character.domain.PaymentType;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Transactional
@@ -86,7 +88,7 @@ public class CharacterService {
     }
 
     private Character localizeCharacter(Character character, Locale locale) {
-        Artwork localizedArtwork = artworkService.getArtworkWithNameChange(character.getArtwork(), locale);
+        Artwork localizedArtwork = artworkService.getArtworkWithNameChange(character.getArtwork(), locale).orElseThrow(ArtworkNotFoundException::new);
 
         String localizedCharacterName = getLocalizedCharacterName(character.getId(), locale);
         return getCharacterWithNameChangeAndArtworkChange(character, localizedCharacterName, localizedArtwork);
