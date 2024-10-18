@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class ArtworkService {
     @Transactional(readOnly = true)
     public List<Artwork> readAllArtworks(Locale locale) {
         return readAllArtworks().stream()
-                .map(artwork -> getArtworkWithNameChange(artwork, locale))
+                .map(artwork -> getArtworkWithNameChange(artwork, locale).get())
                 .toList();
     }
 
@@ -67,8 +68,8 @@ public class ArtworkService {
         }
     }
 
-    public Artwork getArtworkWithNameChange(Artwork artwork, Locale locale) {
-        return new Artwork(artwork.getId(), getLocalizedArtworkTitle(artwork.getId(), locale), artwork.getThumbnailUrl());
+    public Optional<Artwork> getArtworkWithNameChange(Artwork artwork, Locale locale) {
+        return Optional.of(new Artwork(artwork.getId(), getLocalizedArtworkTitle(artwork.getId(), locale), artwork.getThumbnailUrl()));
     }
 
     public String getLocalizedArtworkTitle(Long artworkId, Locale locale) {
