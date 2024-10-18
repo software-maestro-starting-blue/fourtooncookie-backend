@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.notification;
 
-import com.startingblue.fourtooncookie.notification.dto.request.NotificationTokenAssignRequest;
+import com.startingblue.fourtooncookie.notification.dto.NotificationTokenAssignRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
