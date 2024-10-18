@@ -37,7 +37,7 @@ public class ArtworkService {
     @Transactional(readOnly = true)
     public List<Artwork> readAllArtworks(Locale locale) {
         return readAllArtworks().stream()
-                .map(artwork -> getArtworkWithNameChange(artwork, locale).get())
+                .map(artwork -> getArtworkWithNameChange(artwork, locale))
                 .toList();
     }
 
@@ -68,8 +68,8 @@ public class ArtworkService {
         }
     }
 
-    public Optional<Artwork> getArtworkWithNameChange(Artwork artwork, Locale locale) {
-        return Optional.of(new Artwork(artwork.getId(), getLocalizedArtworkTitle(artwork.getId(), locale), artwork.getThumbnailUrl()));
+    public Artwork getArtworkWithNameChange(Artwork artwork, Locale locale) {
+        return new Artwork(artwork.getId(), getLocalizedArtworkTitle(artwork.getId(), locale), artwork.getThumbnailUrl());
     }
 
     public String getLocalizedArtworkTitle(Long artworkId, Locale locale) {

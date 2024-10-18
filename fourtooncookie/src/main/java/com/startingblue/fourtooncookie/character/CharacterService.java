@@ -88,7 +88,7 @@ public class CharacterService {
     }
 
     private Character localizeCharacter(Character character, Locale locale) {
-        Artwork localizedArtwork = artworkService.getArtworkWithNameChange(character.getArtwork(), locale).orElseThrow(ArtworkNotFoundException::new);
+        Artwork localizedArtwork = artworkService.getArtworkWithNameChange(character.getArtwork(), locale);
 
         String localizedCharacterName = getLocalizedCharacterName(character.getId(), locale);
         return getCharacterWithNameChangeAndArtworkChange(character, localizedCharacterName, localizedArtwork);
