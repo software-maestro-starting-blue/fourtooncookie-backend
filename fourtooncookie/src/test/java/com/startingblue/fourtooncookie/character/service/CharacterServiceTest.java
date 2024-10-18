@@ -155,8 +155,8 @@ class CharacterServiceTest {
                 .basePrompt("This is a base prompt2")
                 .build();
 
-        when(artworkService.getArtworkWithNameChange(artwork1, Locale.KOREAN)).thenReturn(new Artwork("랜덤", new URL("https://test.png")));
-        when(artworkService.getArtworkWithNameChange(artwork2, Locale.KOREAN)).thenReturn(new Artwork("말랑", new URL("https://test2.png")));
+        when(artworkService.getArtworkWithNameChange(artwork1, Locale.KOREAN)).thenReturn(Optional.of(new Artwork("랜덤", new URL("https://test.png"))));
+        when(artworkService.getArtworkWithNameChange(artwork2, Locale.KOREAN)).thenReturn(Optional.of(new Artwork("말랑", new URL("https://test2.png"))));
 
         when(messageSource.getMessage(eq("character.name." + character1.getId()), any(), any())).thenReturn(character1.getName());
         when(messageSource.getMessage(eq("character.name." + character2.getId()), any(), any())).thenReturn(character2.getName());
