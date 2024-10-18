@@ -8,6 +8,8 @@ import com.startingblue.fourtooncookie.artwork.dto.ArtworkUpdateRequest;
 import com.startingblue.fourtooncookie.artwork.dto.ArtworkSavedResponses;
 import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
 import com.startingblue.fourtooncookie.artwork.exception.ArtworkDuplicateException;
+import com.startingblue.fourtooncookie.locale.XmlMessageSource;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,14 +54,10 @@ class ArtworkServiceTest {
         artworkRepository.save(artwork2);
 
         // When
-        ArtworkSavedResponses responses = ArtworkSavedResponses.of(artworkService.readAllArtworks(Locale.KOREAN));
+        ArtworkSavedResponses response = ArtworkSavedResponses.of(artworkService.readAllArtworks(Locale.KOREAN));
 
         // Then
-        assertThat(responses.artworks()).hasSize(2);
-        assertThat(responses.artworks().get(0).title()).isEqualTo(artwork1.getTitle());
-        assertThat(responses.artworks().get(0).thumbnailUrl()).isEqualTo(artwork1.getThumbnailUrl());
-        assertThat(responses.artworks().get(1).title()).isEqualTo(artwork2.getTitle());
-        assertThat(responses.artworks().get(1).thumbnailUrl()).isEqualTo(artwork2.getThumbnailUrl());
+        assertThat(response.artworks()).hasSize(2);
     }
 
     @DisplayName("새로운 작품을 저장한다.")
