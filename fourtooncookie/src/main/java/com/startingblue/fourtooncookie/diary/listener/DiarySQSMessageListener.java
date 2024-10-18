@@ -2,7 +2,10 @@ package com.startingblue.fourtooncookie.diary.listener;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.startingblue.fourtooncookie.diary.domain.Diary;
+import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
 import com.startingblue.fourtooncookie.diary.service.DiaryService;
+import com.startingblue.fourtooncookie.notification.NotificationService;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +22,7 @@ public class DiarySQSMessageListener {
 
     private final DiaryService diaryService;
     private final ObjectMapper objectMapper;
+    private final NotificationService notificationService;
 
     @SqsListener(value = "${aws.sqs.fourtooncookie.image.response.sqs.fifo}")
     public CompletableFuture<Void> handleSQSMessage(String message) {
@@ -32,6 +36,11 @@ public class DiarySQSMessageListener {
                     return;
                 }
                 diaryService.processImageGenerationResponse(response);
+
+                Diary diary = diaryService.readById(response.diaryId());
+                if (!DiaryStatus.IN_PROGRESS.equals(diary.getStatus())) {
+                    notificationService.sendNotificationToMember(diary.getMemberId(), diary);
+                }
             } catch (JacksonException e) {
                 log.error("Failed to parse message due to invalid format: {}", message, e);
             } catch (Exception e) {

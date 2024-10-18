@@ -2,6 +2,7 @@ package com.startingblue.fourtooncookie.diary.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.startingblue.fourtooncookie.diary.listener.DiarySQSMessageListener;
+import com.startingblue.fourtooncookie.notification.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,13 +13,21 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @SpringJUnitConfig
 public class DiarySQSMessageListenerTest {
 
     @Mock
     private DiaryService diaryService;
+
+    @Mock
+    private NotificationService notificationService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -28,13 +37,14 @@ public class DiarySQSMessageListenerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        diarySQSMessageListener = new DiarySQSMessageListener(diaryService, objectMapper);
+        diarySQSMessageListener = new DiarySQSMessageListener(diaryService, objectMapper, notificationService);
     }
 
     @Test
     @DisplayName("SQS 메시지가 성공적으로 처리되는 경우")
-    void testSQSMessageProcessingSuccess() throws Exception {
+    void testSQSMessageProcessingSuccess() {
         // given
+        doNothing().when(notificationService).sendNotificationToMember(any(), any());
         String message = "{\"diaryId\": 1, \"gridPosition\": 2, \"isSuccess\": true}";
         DiarySQSMessageListener.DiaryImageResponseMessage response =
                 new DiarySQSMessageListener.DiaryImageResponseMessage(1L, 2, true);
@@ -49,8 +59,9 @@ public class DiarySQSMessageListenerTest {
 
     @Test
     @DisplayName("SQS 메시지의 JSON 포맷이 잘못된 경우")
-    void testInvalidMessageFormatHandling() throws Exception {
+    void testInvalidMessageFormatHandling() {
         // given
+        doNothing().when(notificationService).sendNotificationToMember(any(), any());
         String invalidMessage = "invalid json format";
 
         // when
@@ -62,8 +73,9 @@ public class DiarySQSMessageListenerTest {
 
     @Test
     @DisplayName("SQS 메시지에 diaryId가 없는 경우 예외 처리")
-    void testMissingDiaryIdThrowsException() throws Exception {
+    void testMissingDiaryIdThrowsException() {
         // given
+        doNothing().when(notificationService).sendNotificationToMember(any(), any());
         String message = "{\"diaryId\": null, \"gridPosition\": 2, \"isSuccess\": true}";
 
         // when & then
@@ -77,8 +89,9 @@ public class DiarySQSMessageListenerTest {
 
     @Test
     @DisplayName("예상치 못한 예외가 발생했을 때 처리")
-    void testUnexpectedExceptionHandling() throws Exception {
+    void testUnexpectedExceptionHandling() {
         // given
+        doNothing().when(notificationService).sendNotificationToMember(any(), any());
         String message = "{\"diaryId\": 1, \"gridPosition\": 2, \"isSuccess\": true}";
         DiarySQSMessageListener.DiaryImageResponseMessage response =
                 new DiarySQSMessageListener.DiaryImageResponseMessage(1L, 2, true);
