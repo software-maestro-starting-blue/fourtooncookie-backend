@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
-import com.startingblue.fourtooncookie.diary.service.DiaryService;
 import com.startingblue.fourtooncookie.notification.NotificationService;
 import com.startingblue.fourtooncookie.diary.DiaryService;
 import io.awspring.cloud.sqs.annotation.SqsListener;
