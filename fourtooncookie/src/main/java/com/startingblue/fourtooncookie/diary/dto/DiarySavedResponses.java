@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.diary.dto.response;
+package com.startingblue.fourtooncookie.diary.dto;
 
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 

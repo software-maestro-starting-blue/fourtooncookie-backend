@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.diary.dto.request;
+package com.startingblue.fourtooncookie.diary.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
