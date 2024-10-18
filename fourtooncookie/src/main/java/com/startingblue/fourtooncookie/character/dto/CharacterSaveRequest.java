@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.character.dto.request;
+package com.startingblue.fourtooncookie.character.dto;
 
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.global.domain.PaymentType;

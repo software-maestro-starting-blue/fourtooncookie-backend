@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.character.dto.response;
+package com.startingblue.fourtooncookie.character.dto;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
 

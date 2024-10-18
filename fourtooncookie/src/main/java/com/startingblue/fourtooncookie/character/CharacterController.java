@@ -1,9 +1,9 @@
 package com.startingblue.fourtooncookie.character;
 
-import com.startingblue.fourtooncookie.character.dto.request.CharacterSaveRequest;
-import com.startingblue.fourtooncookie.character.dto.request.CharacterUpdateRequest;
-import com.startingblue.fourtooncookie.character.dto.response.CharacterSavedResponse;
-import com.startingblue.fourtooncookie.character.dto.response.CharacterSavedResponses;
+import com.startingblue.fourtooncookie.character.dto.CharacterSaveRequest;
+import com.startingblue.fourtooncookie.character.dto.CharacterUpdateRequest;
+import com.startingblue.fourtooncookie.character.dto.CharacterSavedResponse;
+import com.startingblue.fourtooncookie.character.dto.CharacterSavedResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
