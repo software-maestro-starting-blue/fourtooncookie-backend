@@ -5,7 +5,6 @@ import com.startingblue.fourtooncookie.notification.domain.NotificationToken;
 import com.startingblue.fourtooncookie.notification.dto.NotificationTokenAssignRequest;
 import com.startingblue.fourtooncookie.notification.exeption.NotificationSendFailedException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -27,9 +26,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class ExpoNotificationService implements NotificationService {
-
-    @Value("${cleanup.cron}")
-    private String cleanupCron;
 
     private final NotificationTokenRepository notificationTokenRepository;
 
@@ -67,7 +63,7 @@ public class ExpoNotificationService implements NotificationService {
     }
 
     @Override
-    @Scheduled(cron = "#{@cleanupCron}")
+    @Scheduled(cron = "${cleanup.cron}")
     @Transactional
     public void cleanupOldRecords() {
         notificationTokenRepository.deleteByModifiedDateTimeBefore(LocalDateTime.now().minusMinutes(1));
