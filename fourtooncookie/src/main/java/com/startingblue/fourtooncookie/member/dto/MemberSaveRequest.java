@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.member.dto.request;
+package com.startingblue.fourtooncookie.member.dto;
 
 import com.startingblue.fourtooncookie.member.domain.Gender;
 
