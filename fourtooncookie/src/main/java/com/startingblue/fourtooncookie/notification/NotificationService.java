@@ -70,4 +70,8 @@ public class NotificationService {
         notificationTokenRepository.findByMemberIdAndToken(memberId, notificationTokenAssignRequest.notificationToken())
                 .ifPresent(notificationTokenRepository::delete);
     }
+
+    public void removeAllNotificationTokenFromMember(final UUID memberId) {
+        notificationTokenRepository.deleteByMemberId(memberId);
+    }
 }
