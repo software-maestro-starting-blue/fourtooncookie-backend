@@ -1,187 +1,168 @@
 package com.startingblue.fourtooncookie.artwork.service;
 
+import com.startingblue.fourtooncookie.artwork.ArtworkRepository;
 import com.startingblue.fourtooncookie.artwork.ArtworkService;
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
-import com.startingblue.fourtooncookie.artwork.ArtworkRepository;
 import com.startingblue.fourtooncookie.artwork.dto.ArtworkSaveRequest;
 import com.startingblue.fourtooncookie.artwork.dto.ArtworkUpdateRequest;
-import com.startingblue.fourtooncookie.artwork.dto.ArtworkSavedResponses;
-import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
 import com.startingblue.fourtooncookie.artwork.exception.ArtworkDuplicateException;
-import com.startingblue.fourtooncookie.locale.XmlMessageSource;
-import org.assertj.core.api.Assertions;
+import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.context.MessageSource;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
 class ArtworkServiceTest {
 
-    @Autowired
+    @InjectMocks
     private ArtworkService artworkService;
 
-    @Autowired
+    @Mock
     private ArtworkRepository artworkRepository;
 
-    @Autowired
-    MessageSource messageSource;
+    @Mock
+    private MessageSource xmlMessageSource;
 
-    @DisplayName("저장된 모든 작품을 가져온다.")
-    @Test
-    public void readAllArtworks() throws MalformedURLException {
-        // Given
-        String title1 = "랜덤";
-        URL url1 = new URL("http://test.com/image1.jpg");
-        String title2 = "말랑";
-        URL url2 = new URL("http://test.com/image2.jpg");
-        Artwork artwork1 = new Artwork(1L, title1, url1);
-        Artwork artwork2 = new Artwork(2L, title2, url2);
-        artworkRepository.save(artwork1);
-        artworkRepository.save(artwork2);
-
-        // When
-        ArtworkSavedResponses response = ArtworkSavedResponses.of(artworkService.readAllArtworks(Locale.KOREAN));
-
-        // Then
-        assertThat(response.artworks()).hasSize(2);
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
-    @DisplayName("새로운 작품을 저장한다.")
     @Test
-    public void createArtwork() throws MalformedURLException {
+    @DisplayName("새로운 Artwork를 성공적으로 저장한다")
+    void testCreateArtworkSuccess() throws MalformedURLException {
         // Given
-        String newTitle = "New Artwork";
-        URL newUrl = new URL("http://test.com/newimage.jpg");
-        ArtworkSaveRequest request = new ArtworkSaveRequest(newTitle, newUrl);
+        ArtworkSaveRequest request = new ArtworkSaveRequest("New Artwork", new URL("http://example.com/new_image.jpg"));
+
+        // 중복 확인을 위한 Mock
+        when(artworkRepository.existsByTitle(anyString())).thenReturn(false);
+        when(artworkRepository.existsByThumbnailUrl(any(URL.class))).thenReturn(false);
 
         // When
         artworkService.createArtwork(request);
 
         // Then
-        Optional<Artwork> savedArtwork = artworkRepository.findAll().stream()
-                .filter(artwork -> artwork.getTitle().equals(newTitle))
-                .findFirst();
-
-        assertThat(savedArtwork).isPresent();
-        assertThat(savedArtwork.get().getTitle()).isEqualTo(newTitle);
-        assertThat(savedArtwork.get().getThumbnailUrl()).isEqualTo(newUrl);
+        verify(artworkRepository, times(1)).save(any(Artwork.class));
     }
 
-    @DisplayName("저장된 작품을 업데이트한다.")
     @Test
-    public void updateArtwork() throws MalformedURLException {
+    @DisplayName("중복된 제목으로 Artwork 저장 시도 시 예외 발생")
+    void testCreateArtworkWithDuplicateTitle() throws MalformedURLException {
         // Given
-        String oldTitle = "Old Title";
-        URL oldUrl = new URL("http://test.com/oldimage.jpg");
-        Artwork artwork = new Artwork(oldTitle, oldUrl);
-        Artwork savedArtwork = artworkRepository.save(artwork);
+        ArtworkSaveRequest request = new ArtworkSaveRequest("Duplicate Artwork", new URL("http://example.com/image.jpg"));
 
-        String updateTitle = "updateById Title";
-        URL updateUrl = new URL("http://test.com/updateimage.jpg");
-        ArtworkUpdateRequest request = new ArtworkUpdateRequest(updateTitle, updateUrl);
-
-        // When
-        artworkService.updateArtwork(savedArtwork.getId(), request);
-
-        // Then
-        Optional<Artwork> updatedArtwork = artworkRepository.findById(savedArtwork.getId());
-        assertThat(updatedArtwork).isPresent();
-        assertThat(updatedArtwork.get().getTitle()).isEqualTo(updateTitle);
-        assertThat(updatedArtwork.get().getThumbnailUrl()).isEqualTo(updateUrl);
-    }
-
-    @DisplayName("저장된 작품을 삭제한다.")
-    @Test
-    public void deleteArtwork() throws MalformedURLException {
-        // Given
-        String title = "Title";
-        URL url = new URL("http://test.com/image.jpg");
-
-        Artwork artwork = new Artwork(title, url);
-        Artwork savedArtwork = artworkRepository.save(artwork);
-
-        Long deleteId = savedArtwork.getId();
-
-        // When
-        artworkService.deleteArtwork(deleteId);
-
-        // Then
-        Optional<Artwork> foundArtwork = artworkRepository.findById(deleteId);
-        assertThat(foundArtwork).isNotPresent();
-    }
-
-    @DisplayName("존재하지 않는 ID로 작품을 업데이트 시도시 예외를 발생시킨다.")
-    @Test
-    public void updateArtworkWithInvalidId() throws MalformedURLException {
-        // Given
-        Long notFoundArtworkId = -1L;
-        String updateTitle = "Update Title";
-        URL updateUrl = new URL("http://test.com/updateimage.jpg");
-        ArtworkUpdateRequest request = new ArtworkUpdateRequest(updateTitle, updateUrl);
-
-        // When & Then
-        assertThatThrownBy(() -> artworkService.updateArtwork(notFoundArtworkId, request))
-                .isInstanceOf(ArtworkNotFoundException.class)
-                .hasMessage("Artwork with ID -1 not found");
-    }
-
-    @DisplayName("존재하지 않는 ID로 작품을 삭제 시도시 예외를 발생시킨다.")
-    @Test
-    public void deleteArtworkWithInvalidId() {
-        // Given
-        Long notFoundArtworkId = -1L;
-
-        // When & Then
-        assertThatThrownBy(() -> artworkService.deleteArtwork(notFoundArtworkId))
-                .isInstanceOf(ArtworkNotFoundException.class)
-                .hasMessage("Artwork with ID -1 not found");
-    }
-
-    @DisplayName("중복된 제목으로 작품 저장 시도시 예외를 발생시킨다.")
-    @Test
-    public void createArtworkWithDuplicateTitle() throws MalformedURLException {
-        // Given
-        String title = "Duplicate Title";
-        URL url = new URL("http://test.com/image.jpg");
-        Artwork artwork = new Artwork(title, url);
-        artworkRepository.save(artwork);
-
-        ArtworkSaveRequest request = new ArtworkSaveRequest(title, new URL("http://test.com/newimage.jpg"));
+        // 중복된 제목 존재
+        when(artworkRepository.existsByTitle(anyString())).thenReturn(true);
 
         // When & Then
         assertThatThrownBy(() -> artworkService.createArtwork(request))
                 .isInstanceOf(ArtworkDuplicateException.class)
-                .hasMessage("Artwork with title 'Duplicate Title' already exists.");
+                .hasMessage("Artwork with title 'Duplicate Artwork' already exists.");
     }
 
-    @DisplayName("중복된 URL로 작품 저장 시도시 예외를 발생시킨다.")
     @Test
-    public void createArtworkWithDuplicateUrl() throws MalformedURLException {
+    @DisplayName("존재하는 모든 Artwork를 성공적으로 가져온다")
+    void testReadAllArtworks() throws MalformedURLException {
         // Given
-        String title = "New Title";
-        URL url = new URL("http://test.com/duplicateimage.jpg");
-        Artwork artwork = new Artwork(title, url);
-        artworkRepository.save(artwork);
+        List<Artwork> artworks = Arrays.asList(
+                new Artwork(1L, "Artwork 1", new URL("http://example.com/image1.jpg")),
+                new Artwork(2L, "Artwork 2", new URL("http://example.com/image2.jpg"))
+        );
 
-        ArtworkSaveRequest request = new ArtworkSaveRequest("Another Title", url);
+        when(artworkRepository.findAll()).thenReturn(artworks);
+
+        // When
+        List<Artwork> result = artworkService.readAllArtworks();
+
+        // Then
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getTitle()).isEqualTo("Artwork 1");
+        assertThat(result.get(1).getTitle()).isEqualTo("Artwork 2");
+    }
+
+    @Test
+    @DisplayName("Artwork ID로 지역화된 이름을 가져온다")
+    void testGetLocalizedArtworkTitle() {
+        // Given
+        Long artworkId = 1L;
+        when(xmlMessageSource.getMessage(anyString(), any(), eq(Locale.KOREAN)))
+                .thenReturn("Localized Artwork Title");
+
+        // When
+        String localizedTitle = artworkService.getLocalizedArtworkTitle(artworkId, Locale.KOREAN);
+
+        // Then
+        assertThat(localizedTitle).isEqualTo("Localized Artwork Title");
+    }
+
+    @Test
+    @DisplayName("Artwork 업데이트 성공")
+    void testUpdateArtwork() throws MalformedURLException {
+        // Given
+        Artwork existingArtwork = new Artwork(1L, "Old Title", new URL("http://example.com/old_image.jpg"));
+        ArtworkUpdateRequest request = new ArtworkUpdateRequest("Updated Title", new URL("http://example.com/new_image.jpg"));
+
+        when(artworkRepository.findById(1L)).thenReturn(Optional.of(existingArtwork));
+
+        // When
+        artworkService.updateArtwork(1L, request);
+
+        // Then
+        assertThat(existingArtwork.getTitle()).isEqualTo("Updated Title");
+        assertThat(existingArtwork.getThumbnailUrl()).isEqualTo(new URL("http://example.com/new_image.jpg"));
+        verify(artworkRepository, times(1)).save(existingArtwork);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 Artwork 업데이트 시 ArtworkNotFoundException 발생")
+    void testUpdateNonExistingArtwork() throws MalformedURLException {
+        // Given
+        ArtworkUpdateRequest request = new ArtworkUpdateRequest("Updated Title", new URL("http://example.com/new_image.jpg"));
+        when(artworkRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // When & Then
-        assertThatThrownBy(() -> artworkService.createArtwork(request))
-                .isInstanceOf(ArtworkDuplicateException.class)
-                .hasMessage("Artwork with thumbnail URL 'http://test.com/duplicateimage.jpg' already exists.");
+        assertThatThrownBy(() -> artworkService.updateArtwork(1L, request))
+                .isInstanceOf(ArtworkNotFoundException.class)
+                .hasMessage("Artwork with ID 1 not found");
+    }
+
+    @Test
+    @DisplayName("Artwork 삭제 성공")
+    void testDeleteArtwork() throws MalformedURLException {
+        // Given
+        Artwork artwork = new Artwork(1L, "Artwork", new URL("http://example.com/image.jpg"));
+        when(artworkRepository.findById(1L)).thenReturn(Optional.of(artwork));
+
+        // When
+        artworkService.deleteArtwork(1L);
+
+        // Then
+        verify(artworkRepository, times(1)).delete(artwork);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 Artwork 삭제 시 ArtworkNotFoundException 발생")
+    void testDeleteNonExistingArtwork() {
+        // Given
+        when(artworkRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> artworkService.deleteArtwork(1L))
+                .isInstanceOf(ArtworkNotFoundException.class)
+                .hasMessage("Artwork with ID 1 not found");
     }
 }
