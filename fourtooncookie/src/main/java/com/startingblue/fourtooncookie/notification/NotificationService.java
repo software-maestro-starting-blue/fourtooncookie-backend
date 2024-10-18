@@ -9,4 +9,6 @@ public interface NotificationService {
     void assignNotificationTokenToMember(final UUID memberId, final NotificationTokenAssignRequest notificationTokenAssignRequest);
 
     void sendNotificationToMember(final UUID memberId, final Diary diary);
+
+    void cleanupOldRecords();
 }
