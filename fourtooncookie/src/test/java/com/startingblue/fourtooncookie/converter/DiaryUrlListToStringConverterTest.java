@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.converter;
 
-import com.startingblue.fourtooncookie.global.converter.exception.ConversionException;
+import com.startingblue.fourtooncookie.diary.exception.DiaryConversionException;
 import com.startingblue.fourtooncookie.diary.domain.converter.DiaryUrlListToStringConverter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -92,7 +92,7 @@ class DiaryUrlListToStringConverterTest {
         String input = "http://example.com,http://example.org,malformed_url";
         assertThatThrownBy(() -> {
             converter.convertToEntityAttribute(input);
-        }).isInstanceOf(ConversionException.class)
+        }).isInstanceOf(DiaryConversionException.class)
                 .hasMessageContaining("Error converting String to List<URL>");
     }
 }

@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.diary.domain.converter;
 
-import com.startingblue.fourtooncookie.global.converter.exception.ConversionException;
+import com.startingblue.fourtooncookie.diary.exception.DiaryConversionException;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ public class DiaryLongListToStringConverter implements AttributeConverter<List<L
                     .map(String::valueOf)
                     .collect(Collectors.joining(","));
         } catch (Exception e) {
-            throw new ConversionException("Error converting List<Long> to String", e);
+            throw new DiaryConversionException("Error converting List<Long> to String", e);
         }
     }
 
@@ -41,7 +41,7 @@ public class DiaryLongListToStringConverter implements AttributeConverter<List<L
                     .map(Long::valueOf)
                     .toList();
         } catch (NumberFormatException e) {
-            throw new ConversionException("Error converting String to List<Long>", e);
+            throw new DiaryConversionException("Error converting String to List<Long>", e);
         }
     }
 

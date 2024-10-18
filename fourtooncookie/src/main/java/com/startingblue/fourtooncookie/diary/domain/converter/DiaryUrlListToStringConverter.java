@@ -1,6 +1,6 @@
 package com.startingblue.fourtooncookie.diary.domain.converter;
 
-import com.startingblue.fourtooncookie.global.converter.exception.ConversionException;
+import com.startingblue.fourtooncookie.diary.exception.DiaryConversionException;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,7 @@ public class DiaryUrlListToStringConverter implements AttributeConverter<List<UR
                     .map(String::valueOf)
                     .collect(Collectors.joining(","));
         } catch (Exception e) {
-            throw new ConversionException("Error converting List<URL> to String", e);
+            throw new DiaryConversionException("Error converting List<URL> to String", e);
         }
     }
 
@@ -44,12 +44,12 @@ public class DiaryUrlListToStringConverter implements AttributeConverter<List<UR
                         try {
                             return new URL(urlString);
                         } catch (MalformedURLException e) {
-                            throw new ConversionException("Malformed URL: " + urlString, e);
+                            throw new DiaryConversionException("Malformed URL: " + urlString, e);
                         }
                     })
                     .toList();
         } catch (Exception e) {
-            throw new ConversionException("Error converting String to List<URL>", e);
+            throw new DiaryConversionException("Error converting String to List<URL>", e);
         }
     }
 
