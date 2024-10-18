@@ -26,6 +26,7 @@ import java.util.UUID;
 @Service
 public class NotificationService {
 
+    private static final String EXPO_PUSH_SEND_API = "https://exp.host/--/api/v2/push/send";
     private final NotificationTokenRepository notificationTokenRepository;
 
     public void assignNotificationTokenToMember(final UUID memberId, final NotificationTokenAssignRequest notificationTokenAssignRequest) {
@@ -48,7 +49,7 @@ public class NotificationService {
         pushMessage.put("body", "내용");
 
         final RestTemplate restTemplate = new RestTemplate();
-        final String url = "https://exp.host/--/api/v2/push/send";
+        final String url = EXPO_PUSH_SEND_API;
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         final HttpEntity<Map<String, Object>> entity = new HttpEntity<>(pushMessage, headers);
