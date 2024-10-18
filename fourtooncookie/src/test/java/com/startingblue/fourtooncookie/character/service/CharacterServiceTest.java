@@ -6,7 +6,7 @@ import com.startingblue.fourtooncookie.character.CharacterService;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
-import com.startingblue.fourtooncookie.global.domain.PaymentType;
+import com.startingblue.fourtooncookie.character.domain.PaymentType;
 import com.startingblue.fourtooncookie.character.dto.CharacterSaveRequest;
 import com.startingblue.fourtooncookie.character.dto.CharacterUpdateRequest;
 import com.startingblue.fourtooncookie.character.dto.CharacterSavedResponse;
