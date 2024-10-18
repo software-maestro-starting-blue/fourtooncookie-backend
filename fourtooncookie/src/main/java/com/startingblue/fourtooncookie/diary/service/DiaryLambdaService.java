@@ -27,12 +27,10 @@ public class DiaryLambdaService {
     private final LambdaService lambdaService;
     private final LambdaClient lambdaClient;
     private final ObjectMapper objectMapper;
-    private final DiaryRepository diaryRepository;
 
     @Async
     @Transactional
     public void invokeDiaryImageGenerationLambda(Diary diary, Character character) {
-        DiaryStatus status = DiaryStatus.IN_PROGRESS;
         try {
             DiaryImageGenerationLambdaPayload diaryImageGenerationLambdaPayload = buildPayload(diary, character);
             String serializePayload = serializePayload(diaryImageGenerationLambdaPayload);
