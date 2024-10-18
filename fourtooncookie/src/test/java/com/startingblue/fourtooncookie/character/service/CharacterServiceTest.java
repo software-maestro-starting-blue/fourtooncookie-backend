@@ -132,11 +132,14 @@ class CharacterServiceTest {
     @Test
     void showAllCharacters() throws MalformedURLException {
         // given
+        Artwork artwork1 = new Artwork("랜덤", new URL("https://test.png"));
+        Artwork artwork2 = new Artwork("말랑", new URL("https://test2.png"));
+
         Character character1 = Character.builder()
                 .id(1L)
                 .characterVisionType(CharacterVisionType.DALL_E_3)
                 .paymentType(PaymentType.FREE)
-                .artwork(new Artwork("Test Artwork", new URL("https://test.png")))
+                .artwork(artwork1)
                 .name("랜덤")
                 .selectionThumbnailUrl(new URL("https://test.png"))
                 .basePrompt("This is a base prompt")
@@ -146,11 +149,14 @@ class CharacterServiceTest {
                 .id(2L)
                 .characterVisionType(CharacterVisionType.STABLE_DIFFUSION)
                 .paymentType(PaymentType.FREE)
-                .artwork(new Artwork("Test2 Artwork", new URL("https://test2.png")))
+                .artwork(artwork2)
                 .name("말랑")
                 .selectionThumbnailUrl(new URL("https://test2.png"))
                 .basePrompt("This is a base prompt2")
                 .build();
+
+        when(artworkService.getArtworkWithNameChange(artwork1, Locale.KOREAN)).thenReturn(new Artwork("랜덤", new URL("https://test.png")));
+        when(artworkService.getArtworkWithNameChange(artwork2, Locale.KOREAN)).thenReturn(new Artwork("말랑", new URL("https://test2.png")));
 
         when(messageSource.getMessage(eq("character.name." + character1.getId()), any(), any())).thenReturn(character1.getName());
         when(messageSource.getMessage(eq("character.name." + character2.getId()), any(), any())).thenReturn(character2.getName());

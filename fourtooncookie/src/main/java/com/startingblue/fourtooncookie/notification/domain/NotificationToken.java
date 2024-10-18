@@ -1,24 +1,24 @@
 package com.startingblue.fourtooncookie.notification.domain;
 
-import com.startingblue.fourtooncookie.global.domain.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class NotificationToken extends BaseEntity {
+@EntityListeners(AuditingEntityListener.class)
+public class NotificationToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +32,12 @@ public class NotificationToken extends BaseEntity {
     @NotNull
     @Column(name = "member_id", nullable = false)
     private UUID memberId;
+
+    @CreatedDate
+    private LocalDateTime createdDateTime;
+
+    @LastModifiedDate
+    private LocalDateTime modifiedDateTime;
 
     public NotificationToken(String token, UUID memberId) {
         this.token = token;

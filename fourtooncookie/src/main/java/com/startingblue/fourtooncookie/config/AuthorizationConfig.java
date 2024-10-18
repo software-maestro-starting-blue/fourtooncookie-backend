@@ -1,9 +1,9 @@
 package com.startingblue.fourtooncookie.config;
 
+import com.startingblue.fourtooncookie.web.ArgumentResolver;
 import com.startingblue.fourtooncookie.web.interceptor.DiaryOwnerAuthorizationInterceptor;
 import com.startingblue.fourtooncookie.web.interceptor.MemberAdminAuthorizationInterceptor;
 import com.startingblue.fourtooncookie.web.interceptor.MemberSignedUpAuthorizationInterceptor;
-import com.startingblue.fourtooncookie.web.ArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

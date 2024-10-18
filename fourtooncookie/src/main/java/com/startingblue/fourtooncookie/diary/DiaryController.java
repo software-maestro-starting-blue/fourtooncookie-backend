@@ -1,11 +1,6 @@
 package com.startingblue.fourtooncookie.diary;
 
-import com.startingblue.fourtooncookie.diary.dto.DiaryFavoriteRequest;
-import com.startingblue.fourtooncookie.diary.dto.DiarySaveRequest;
-import com.startingblue.fourtooncookie.diary.dto.DiaryUpdateRequest;
-import com.startingblue.fourtooncookie.diary.dto.DiaryCreatedResponse;
-import com.startingblue.fourtooncookie.diary.dto.DiarySavedResponse;
-import com.startingblue.fourtooncookie.diary.dto.DiarySavedResponses;
+import com.startingblue.fourtooncookie.diary.dto.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.UUID;
 
-import static org.springframework.http.ResponseEntity.*;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("/diary")

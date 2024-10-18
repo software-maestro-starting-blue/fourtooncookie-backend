@@ -1,7 +1,7 @@
 package com.startingblue.fourtooncookie.diary;
 
-import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.CharacterService;
+import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryPaintingImageGenerationStatus;
 import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
@@ -23,16 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.startingblue.fourtooncookie.diary.listener.DiarySQSMessageListener.*;
+import static com.startingblue.fourtooncookie.diary.listener.DiarySQSMessageListener.DiaryImageResponseMessage;
 
 @Service
 @RequiredArgsConstructor

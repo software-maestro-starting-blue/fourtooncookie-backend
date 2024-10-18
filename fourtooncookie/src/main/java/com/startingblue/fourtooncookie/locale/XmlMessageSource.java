@@ -3,6 +3,7 @@ package com.startingblue.fourtooncookie.locale;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.AbstractMessageSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -83,6 +84,11 @@ public class XmlMessageSource extends AbstractMessageSource {
         String language = locale.getLanguage();
         Map<String, String> localeMessages = messages.getOrDefault(language, messages.get(DEFAULT_LANGUAGE));
         String message = localeMessages.get(code);
-        return new MessageFormat(message, locale);
+
+        if (!StringUtils.hasText(message)) {
+            throw new IllegalArgumentException(String.format("Message for code '%s' not found for locale '%s'", code, locale));
+        }
+
+        return new MessageFormat(code, locale);
     }
 }

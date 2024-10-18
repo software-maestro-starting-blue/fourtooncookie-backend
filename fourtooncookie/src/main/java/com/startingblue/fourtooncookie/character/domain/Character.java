@@ -10,7 +10,8 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URL;
-import java.util.*;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Slf4j

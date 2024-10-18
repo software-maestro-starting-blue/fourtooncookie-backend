@@ -29,7 +29,7 @@ public class MemberAdminAuthorizationInterceptor extends MemberAuthorizationInte
     }
 
     @Override
-    protected boolean isAuthorized(UUID memberId) {
+    public boolean isAuthorized(UUID memberId) {
         boolean isAuthorized = memberService.verifyMemberAdmin(memberId);
 
         if (isAuthorized) {
