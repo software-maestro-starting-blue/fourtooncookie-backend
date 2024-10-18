@@ -1,19 +1,20 @@
 package com.startingblue.fourtooncookie.diary.service;
 
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
-import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
+import com.startingblue.fourtooncookie.artwork.ArtworkRepository;
 import com.startingblue.fourtooncookie.character.domain.Character;
-import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
+import com.startingblue.fourtooncookie.character.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
+import com.startingblue.fourtooncookie.diary.DiaryService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
-import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
-import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
+import com.startingblue.fourtooncookie.diary.DiaryRepository;
+import com.startingblue.fourtooncookie.diary.dto.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
-import com.startingblue.fourtooncookie.global.domain.PaymentType;
+import com.startingblue.fourtooncookie.character.domain.PaymentType;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
-import com.startingblue.fourtooncookie.member.domain.MemberRepository;
+import com.startingblue.fourtooncookie.member.MemberRepository;
 import com.startingblue.fourtooncookie.member.domain.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

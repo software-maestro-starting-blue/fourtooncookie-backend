@@ -1,8 +1,7 @@
 package com.startingblue.fourtooncookie.member;
 
-import com.startingblue.fourtooncookie.member.dto.request.MemberSaveRequest;
-import com.startingblue.fourtooncookie.member.dto.response.MemberSavedResponse;
-import com.startingblue.fourtooncookie.member.service.MemberService;
+import com.startingblue.fourtooncookie.member.dto.MemberSaveRequest;
+import com.startingblue.fourtooncookie.member.dto.MemberSavedResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,10 +1,11 @@
 package com.startingblue.fourtooncookie.member.service;
 
+import com.startingblue.fourtooncookie.member.MemberService;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
-import com.startingblue.fourtooncookie.member.domain.MemberRepository;
+import com.startingblue.fourtooncookie.member.MemberRepository;
 import com.startingblue.fourtooncookie.member.domain.Role;
-import com.startingblue.fourtooncookie.member.dto.request.MemberSaveRequest;
+import com.startingblue.fourtooncookie.member.dto.MemberSaveRequest;
 import com.startingblue.fourtooncookie.member.exception.MemberDuplicateException;
 import com.startingblue.fourtooncookie.member.exception.MemberNotFoundException;
 import org.junit.jupiter.api.BeforeEach;

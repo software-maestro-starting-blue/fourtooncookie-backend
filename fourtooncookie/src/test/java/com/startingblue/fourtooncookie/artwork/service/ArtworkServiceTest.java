@@ -1,18 +1,18 @@
 package com.startingblue.fourtooncookie.artwork.service;
 
+import com.startingblue.fourtooncookie.artwork.ArtworkService;
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
-import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
-import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkSaveRequest;
-import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkUpdateRequest;
-import com.startingblue.fourtooncookie.artwork.dto.response.ArtworkSavedResponses;
+import com.startingblue.fourtooncookie.artwork.ArtworkRepository;
+import com.startingblue.fourtooncookie.artwork.dto.ArtworkSaveRequest;
+import com.startingblue.fourtooncookie.artwork.dto.ArtworkUpdateRequest;
+import com.startingblue.fourtooncookie.artwork.dto.ArtworkSavedResponses;
 import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
 import com.startingblue.fourtooncookie.artwork.exception.ArtworkDuplicateException;
-import com.startingblue.fourtooncookie.global.config.XmlMessageSource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cglib.core.Local;
+import org.springframework.context.MessageSource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +36,7 @@ class ArtworkServiceTest {
     private ArtworkRepository artworkRepository;
 
     @Autowired
-    XmlMessageSource messageSource;
+    MessageSource messageSource;
 
     @DisplayName("저장된 모든 작품을 가져온다.")
     @Test

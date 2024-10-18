@@ -1,8 +1,8 @@
 package com.startingblue.fourtooncookie.character.domain;
 
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
-import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
-import com.startingblue.fourtooncookie.global.domain.PaymentType;
+import com.startingblue.fourtooncookie.artwork.ArtworkRepository;
+import com.startingblue.fourtooncookie.character.CharacterRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
