@@ -3,7 +3,7 @@ package com.startingblue.fourtooncookie.notification;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.notification.domain.NotificationToken;
 import com.startingblue.fourtooncookie.notification.dto.NotificationTokenAssignRequest;
-import com.startingblue.fourtooncookie.notification.exeption.NotificationSendFailedException;
+import com.startingblue.fourtooncookie.notification.exeption.NotificationSendException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -55,7 +55,7 @@ public class NotificationService {
         final ResponseEntity<String> exchange = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
         if (!exchange.getStatusCode().is2xxSuccessful()) {
-            throw new NotificationSendFailedException(exchange.getStatusCode() + exchange.getBody());
+            throw new NotificationSendException(exchange.getStatusCode() + exchange.getBody());
         }
     }
 
