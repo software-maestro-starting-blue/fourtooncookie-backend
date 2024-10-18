@@ -15,7 +15,7 @@ public class MemberSignedUpAuthorizationInterceptor extends MemberAuthorizationI
     }
 
     @Override
-    protected boolean isAuthorized(UUID memberId) {
+    public boolean isAuthorized(UUID memberId) {
         boolean isAuthorized = memberService.verifyMemberSignUp(memberId);
 
         if (isAuthorized) {
