@@ -1,7 +1,7 @@
 package com.startingblue.fourtooncookie.converter;
 
-import com.startingblue.fourtooncookie.global.converter.exception.ConversionException;
-import com.startingblue.fourtooncookie.global.converter.UrlListToStringConverter;
+import com.startingblue.fourtooncookie.diary.exception.DiaryConversionException;
+import com.startingblue.fourtooncookie.diary.domain.converter.DiaryUrlListToStringConverter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -11,9 +11,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
-class UrlListToStringConverterTest {
+class DiaryUrlListToStringConverterTest {
 
-    private final UrlListToStringConverter converter = new UrlListToStringConverter();
+    private final DiaryUrlListToStringConverter converter = new DiaryUrlListToStringConverter();
 
     @Test
     @DisplayName("List<URL>을 String으로 변환 (값 포함)")
@@ -92,7 +92,7 @@ class UrlListToStringConverterTest {
         String input = "http://example.com,http://example.org,malformed_url";
         assertThatThrownBy(() -> {
             converter.convertToEntityAttribute(input);
-        }).isInstanceOf(ConversionException.class)
+        }).isInstanceOf(DiaryConversionException.class)
                 .hasMessageContaining("Error converting String to List<URL>");
     }
 }

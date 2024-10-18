@@ -2,17 +2,20 @@ package com.startingblue.fourtooncookie.diary.domain;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.diary.domain.converter.DiaryPaintingImageGenerationStatusListConverter;
-import com.startingblue.fourtooncookie.global.domain.BaseEntity;
-import com.startingblue.fourtooncookie.global.converter.UrlListToStringConverter;
+import com.startingblue.fourtooncookie.diary.domain.converter.DiaryUrlListToStringConverter;
 import jakarta.persistence.*;
 import jakarta.validation.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -20,7 +23,8 @@ import java.util.*;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public final class Diary extends BaseEntity {
+@EntityListeners(AuditingEntityListener.class)
+public final class Diary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +42,7 @@ public final class Diary extends BaseEntity {
     private LocalDate diaryDate;
 
     @Size(max = 4, message = "일기 그림은 최대 4개 입니다.")
-    @Convert(converter = UrlListToStringConverter.class)
+    @Convert(converter = DiaryUrlListToStringConverter.class)
     @Builder.Default
     private List<URL> paintingImageUrls = new ArrayList<>();
 
@@ -57,6 +61,12 @@ public final class Diary extends BaseEntity {
     @Convert(converter = DiaryPaintingImageGenerationStatusListConverter.class)
     @Builder.Default
     private List<DiaryPaintingImageGenerationStatus> paintingImageGenerationStatuses = new ArrayList<>();
+
+    @CreatedDate
+    private LocalDateTime createdDateTime;
+
+    @LastModifiedDate
+    private LocalDateTime modifiedDateTime;
 
     public static DiaryBuilder builder() {
         return new CustomDiaryBuilder();

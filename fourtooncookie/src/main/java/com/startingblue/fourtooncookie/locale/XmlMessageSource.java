@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.global;
+package com.startingblue.fourtooncookie.locale;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.AbstractMessageSource;
