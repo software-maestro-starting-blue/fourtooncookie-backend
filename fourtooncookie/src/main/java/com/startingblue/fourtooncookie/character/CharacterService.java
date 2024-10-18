@@ -25,7 +25,7 @@ public class CharacterService {
 
     private final CharacterRepository characterRepository;
     private final ArtworkService artworkService;
-    private final MessageSource messageSource;
+    private final MessageSource xmlMessageSource;
 
     public void createCharacter(final CharacterSaveRequest request) {
         CharacterVisionType visionType = findByCharacterVisionType(request.characterVisionType());
@@ -105,7 +105,7 @@ public class CharacterService {
     }
 
     public String getLocalizedCharacterName(Long characterId, Locale locale) {
-        return Objects.requireNonNull(messageSource.getMessage("character.name." + characterId, null, locale));
+        return Objects.requireNonNull(xmlMessageSource.getMessage("character.name." + characterId, null, locale));
     }
 
     private CharacterVisionType findByCharacterVisionType(CharacterVisionType characterVisionType) {
