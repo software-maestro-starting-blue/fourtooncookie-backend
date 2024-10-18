@@ -1,7 +1,7 @@
 package com.startingblue.fourtooncookie.diary.service;
 
 import com.startingblue.fourtooncookie.aws.s3.S3Service;
-import com.startingblue.fourtooncookie.global.converter.image.ImageConverter;
+import com.startingblue.fourtooncookie.global.converter.ImageConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

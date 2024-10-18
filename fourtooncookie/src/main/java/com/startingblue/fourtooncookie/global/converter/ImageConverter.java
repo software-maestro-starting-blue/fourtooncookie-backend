@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.global.converter.image;
+package com.startingblue.fourtooncookie.global.converter;
 
 import org.springframework.stereotype.Component;
 
