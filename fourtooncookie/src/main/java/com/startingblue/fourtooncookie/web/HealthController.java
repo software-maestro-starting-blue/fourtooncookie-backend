@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.global.monitoring;
+package com.startingblue.fourtooncookie.web;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
