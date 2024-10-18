@@ -11,10 +11,12 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,5 +60,11 @@ public class ExpoNotificationService implements NotificationService {
         if (!exchange.getStatusCode().is2xxSuccessful()) {
             throw new NotificationSendFailedException(exchange.getStatusCode() + exchange.getBody());
         }
+    }
+
+    @Scheduled(cron = "0 40 13 * * ?")
+    @Transactional
+    public void cleanupOldRecords() {
+        notificationTokenRepository.deleteByCreatedAtBefore(LocalDateTime.now().minusMinutes(1));
     }
 }
