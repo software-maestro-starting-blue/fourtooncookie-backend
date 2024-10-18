@@ -11,10 +11,10 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class ExpoNotificationServiceTest {
+class NotificationServiceTest {
 
     @Autowired
-    private ExpoNotificationService expoNotificationService;
+    private NotificationService notificationService;
 
     @Autowired
     private NotificationTokenRepository notificationTokenRepository;
@@ -28,7 +28,7 @@ class ExpoNotificationServiceTest {
         final NotificationTokenAssignRequest notificationTokenAssignRequest = new NotificationTokenAssignRequest(token);
 
         //when
-        expoNotificationService.assignNotificationTokenToMember(memberId, notificationTokenAssignRequest);
+        notificationService.assignNotificationTokenToMember(memberId, notificationTokenAssignRequest);
 
         //then
         final String actual = notificationTokenRepository.findByMemberId(memberId).get(0).getToken();
@@ -48,8 +48,8 @@ class ExpoNotificationServiceTest {
         final NotificationTokenAssignRequest notificationTokenAssignRequest2 = new NotificationTokenAssignRequest(token2);
 
         //when
-        expoNotificationService.assignNotificationTokenToMember(memberId, notificationTokenAssignRequest);
-        expoNotificationService.assignNotificationTokenToMember(memberId, notificationTokenAssignRequest2);
+        notificationService.assignNotificationTokenToMember(memberId, notificationTokenAssignRequest);
+        notificationService.assignNotificationTokenToMember(memberId, notificationTokenAssignRequest2);
 
         //then
         assertEquals(2, notificationTokenRepository.findByMemberId(memberId).size());
@@ -66,8 +66,8 @@ class ExpoNotificationServiceTest {
         final NotificationTokenAssignRequest notificationTokenAssignRequest = new NotificationTokenAssignRequest(token);
 
         //when
-        expoNotificationService.assignNotificationTokenToMember(beforeMemberId, notificationTokenAssignRequest);
-        expoNotificationService.assignNotificationTokenToMember(afterMemberId, notificationTokenAssignRequest);
+        notificationService.assignNotificationTokenToMember(beforeMemberId, notificationTokenAssignRequest);
+        notificationService.assignNotificationTokenToMember(afterMemberId, notificationTokenAssignRequest);
 
         //then
         assertEquals(0, notificationTokenRepository.findByMemberId(beforeMemberId).size());
