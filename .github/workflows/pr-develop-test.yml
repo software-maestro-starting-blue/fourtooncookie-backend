@@ -18,6 +18,7 @@ jobs:
       AWS_CLOUDFRONT_KEYPAIRID: ""
       AWS_CLOUDFRONT_PRIVATEKEYPATH: ""
       AWS_SQS_FOURTOONCOOKIE_IMAGE_RESPONSE_SQS_FIFO: ""
+      CLEANUP_CRON: ""
       
     defaults:
       run:
