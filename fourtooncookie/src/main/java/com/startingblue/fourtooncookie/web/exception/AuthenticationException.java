@@ -2,16 +2,14 @@ package com.startingblue.fourtooncookie.web.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Getter
+@ResponseStatus(HttpStatus.UNAUTHORIZED)
 public final class AuthenticationException extends RuntimeException {
-
-    private final HttpStatus statusCode = HttpStatus.UNAUTHORIZED;
-
     public AuthenticationException(String message) {
         super(message);
     }
-
     public AuthenticationException(String message, Throwable cause) {
         super(message, cause);
     }
