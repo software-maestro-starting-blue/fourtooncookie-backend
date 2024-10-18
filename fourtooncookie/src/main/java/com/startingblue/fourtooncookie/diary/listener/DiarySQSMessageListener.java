@@ -35,7 +35,14 @@ public class DiarySQSMessageListener {
                     // 다이어리 ID가 없을 경우 처리를 하지 않음 (메시지 삭제)
                     return;
                 }
+
+                DiaryStatus currentDiaryStatus = diaryService.readById(response.diaryId()).getStatus();
+
                 diaryService.processImageGenerationResponse(response);
+
+                if (!DiaryStatus.IN_PROGRESS.equals(currentDiaryStatus)) {
+                    return;
+                }
 
                 Diary diary = diaryService.readById(response.diaryId());
                 if (!DiaryStatus.IN_PROGRESS.equals(diary.getStatus())) {
