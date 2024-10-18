@@ -1,7 +1,7 @@
 package com.startingblue.fourtooncookie.converter;
 
 import com.startingblue.fourtooncookie.global.converter.exception.ConversionException;
-import com.startingblue.fourtooncookie.global.converter.LongListToStringConverter;
+import com.startingblue.fourtooncookie.diary.domain.converter.LongListToStringConverter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

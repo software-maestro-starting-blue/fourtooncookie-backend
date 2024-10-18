@@ -3,7 +3,7 @@ package com.startingblue.fourtooncookie.diary.domain;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.diary.domain.converter.DiaryPaintingImageGenerationStatusListConverter;
 import com.startingblue.fourtooncookie.global.domain.BaseEntity;
-import com.startingblue.fourtooncookie.global.converter.UrlListToStringConverter;
+import com.startingblue.fourtooncookie.diary.domain.converter.DiaryUrlListToStringConverter;
 import jakarta.persistence.*;
 import jakarta.validation.*;
 import jakarta.validation.constraints.NotBlank;
@@ -38,7 +38,7 @@ public final class Diary extends BaseEntity {
     private LocalDate diaryDate;
 
     @Size(max = 4, message = "일기 그림은 최대 4개 입니다.")
-    @Convert(converter = UrlListToStringConverter.class)
+    @Convert(converter = DiaryUrlListToStringConverter.class)
     @Builder.Default
     private List<URL> paintingImageUrls = new ArrayList<>();
 

@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.global.converter;
+package com.startingblue.fourtooncookie.diary.domain.converter;
 
 import com.startingblue.fourtooncookie.global.converter.exception.ConversionException;
 import jakarta.persistence.AttributeConverter;
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @Converter
 @Component
-public class LongListToStringConverter implements AttributeConverter<List<Long>, String> {
+public class DiaryLongListToStringConverter implements AttributeConverter<List<Long>, String> {
 
     private static final String EMPTY_LIST_STRING = "";
 
