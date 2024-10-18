@@ -1,4 +1,4 @@
-package com.startingblue.fourtooncookie.artwork.dto.response;
+package com.startingblue.fourtooncookie.artwork.dto;
 
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 

@@ -1,7 +1,7 @@
 package com.startingblue.fourtooncookie.artwork.domain;
 
 import com.startingblue.fourtooncookie.artwork.ArtworkRepository;
-import com.startingblue.fourtooncookie.artwork.dto.request.ArtworkSaveRequest;
+import com.startingblue.fourtooncookie.artwork.dto.ArtworkSaveRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
