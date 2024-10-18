@@ -8,10 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
-import software.amazon.awssdk.services.s3.S3Client;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,9 +17,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class DiaryS3ServiceTest {
-
-    @Mock
-    private S3Client s3Client;
 
     @Mock
     private S3Service s3Service;
@@ -38,21 +33,6 @@ class DiaryS3ServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         ReflectionTestUtils.setField(diaryS3Service, "bucketName", "test-bucket");
-    }
-
-    @Test
-    @DisplayName("Presigned URL 생성 성공 테스트")
-    void testGeneratePresignedUrlSuccess() throws Exception {
-        // given
-        URL expectedUrl = new URL("http://example.com");
-        when(s3Service.generatePresignedUrl(any(String.class), any(String.class))).thenReturn(expectedUrl);
-
-        // when
-        URL actualUrl = diaryS3Service.generatePresignedUrl(diaryId, gridPosition);
-
-        // then
-        assertEquals(expectedUrl, actualUrl);
-        verify(s3Service).generatePresignedUrl(any(String.class), any(String.class));
     }
 
     @Test
