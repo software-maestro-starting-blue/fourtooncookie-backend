@@ -1,5 +1,6 @@
-package com.startingblue.fourtooncookie.notification;
+package com.startingblue.fourtooncookie.notification.batch;
 
+import com.startingblue.fourtooncookie.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
