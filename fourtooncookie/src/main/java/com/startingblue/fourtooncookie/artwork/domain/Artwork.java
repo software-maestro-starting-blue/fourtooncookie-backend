@@ -19,7 +19,6 @@ import java.util.Set;
 @Slf4j
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Artwork {
 
     @Id
@@ -39,6 +38,12 @@ public class Artwork {
         this.title = title;
         this.thumbnailUrl = thumbnailUrl;
         validate();
+    }
+
+    public Artwork(final Long id, final String title, final URL thumbnailUrl) {
+        this.id = id;
+        this.title = title;
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     public void update(final String title, final URL thumbnailUrl) {

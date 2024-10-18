@@ -1,7 +1,7 @@
 package com.startingblue.fourtooncookie.diary.service;
 
-import com.startingblue.fourtooncookie.aws.s3.service.S3Service;
-import com.startingblue.fourtooncookie.global.converter.image.ImageConverter;
+import com.startingblue.fourtooncookie.aws.s3.S3Service;
+import com.startingblue.fourtooncookie.global.converter.ImageConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

@@ -1,13 +1,11 @@
 package com.startingblue.fourtooncookie.diary;
 
-import com.startingblue.fourtooncookie.diary.dto.request.DiaryFavoriteRequest;
-import com.startingblue.fourtooncookie.diary.dto.request.DiarySaveRequest;
-import com.startingblue.fourtooncookie.diary.dto.request.DiaryUpdateRequest;
-import com.startingblue.fourtooncookie.diary.dto.response.DiaryCreatedResponse;
-import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponse;
-import com.startingblue.fourtooncookie.diary.dto.response.DiarySavedResponses;
-import com.startingblue.fourtooncookie.diary.service.DiaryService;
-import jakarta.servlet.http.HttpServletResponse;
+import com.startingblue.fourtooncookie.diary.dto.DiaryFavoriteRequest;
+import com.startingblue.fourtooncookie.diary.dto.DiarySaveRequest;
+import com.startingblue.fourtooncookie.diary.dto.DiaryUpdateRequest;
+import com.startingblue.fourtooncookie.diary.dto.DiaryCreatedResponse;
+import com.startingblue.fourtooncookie.diary.dto.DiarySavedResponse;
+import com.startingblue.fourtooncookie.diary.dto.DiarySavedResponses;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.springframework.http.ResponseEntity.*;

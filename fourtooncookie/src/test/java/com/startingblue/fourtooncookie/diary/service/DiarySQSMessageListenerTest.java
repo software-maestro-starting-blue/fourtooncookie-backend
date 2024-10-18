@@ -1,6 +1,7 @@
 package com.startingblue.fourtooncookie.diary.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.startingblue.fourtooncookie.diary.DiaryService;
 import com.startingblue.fourtooncookie.diary.listener.DiarySQSMessageListener;
 import com.startingblue.fourtooncookie.notification.NotificationService;
 import org.junit.jupiter.api.BeforeEach;

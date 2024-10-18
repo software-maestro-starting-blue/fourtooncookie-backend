@@ -1,15 +1,16 @@
 package com.startingblue.fourtooncookie.character;
 
-import com.startingblue.fourtooncookie.character.dto.request.CharacterSaveRequest;
-import com.startingblue.fourtooncookie.character.dto.request.CharacterUpdateRequest;
-import com.startingblue.fourtooncookie.character.dto.response.CharacterSavedResponse;
-import com.startingblue.fourtooncookie.character.dto.response.CharacterSavedResponses;
-import com.startingblue.fourtooncookie.character.service.CharacterService;
+import com.startingblue.fourtooncookie.character.dto.CharacterSaveRequest;
+import com.startingblue.fourtooncookie.character.dto.CharacterUpdateRequest;
+import com.startingblue.fourtooncookie.character.dto.CharacterSavedResponse;
+import com.startingblue.fourtooncookie.character.dto.CharacterSavedResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Locale;
 
 @RequiredArgsConstructor
 @RestController
@@ -27,15 +28,15 @@ public final class CharacterController {
     }
 
     @GetMapping
-    public ResponseEntity<CharacterSavedResponses> readAllCharacters() {
-        CharacterSavedResponses responses = CharacterSavedResponses.of(characterService.readAllCharacters());
+    public ResponseEntity<CharacterSavedResponses> readAllCharacters(Locale locale) {
+        CharacterSavedResponses responses = CharacterSavedResponses.of(characterService.readAllCharacters(locale));
         return ResponseEntity
                 .ok(responses);
     }
 
     @GetMapping("/{characterId}")
-    public ResponseEntity<CharacterSavedResponse> readCharacter(@PathVariable final Long characterId) {
-        CharacterSavedResponse response = CharacterSavedResponse.of(characterService.readById(characterId));
+    public ResponseEntity<CharacterSavedResponse> readCharacter(@PathVariable final Long characterId, Locale locale) {
+        CharacterSavedResponse response = CharacterSavedResponse.of(characterService.readById(characterId, locale));
         return ResponseEntity
                 .ok(response);
     }

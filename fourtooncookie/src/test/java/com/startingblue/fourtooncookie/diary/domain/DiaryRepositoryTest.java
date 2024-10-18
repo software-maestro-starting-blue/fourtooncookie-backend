@@ -1,14 +1,15 @@
 package com.startingblue.fourtooncookie.diary.domain;
 
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
-import com.startingblue.fourtooncookie.artwork.domain.ArtworkRepository;
+import com.startingblue.fourtooncookie.artwork.ArtworkRepository;
 import com.startingblue.fourtooncookie.character.domain.Character;
-import com.startingblue.fourtooncookie.character.domain.CharacterRepository;
+import com.startingblue.fourtooncookie.character.CharacterRepository;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
-import com.startingblue.fourtooncookie.global.domain.PaymentType;
+import com.startingblue.fourtooncookie.diary.DiaryRepository;
+import com.startingblue.fourtooncookie.character.domain.PaymentType;
 import com.startingblue.fourtooncookie.member.domain.Gender;
 import com.startingblue.fourtooncookie.member.domain.Member;
-import com.startingblue.fourtooncookie.member.domain.MemberRepository;
+import com.startingblue.fourtooncookie.member.MemberRepository;
 import com.startingblue.fourtooncookie.member.domain.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

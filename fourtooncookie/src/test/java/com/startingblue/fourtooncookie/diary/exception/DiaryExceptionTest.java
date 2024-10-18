@@ -1,7 +1,7 @@
 package com.startingblue.fourtooncookie.diary.exception;
 
-import com.startingblue.fourtooncookie.diary.domain.DiaryRepository;
-import com.startingblue.fourtooncookie.diary.service.DiaryService;
+import com.startingblue.fourtooncookie.diary.DiaryRepository;
+import com.startingblue.fourtooncookie.diary.DiaryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
