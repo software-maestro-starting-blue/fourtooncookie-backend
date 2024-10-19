@@ -1,13 +1,13 @@
 package com.startingblue.fourtooncookie.diary;
 
 import com.startingblue.fourtooncookie.character.domain.Character;
-import com.startingblue.fourtooncookie.character.CharacterService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryPaintingImageGenerationStatus;
 import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
 import com.startingblue.fourtooncookie.diary.dto.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.DiaryUpdateRequest;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
+import com.startingblue.fourtooncookie.diary.service.DiaryCharacterService;
 import com.startingblue.fourtooncookie.diary.service.DiaryLambdaService;
 import com.startingblue.fourtooncookie.diary.service.DiaryPaintingImageCloudFrontService;
 import com.startingblue.fourtooncookie.diary.service.DiaryS3Service;
@@ -22,16 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.startingblue.fourtooncookie.diary.listener.DiarySQSMessageListener.*;
+import static com.startingblue.fourtooncookie.diary.listener.DiarySQSMessageListener.DiaryImageResponseMessage;
 
 @Service
 @RequiredArgsConstructor
@@ -44,13 +39,14 @@ public class DiaryService {
     private static final int MAX_PAINTING_IMAGE_SIZE = 4;
 
     private final DiaryRepository diaryRepository;
-    private final CharacterService characterService;
+    private final DiaryCharacterService diaryCharacterService;
     private final DiaryS3Service diaryS3Service;
     private final DiaryPaintingImageCloudFrontService diaryPaintingImageCloudFrontService;
     private final DiaryLambdaService diaryImageGenerationLambdaInvoker;
 
     public Long createDiary(final DiarySaveRequest request, final UUID memberId) {
-        Character character = characterService.readById(request.characterId());
+        Character character = diaryCharacterService.readById(request.characterId());
+        verifyUniqueDiary(memberId, request.diaryDate());
 
         Diary diary = buildDiary(request, memberId, character);
         diaryRepository.save(diary);
@@ -123,7 +119,7 @@ public class DiaryService {
 
     public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
         Diary existedDiary = readById(diaryId);
-        Character character = characterService.readById(request.characterId());
+        Character character = diaryCharacterService.readById(request.characterId());
         existedDiary.update(request.content(), character);
         diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(existedDiary, character);
         diaryPaintingImageCloudFrontService.invalidateCache(diaryId);
