@@ -43,7 +43,7 @@ class CharacterServiceTest {
     private CharacterRepository characterRepository;
 
     @Mock
-    private ArtworkService artworkService;
+    private CharacterArtworkService characterArtworkService;
 
     @InjectMocks
     private CharacterService characterService;
@@ -70,7 +70,7 @@ class CharacterServiceTest {
                 .basePrompt(request.basePrompt())
                 .build();
 
-        when(artworkService.readById(request.artworkId())).thenReturn(artwork);
+        when(characterArtworkService.readById(request.artworkId())).thenReturn(artwork);
         when(characterRepository.save(any(Character.class))).thenReturn(character);
 
         // when
@@ -155,8 +155,8 @@ class CharacterServiceTest {
                 .basePrompt("This is a base prompt2")
                 .build();
 
-        when(artworkService.getArtworkWithNameChange(artwork1, Locale.KOREAN)).thenReturn(new Artwork("랜덤", new URL("https://test.png")));
-        when(artworkService.getArtworkWithNameChange(artwork2, Locale.KOREAN)).thenReturn(new Artwork("말랑", new URL("https://test2.png")));
+        when(characterArtworkService.getArtworkWithNameChange(artwork1, Locale.KOREAN)).thenReturn(new Artwork("랜덤", new URL("https://test.png")));
+        when(characterArtworkService.getArtworkWithNameChange(artwork2, Locale.KOREAN)).thenReturn(new Artwork("말랑", new URL("https://test2.png")));
 
         when(messageSource.getMessage(eq("character.name." + character1.getId()), any(), any())).thenReturn(character1.getName());
         when(messageSource.getMessage(eq("character.name." + character2.getId()), any(), any())).thenReturn(character2.getName());
@@ -224,7 +224,7 @@ class CharacterServiceTest {
         CharacterUpdateRequest request = new CharacterUpdateRequest(updateCharacterVisionType, PaymentType.PAID, updateArtworkId, updateCharacterName, updateUrl, updatedBasePrompt);
 
         when(characterRepository.findById(characterId)).thenReturn(Optional.of(character));
-        when(artworkService.readById(request.artworkId())).thenReturn(updateArtwork);
+        when(characterArtworkService.readById(request.artworkId())).thenReturn(updateArtwork);
 
         // when
         characterService.updateCharacter(characterId, request);

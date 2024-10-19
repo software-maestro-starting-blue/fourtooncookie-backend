@@ -1,8 +1,6 @@
 package com.startingblue.fourtooncookie.character;
 
-import com.startingblue.fourtooncookie.artwork.ArtworkService;
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
-import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
 import com.startingblue.fourtooncookie.character.domain.Character;
 import com.startingblue.fourtooncookie.character.domain.CharacterVisionType;
 import com.startingblue.fourtooncookie.character.domain.PaymentType;
@@ -10,6 +8,7 @@ import com.startingblue.fourtooncookie.character.dto.CharacterSaveRequest;
 import com.startingblue.fourtooncookie.character.dto.CharacterUpdateRequest;
 import com.startingblue.fourtooncookie.character.exception.CharacterDuplicateException;
 import com.startingblue.fourtooncookie.character.exception.CharacterNotFoundException;
+import com.startingblue.fourtooncookie.character.service.CharacterArtworkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Transactional
@@ -26,12 +24,12 @@ import java.util.Optional;
 public class CharacterService {
 
     private final CharacterRepository characterRepository;
-    private final ArtworkService artworkService;
+    private final CharacterArtworkService characterArtworkService;
     private final MessageSource xmlMessageSource;
 
     public void createCharacter(final CharacterSaveRequest request) {
         CharacterVisionType visionType = findByCharacterVisionType(request.characterVisionType());
-        Artwork artwork = artworkService.readById(request.artworkId());
+        Artwork artwork = characterArtworkService.readById(request.artworkId());
 
         verifyUniqueCharacter(request.name(), artwork, request.paymentType(), visionType);
 
@@ -59,7 +57,7 @@ public class CharacterService {
 
     public void updateCharacter(final Long characterId, final CharacterUpdateRequest request) {
         Character character = readById(characterId);
-        Artwork artwork = artworkService.readById(request.artworkId());
+        Artwork artwork = characterArtworkService.readById(request.artworkId());
 
         character.update(request.characterVisionType(),
                 request.paymentType(),
@@ -88,7 +86,7 @@ public class CharacterService {
     }
 
     private Character localizeCharacter(Character character, Locale locale) {
-        Artwork localizedArtwork = artworkService.getArtworkWithNameChange(character.getArtwork(), locale);
+        Artwork localizedArtwork = characterArtworkService.getArtworkWithNameChange(character.getArtwork(), locale);
 
         String localizedCharacterName = getLocalizedCharacterName(character.getId(), locale);
         return getCharacterWithNameChangeAndArtworkChange(character, localizedCharacterName, localizedArtwork);
