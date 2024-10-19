@@ -1,8 +1,8 @@
 package com.startingblue.fourtooncookie.locale;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.AbstractMessageSource;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -16,27 +16,25 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
-@Component
+@Getter
 public class XmlMessageSource extends AbstractMessageSource {
 
-    private static final String DEFAULT_LANGUAGE = "en";
-    private static final String KOREA_LANGUAGE = "ko";
-    private static final String MESSAGE_FILE_PATH_FORMAT = "/messages/messages_%s.xml";
     private static final String ENTRY_TAG_NAME = "entry";
     private static final String KEY_ATTRIBUTE_NAME = "key";
+    private static final String MESSAGE_FILE_PATH_FORMAT = "/messages/messages_%s.xml";
 
     private static final Map<String, Map<String, String>> messages = new ConcurrentHashMap<>();
 
-    public XmlMessageSource() {
-        try {
-            loadMessages(new Locale(DEFAULT_LANGUAGE));
-            loadMessages(new Locale(KOREA_LANGUAGE));
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load locale messages", e);
-        }
+    private Locale defaultLocale;
+
+    public XmlMessageSource() {}
+
+    public void setDefaultLocale(Locale locale) {
+        this.defaultLocale = locale;
+        setMessages(locale);
     }
 
-    private void loadMessages(Locale locale) throws Exception {
+    public void setMessages(Locale locale) {
         String filename = getMessageFilePath(locale);
         Optional<Document> document = parseXmlDocument(filename);
         if (document.isPresent()) {
@@ -81,7 +79,7 @@ public class XmlMessageSource extends AbstractMessageSource {
     @Override
     public MessageFormat resolveCode(String code, Locale locale) {
         String language = locale.getLanguage();
-        Map<String, String> localeMessages = messages.getOrDefault(language, messages.get(DEFAULT_LANGUAGE));
+        Map<String, String> localeMessages = messages.getOrDefault(language, messages.get(defaultLocale));
         String message = localeMessages.get(code);
         return new MessageFormat(message, locale);
     }
