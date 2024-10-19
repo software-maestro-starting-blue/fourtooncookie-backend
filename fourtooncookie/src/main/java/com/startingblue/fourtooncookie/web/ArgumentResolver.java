@@ -17,7 +17,7 @@ public class ArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return UUID.class.equals(parameter.getParameterType());
+        return UUID.class.equals(parameter.getParameterType()); 
     }
 
     @Override

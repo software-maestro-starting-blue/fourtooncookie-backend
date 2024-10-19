@@ -1,5 +1,6 @@
 package com.startingblue.fourtooncookie.notification.domain;
 
+import jakarta.persistence.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;

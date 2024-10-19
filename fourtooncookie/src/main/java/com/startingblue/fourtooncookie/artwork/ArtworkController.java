@@ -1,8 +1,8 @@
 package com.startingblue.fourtooncookie.artwork;
 
 import com.startingblue.fourtooncookie.artwork.dto.ArtworkSaveRequest;
-import com.startingblue.fourtooncookie.artwork.dto.ArtworkUpdateRequest;
 import com.startingblue.fourtooncookie.artwork.dto.ArtworkSavedResponses;
+import com.startingblue.fourtooncookie.artwork.dto.ArtworkUpdateRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

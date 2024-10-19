@@ -1,18 +1,18 @@
 package com.startingblue.fourtooncookie.diary.service;
 
 import com.startingblue.fourtooncookie.aws.s3.S3Service;
+import com.startingblue.fourtooncookie.aws.s3.exception.S3PathNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.test.util.ReflectionTestUtils;
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.List;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,56 +23,86 @@ class DiaryS3ServiceTest {
     @Mock
     private S3Client s3Client;
 
-    @Mock
-    private S3Service s3Service;
-
     @InjectMocks
-    private DiaryS3Service diaryS3Service;
-
-    static String bucketName = "bucketName";
-    static long diaryId = 1;
-    static int gridPosition = 1;
-    static String keyName = diaryId + "/" + gridPosition + ".png";
+    private S3Service s3Service;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        ReflectionTestUtils.setField(diaryS3Service, "bucketName", "test-bucket");
     }
 
     @Test
-    @DisplayName("Presigned URL 생성 성공 테스트")
-    void testGeneratePresignedUrlSuccess() throws Exception {
+    @DisplayName("S3에서 이미지 가져오기 성공 테스트")
+    void testGetImageFromS3Success() {
         // given
-        URL expectedUrl = new URL("http://example.com");
-        when(s3Service.generatePresignedUrl(any(String.class), any(String.class))).thenReturn(expectedUrl);
+        String bucketName = "test-bucket";
+        String keyName = "test-key.png";
+        byte[] imageData = new byte[]{1, 2, 3, 4};
+
+        ResponseBytes<GetObjectResponse> responseBytes = ResponseBytes.fromByteArray(GetObjectResponse.builder().build(), imageData);
+        when(s3Client.getObjectAsBytes(any(GetObjectRequest.class))).thenReturn(responseBytes);
 
         // when
-        URL actualUrl = diaryS3Service.generatePresignedUrl(diaryId, gridPosition);
-
-        // then
-        assertEquals(expectedUrl, actualUrl);
-        verify(s3Service).generatePresignedUrl(any(String.class), any(String.class));
-    }
-
-    @Test
-    @DisplayName("다이어리 ID로 4개의 이미지를 성공적으로 가져오고 병합")
-    void testGetFullImageByDiaryIdSuccess() throws IOException {
-        // given
-        byte[] mockImageData = new byte[]{1, 2, 3, 4};
-        byte[] mergedImage = new byte[]{10, 11, 12, 5};
-
-        when(s3Service.getImageFromS3(eq(bucketName), eq(keyName))).thenReturn(mockImageData);
-        when(diaryS3Service.mergeImagesIntoGrid(any(List.class))).thenReturn(mergedImage);
-
-        // when
-        byte[] result = diaryS3Service.getFullImageByDiaryId(1L);
+        byte[] result = s3Service.getImageFromS3(bucketName, keyName);
 
         // then
         assertNotNull(result);
-        assertArrayEquals(mergedImage, result);
-        verify(s3Service, times(4)).getImageFromS3(any(String.class), any(String.class));
-        verify(diaryS3Service).mergeImagesIntoGrid(any(List.class));
+        assertArrayEquals(imageData, result);
+        verify(s3Client).getObjectAsBytes(any(GetObjectRequest.class));
     }
 
+    @Test
+    @DisplayName("S3에서 이미지 가져오기 실패: NoSuchBucketException 테스트")
+    void testGetImageFromS3NoSuchBucketException() {
+        // given
+        String bucketName = "test-bucket";
+        String keyName = "test-key.png";
+
+        when(s3Client.getObjectAsBytes(any(GetObjectRequest.class)))
+                .thenThrow(NoSuchBucketException.builder().build());
+
+        // when & then
+        assertThrows(S3PathNotFoundException.class, () -> s3Service.getImageFromS3(bucketName, keyName));
+        verify(s3Client).getObjectAsBytes(any(GetObjectRequest.class));
+    }
+
+    @Test
+    @DisplayName("S3에서 폴더 내 모든 객체 삭제 성공 테스트")
+    void testDeleteObjectsInFolderSuccess() {
+        // given
+        String bucketName = "test-bucket";
+        String folderKey = "test-folder/";
+
+        S3Object s3Object1 = S3Object.builder().key("test-folder/file1.png").build();
+        S3Object s3Object2 = S3Object.builder().key("test-folder/file2.png").build();
+
+        ListObjectsV2Response listObjectsResponse = ListObjectsV2Response.builder()
+                .contents(Arrays.asList(s3Object1, s3Object2))
+                .build();
+
+        when(s3Client.listObjectsV2(any(ListObjectsV2Request.class)))
+                .thenReturn(listObjectsResponse);
+
+        // when
+        s3Service.deleteObjectsInFolder(bucketName, folderKey);
+
+        // then
+        verify(s3Client).listObjectsV2(any(ListObjectsV2Request.class));
+        verify(s3Client).deleteObjects(any(DeleteObjectsRequest.class));
+    }
+
+    @Test
+    @DisplayName("S3에서 폴더 내 객체 삭제 실패: NoSuchBucketException 테스트")
+    void testDeleteObjectsInFolderNoSuchBucketException() {
+        // given
+        String bucketName = "test-bucket";
+        String folderKey = "test-folder/";
+
+        when(s3Client.listObjectsV2(any(ListObjectsV2Request.class)))
+                .thenThrow(NoSuchBucketException.builder().build());
+
+        // when & then
+        assertThrows(S3PathNotFoundException.class, () -> s3Service.deleteObjectsInFolder(bucketName, folderKey));
+        verify(s3Client).listObjectsV2(any(ListObjectsV2Request.class));
+    }
 }
