@@ -6,7 +6,6 @@ import com.startingblue.fourtooncookie.diary.domain.DiaryPaintingImageGeneration
 import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
 import com.startingblue.fourtooncookie.diary.dto.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.DiaryUpdateRequest;
-import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
 import com.startingblue.fourtooncookie.diary.service.DiaryCharacterService;
 import com.startingblue.fourtooncookie.diary.service.DiaryLambdaService;
@@ -136,13 +135,6 @@ public class DiaryService {
     public Diary readById(final Long id) {
         return diaryRepository.findById(id)
                 .orElseThrow(DiaryNotFoundException::new);
-    }
-
-    @Transactional(readOnly = true)
-    public void verifyUniqueDiary(UUID memberId, LocalDate diaryDate) {
-        if (diaryRepository.existsByMemberIdAndDiaryDate(memberId, diaryDate)) {
-            throw new DiaryDuplicateException("이미 " + diaryDate + "에 일기를 작성하셨습니다.");
-        }
     }
 
     @Transactional(readOnly = true)

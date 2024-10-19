@@ -9,7 +9,6 @@ import com.startingblue.fourtooncookie.diary.DiaryService;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.dto.DiarySaveRequest;
-import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
 import com.startingblue.fourtooncookie.character.domain.PaymentType;
 import com.startingblue.fourtooncookie.member.domain.Gender;
@@ -175,19 +174,6 @@ class DiaryServiceTest {
         // then
         Diary updatedDiary = diaryService.readById(diary.getId());
         assertThat(updatedDiary.isFavorite()).isTrue();
-    }
-
-    @DisplayName("같은 날짜에 중복 일기를 작성하면 예외가 발생한다.")
-    @Test
-    void duplicateDiaryTest() throws MalformedURLException {
-        // given
-        LocalDate now = LocalDate.now();
-        DiarySaveRequest request = new DiarySaveRequest("오늘의 일기", now, character.getId());
-        diaryService.createDiary(request, member.getId());
-
-        // when & then
-        assertThatThrownBy(() -> diaryService.createDiary(request, member.getId()))
-                .isInstanceOf(DiaryDuplicateException.class);
     }
 
     @DisplayName("일기의 소유자가 맞는지 확인한다.")
