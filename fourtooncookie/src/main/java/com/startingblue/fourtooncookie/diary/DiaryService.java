@@ -7,7 +7,6 @@ import com.startingblue.fourtooncookie.diary.domain.DiaryPaintingImageGeneration
 import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
 import com.startingblue.fourtooncookie.diary.dto.DiarySaveRequest;
 import com.startingblue.fourtooncookie.diary.dto.DiaryUpdateRequest;
-import com.startingblue.fourtooncookie.diary.exception.DiaryDuplicateException;
 import com.startingblue.fourtooncookie.diary.exception.DiaryNotFoundException;
 import com.startingblue.fourtooncookie.diary.service.DiaryLambdaService;
 import com.startingblue.fourtooncookie.diary.service.DiaryPaintingImageCloudFrontService;
