@@ -52,7 +52,6 @@ public class DiaryService {
 
     public Long createDiary(final DiarySaveRequest request, final UUID memberId) {
         Character character = characterService.readById(request.characterId());
-        verifyUniqueDiary(memberId, request.diaryDate());
 
         Diary diary = buildDiary(request, memberId, character);
         diaryRepository.save(diary);
@@ -141,13 +140,6 @@ public class DiaryService {
     public Diary readById(final Long id) {
         return diaryRepository.findById(id)
                 .orElseThrow(DiaryNotFoundException::new);
-    }
-
-    @Transactional(readOnly = true)
-    public void verifyUniqueDiary(UUID memberId, LocalDate diaryDate) {
-        if (diaryRepository.existsByMemberIdAndDiaryDate(memberId, diaryDate)) {
-            throw new DiaryDuplicateException("이미 " + diaryDate + "에 일기를 작성하셨습니다.");
-        }
     }
 
     @Transactional(readOnly = true)
