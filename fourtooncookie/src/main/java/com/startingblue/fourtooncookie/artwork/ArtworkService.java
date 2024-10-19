@@ -5,8 +5,8 @@ import com.startingblue.fourtooncookie.artwork.dto.ArtworkSaveRequest;
 import com.startingblue.fourtooncookie.artwork.dto.ArtworkUpdateRequest;
 import com.startingblue.fourtooncookie.artwork.exception.ArtworkDuplicateException;
 import com.startingblue.fourtooncookie.artwork.exception.ArtworkNotFoundException;
+import com.startingblue.fourtooncookie.locale.LocaleService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +21,7 @@ import java.util.Objects;
 public class ArtworkService {
 
     private final ArtworkRepository artworkRepository;
-    private final MessageSource xmlMessageSource;
+    private final LocaleService localeService;
 
     public void createArtwork(ArtworkSaveRequest request) {
         verifyUniqueArtwork(request.title(), request.thumbnailUrl());
@@ -72,7 +72,7 @@ public class ArtworkService {
     }
 
     public String getLocalizedArtworkTitle(Long artworkId, Locale locale) {
-        return Objects.requireNonNull(xmlMessageSource.getMessage("artwork.name." + artworkId, null, locale));
+        return Objects.requireNonNull(localeService.getMessage("artwork.name." + artworkId, locale));
     }
 
 }
