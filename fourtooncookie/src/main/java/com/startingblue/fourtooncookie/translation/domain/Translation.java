@@ -14,7 +14,6 @@ import java.util.Objects;
 public class Translation {
 
     @EmbeddedId
-    @Column(name = "translation_id")
     private TranslationId translationId;
 
     @NotNull
