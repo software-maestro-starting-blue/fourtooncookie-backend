@@ -1,10 +1,12 @@
 package com.startingblue.fourtooncookie.translation.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.*;
 import lombok.*;
 import software.amazon.awssdk.annotations.NotNull;
 
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -39,7 +41,12 @@ public class Translation {
     }
 
     private void validate() {
-
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+        Set<ConstraintViolation<Translation>> violations = validator.validate(this);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
     }
 
     @Override
