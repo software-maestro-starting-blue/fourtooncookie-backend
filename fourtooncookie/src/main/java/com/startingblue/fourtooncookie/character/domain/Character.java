@@ -1,6 +1,7 @@
 package com.startingblue.fourtooncookie.character.domain;
 
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
+import com.startingblue.fourtooncookie.translation.annotation.TranslatableField;
 import jakarta.persistence.*;
 import jakarta.validation.*;
 import jakarta.validation.constraints.NotBlank;
@@ -42,6 +43,7 @@ public class Character {
 
     @NotBlank(message = "캐릭터 이름은 필수 입니다.")
     @Size(min = 1, max = 255, message = "캐릭터 이름은 1자 이상 255자 이내여야 합니다.")
+    @TranslatableField
     private String name;
 
     @NotNull(message = "캐릭터 선택 썸네일 URL은 필수 입니다.")
