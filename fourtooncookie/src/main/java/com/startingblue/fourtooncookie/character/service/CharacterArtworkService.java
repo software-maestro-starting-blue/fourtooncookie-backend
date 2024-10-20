@@ -17,8 +17,7 @@ public class CharacterArtworkService {
         return artworkService.readById(artworkId);
     }
 
-
-    public Artwork getArtworkWithNameChange(Artwork artwork, Locale locale) {
-        return artworkService.getArtworkWithNameChange(artwork, locale);
+    public Artwork readById(Long artworkId, Locale locale) {
+        return artworkService.readById(artworkId, locale);
     }
 }
