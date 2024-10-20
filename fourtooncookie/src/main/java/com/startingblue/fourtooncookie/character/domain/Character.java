@@ -17,7 +17,7 @@ import java.util.Set;
 @Slf4j
 @Table(name = "`character`")
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Character {
