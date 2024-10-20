@@ -13,10 +13,9 @@ import java.util.Locale;
 public class CharacterTranslationService {
 
     private final TranslationService translationService;
-    private final CharacterArtworkService characterArtworkService;
 
     public Character translateCharacter(Character character, Locale locale) {
-        Artwork localizedArtwork = characterArtworkService.readById(character.getArtwork().getId(), locale);
+        Artwork localizedArtwork = translationService.getTranslatedObject(character.getArtwork().clone(), locale);
 
         Character clonedCharacter = character.toBuilder()
                 .artwork(localizedArtwork)
