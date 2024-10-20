@@ -14,7 +14,7 @@ public class ArtworkTranslationService {
     private final TranslationService translationService;
 
     public Artwork translateArtwork(Artwork artwork, Locale locale) {
-        return translationService.getTranslatedObject(artwork, locale);
+        return translationService.getTranslatedObject(artwork.clone(), locale);
     }
 
 }

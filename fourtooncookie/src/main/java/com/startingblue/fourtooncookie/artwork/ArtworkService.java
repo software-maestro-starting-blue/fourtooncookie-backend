@@ -38,7 +38,7 @@ public class ArtworkService {
     @Transactional(readOnly = true)
     public List<Artwork> readAllArtworks(Locale locale) {
         return readAllArtworks().stream()
-                .map(artwork -> artworkTranslationService.translateArtwork(artwork.clone(), locale))
+                .map(artwork -> artworkTranslationService.translateArtwork(artwork, locale))
                 .toList();
     }
 
@@ -62,7 +62,7 @@ public class ArtworkService {
     @Transactional(readOnly = true)
     public Artwork readById(Long artworkId, Locale locale) {
         return artworkTranslationService.translateArtwork(
-                readById(artworkId).clone(),
+                readById(artworkId),
                 locale
         );
     }
