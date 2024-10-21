@@ -27,9 +27,9 @@ public class ArtworkController {
     }
 
     @GetMapping
-    public ResponseEntity<ArtworkSavedResponses> getAllArtwork(Locale locale) {
+    public ResponseEntity<ArtworkSavedResponses> getAllArtwork() {
         return ResponseEntity
-                .ok(ArtworkSavedResponses.of(artworkService.getAllArtworks(locale)));
+                .ok(ArtworkSavedResponses.of(artworkService.getAllArtworks()));
     }
 
     @PutMapping("/{artworkId}")

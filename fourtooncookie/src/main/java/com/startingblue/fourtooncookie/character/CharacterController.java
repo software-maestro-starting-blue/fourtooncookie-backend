@@ -28,15 +28,15 @@ public final class CharacterController {
     }
 
     @GetMapping("/{characterId}")
-    public ResponseEntity<CharacterSavedResponse> getCharacter(@PathVariable final Long characterId, Locale locale) {
-        CharacterSavedResponse response = CharacterSavedResponse.of(characterService.getById(characterId, locale));
+    public ResponseEntity<CharacterSavedResponse> getCharacter(@PathVariable final Long characterId) {
+        CharacterSavedResponse response = CharacterSavedResponse.of(characterService.getById(characterId));
         return ResponseEntity
                 .ok(response);
     }
 
     @GetMapping
-    public ResponseEntity<CharacterSavedResponses> getAllCharacters(Locale locale) {
-        CharacterSavedResponses responses = CharacterSavedResponses.of(characterService.getAllCharacters(locale));
+    public ResponseEntity<CharacterSavedResponses> getAllCharacters() {
+        CharacterSavedResponses responses = CharacterSavedResponses.of(characterService.getAllCharacters());
         return ResponseEntity
                 .ok(responses);
     }
