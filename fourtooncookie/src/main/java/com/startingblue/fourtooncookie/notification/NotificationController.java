@@ -3,6 +3,7 @@ package com.startingblue.fourtooncookie.notification;
 import com.startingblue.fourtooncookie.notification.dto.NotificationTokenAssignRequest;
 import com.startingblue.fourtooncookie.notification.dto.NotificationTokenUnassignRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +21,7 @@ public final class NotificationController {
         notificationService.assignNotificationTokenToMember(memberId, notificationTokenAssignRequest);
     }
 
-    @PostMapping("/notification")
+    @DeleteMapping("/notification")
     public void unassignNotificationToken(final UUID memberId, @RequestBody final NotificationTokenUnassignRequest notificationTokenAssignRequest) {
         notificationService.removeNotificationTokenFromMember(memberId, notificationTokenAssignRequest);
     }
