@@ -60,12 +60,12 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("멤버 저장 시 중복 멤버가 있는 경우 MemberDuplicateException 발생")
-    void save_ThrowsException_WhenMemberExists() {
+    void add_Member_ThrowsException_WhenMemberExists() {
         // given
         when(memberRepository.existsById(memberId)).thenReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> memberService.save(memberId, memberSaveRequest))
+        assertThatThrownBy(() -> memberService.addMember(memberId, memberSaveRequest))
                 .isInstanceOf(MemberDuplicateException.class)
                 .hasMessageContaining("Member with id " + memberId + " already exists");
 
@@ -74,12 +74,12 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("새로운 멤버를 성공적으로 저장")
-    void save_Success_WhenMemberDoesNotExist() {
+    void add_Member_Success_WhenMemberDoesNotExist() {
         // given
         when(memberRepository.existsById(memberId)).thenReturn(false);
 
         // when
-        memberService.save(memberId, memberSaveRequest);
+        memberService.addMember(memberId, memberSaveRequest);
 
         // then
         verify(memberRepository, times(1)).save(any(Member.class)); // 한 번 호출
@@ -87,12 +87,12 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("멤버 ID로 조회 시 멤버를 찾는다.")
-    void readById_ReturnsMember_WhenMemberExists() {
+    void getById_ReturnsMember_WhenMemberExists() {
         // given
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
         // when
-        Member foundMember = memberService.readById(memberId);
+        Member foundMember = memberService.getById(memberId);
 
         // then
         assertThat(foundMember).isNotNull();
@@ -102,62 +102,24 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("멤버 ID로 조회 시 멤버를 찾을 수 없을 때 MemberNotFoundException 발생")
-    void readById_ThrowsException_WhenMemberNotFound() {
+    void getById_ThrowsException_WhenMemberNotFound() {
         // given
         when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> memberService.readById(memberId))
+        assertThatThrownBy(() -> memberService.getById(memberId))
                 .isInstanceOf(MemberNotFoundException.class)
                 .hasMessageContaining("member not found");
     }
 
     @Test
-    @DisplayName("멤버를 성공적으로 삭제")
-    void hardDeleteById_DeletesMember_WhenCalled() {
-        doNothing().when(memberDiaryService).deleteDiariesByMemberId(memberId);
-
-        // when
-        memberService.hardDeleteById(memberId);
-
-        // then
-        verify(memberRepository, times(1)).deleteById(memberId); // 삭제 호출
-    }
-
-    @Test
-    @DisplayName("멤버 존재 여부를 확인")
-    void verifyMemberExists_ReturnsTrue_WhenMemberExists() {
-        // given
-        when(memberRepository.existsById(memberId)).thenReturn(true);
-
-        // when
-        boolean exists = memberService.verifyMemberExists(memberId);
-
-        // then
-        assertThat(exists).isTrue();
-    }
-
-    @Test
-    @DisplayName("멤버가 존재하지 않으면 false 반환")
-    void verifyMemberExists_ReturnsFalse_WhenMemberNotExists() {
-        // given
-        when(memberRepository.existsById(memberId)).thenReturn(false);
-
-        // when
-        boolean exists = memberService.verifyMemberExists(memberId);
-
-        // then
-        assertThat(exists).isFalse();
-    }
-
-    @Test
     @DisplayName("멤버의 가입 여부 확인")
-    void verifyMemberSignUp_ReturnsTrue_WhenSignedUp() {
+    void isMemberSignUp_ReturnsTrue_WhenSignedUp() {
         // given
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
         // when
-        boolean signedUp = memberService.verifyMemberSignUp(memberId);
+        boolean signedUp = memberService.isMemberSignUp(memberId);
 
         // then
         assertThat(signedUp).isTrue();
@@ -165,13 +127,13 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("멤버의 가입 상태가 불완전할 경우 false 반환")
-    void verifyMemberSignUp_ReturnsFalse_WhenNotSignedUp() {
+    void isMemberSignUp_ReturnsFalse_WhenNotSignedUp() {
         // given
         Member incompleteMember = Member.builder().id(memberId).build();
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(incompleteMember));
 
         // when
-        boolean signedUp = memberService.verifyMemberSignUp(memberId);
+        boolean signedUp = memberService.isMemberSignUp(memberId);
 
         // then
         assertThat(signedUp).isFalse();
@@ -179,7 +141,7 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("멤버가 관리자인 경우 true 반환")
-    void verifyMemberAdmin_ReturnsTrue_WhenAdmin() {
+    void isMemberAdmin_ReturnsTrue_WhenAdmin() {
         // given
         UUID adminMemberId = UUID.randomUUID();
         Member adminMember = Member.builder()
@@ -192,7 +154,7 @@ class MemberServiceTest {
         when(memberRepository.findById(adminMemberId)).thenReturn(Optional.of(adminMember));
 
         // when
-        boolean isAdmin = memberService.verifyMemberAdmin(adminMemberId);
+        boolean isAdmin = memberService.isMemberAdmin(adminMemberId);
 
         // then
         assertThat(isAdmin).isTrue();
@@ -200,12 +162,12 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("멤버가 관리자가 아닐 경우 false 반환")
-    void verifyMemberAdmin_ReturnsFalse_WhenNotAdmin() {
+    void isMemberAdmin_ReturnsFalse_WhenNotAdmin() {
         // given
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
         // when
-        boolean isAdmin = memberService.verifyMemberAdmin(memberId);
+        boolean isAdmin = memberService.isMemberAdmin(memberId);
 
         // then
         assertThat(isAdmin).isFalse();

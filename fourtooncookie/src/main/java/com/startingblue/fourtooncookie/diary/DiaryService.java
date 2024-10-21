@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -44,8 +43,8 @@ public class DiaryService {
     private final DiaryPaintingImageCloudFrontService diaryPaintingImageCloudFrontService;
     private final DiaryLambdaService diaryImageGenerationLambdaInvoker;
 
-    public Long createDiary(final DiarySaveRequest request, final UUID memberId) {
-        Character character = diaryCharacterService.readById(request.characterId());
+    public Long addDiary(final DiarySaveRequest request, final UUID memberId) {
+        Character character = diaryCharacterService.getById(request.characterId());
         
         Diary diary = buildDiary(request, memberId, character);
         diaryRepository.save(diary);
@@ -67,17 +66,17 @@ public class DiaryService {
     }
 
     @Transactional(readOnly = true)
-    public Diary readDiaryById(final Long diaryId) {
-        Optional<Diary> foundDiary = diaryRepository.findById(diaryId);
-        if (foundDiary.get().isCompleted()) {
-            List<URL> signedUrls = generateSignedUrls(foundDiary.get().getId());
-            foundDiary.get().updatePaintingImageUrls(signedUrls);
+    public Diary getById(final Long diaryId) {
+        Diary foundDiary = diaryRepository.findById(diaryId).orElseThrow(DiaryNotFoundException::new);
+        if (foundDiary.isCompleted()) {
+            List<URL> signedUrls = generateSignedUrls(foundDiary.getId());
+            foundDiary.updatePaintingImageUrls(signedUrls);
         }
-        return foundDiary.get();
+        return foundDiary;
     }
 
     @Transactional(readOnly = true)
-    public List<Diary> readDiariesByMemberId(final UUID memberId, final int pageNumber, final int pageSize) {
+    public List<Diary> getDiariesByMemberId(final UUID memberId, final int pageNumber, final int pageSize) {
         Page<Diary> diaries = diaryRepository.findAllByMemberIdOrderByDiaryDateDesc(
                 memberId,
                 PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "diaryDate"))
@@ -93,7 +92,7 @@ public class DiaryService {
     }
 
     @Transactional(readOnly = true)
-    public byte[] readDiaryFullImage(final Long diaryId) throws IOException {
+    public byte[] getDiaryFullImage(final Long diaryId) throws IOException {
         return diaryS3Service.getFullImageByDiaryId(diaryId);
     }
 
@@ -111,40 +110,32 @@ public class DiaryService {
                 .toList();
     }
 
-    public void updateDiaryFavorite(Long diaryId, boolean isFavorite) {
-        Diary foundDiary = readById(diaryId);
-        foundDiary.updateFavorite(isFavorite);
-    }
-
-    public void updateDiary(Long diaryId, DiaryUpdateRequest request) {
-        Diary existedDiary = readById(diaryId);
-        Character character = diaryCharacterService.readById(request.characterId());
+    public void modifyDiary(Long diaryId, DiaryUpdateRequest request) {
+        Diary existedDiary = getById(diaryId);
+        Character character = diaryCharacterService.getById(request.characterId());
         existedDiary.update(request.content(), character);
         diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(existedDiary, character);
         diaryPaintingImageCloudFrontService.invalidateCache(diaryId);
     }
 
-    public void deleteDiaryById(Long diaryId) {
-        Diary foundDiary = readById(diaryId);
-        diaryS3Service.deleteImagesByDiaryId(diaryId);
+    public void modifyDiaryFavorite(Long diaryId, boolean isFavorite) {
+        Diary foundDiary = getById(diaryId);
+        foundDiary.updateFavorite(isFavorite);
+    }
+
+    public void removeDiaryById(Long diaryId) {
+        Diary foundDiary = getById(diaryId);
+        diaryS3Service.removeImagesByDiaryId(diaryId);
         diaryRepository.delete(foundDiary);
     }
 
     @Transactional(readOnly = true)
-    public Diary readById(final Long id) {
-        return diaryRepository.findById(id)
-                .orElseThrow(DiaryNotFoundException::new);
-    }
-
-    @Transactional(readOnly = true)
-    public boolean verifyDiaryOwner(UUID memberId, Long diaryId) {
-        Diary foundDiary = readById(diaryId);
-        return foundDiary.isOwner(memberId);
+    public boolean isDiaryOwner(UUID memberId, Long diaryId) {
+        return getById(diaryId).isOwner(memberId);
     }
 
     @Transactional
-    public boolean existsById(Long diaryId) {
-        if (diaryId == null) return false;
+    public boolean isExistsById(Long diaryId) {
         return diaryRepository.existsById(diaryId);
     }
 

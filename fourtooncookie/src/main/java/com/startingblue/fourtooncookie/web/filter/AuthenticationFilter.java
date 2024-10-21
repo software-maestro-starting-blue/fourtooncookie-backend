@@ -32,13 +32,13 @@ public class AuthenticationFilter extends HttpFilter {
         String requestURI = request.getRequestURI();
         String method = request.getMethod();
 
-        if (shouldBypassAuthentication(requestURI, method)) {
+        if (isPassAuthentication(requestURI, method)) {
             chain.doFilter(request, response);
             return;
         }
 
         try {
-            UUID memberId = extractUUIDFromToken(request);
+            UUID memberId = getUUIDByExtractingToken(request);
             log.info("Login attempt for memberId: {}", memberId);
 
             if (isSignupRequest(requestURI, method)) {
@@ -56,12 +56,12 @@ public class AuthenticationFilter extends HttpFilter {
         }
     }
 
-    private boolean shouldBypassAuthentication(String requestURI, String method) {
+    private boolean isPassAuthentication(String requestURI, String method) {
         return requestURI.startsWith("/h2-console") || requestURI.startsWith("/health") ||
                 (method.equalsIgnoreCase("GET") && (requestURI.startsWith("/character") || requestURI.startsWith("/artwork")));
     }
 
-    private UUID extractUUIDFromToken(HttpServletRequest request) {
+    private UUID getUUIDByExtractingToken(HttpServletRequest request) {
         String token = jwtExtractor.resolveToken(request);
         Claims claims = jwtExtractor.parseToken(token);
         return UUID.fromString(claims.getSubject());
@@ -88,6 +88,6 @@ public class AuthenticationFilter extends HttpFilter {
     }
 
     private boolean isExistsMember(UUID memberId) {
-        return memberService.verifyMemberExists(memberId);
+        return memberService.isMemberSignUp(memberId);
     }
 }

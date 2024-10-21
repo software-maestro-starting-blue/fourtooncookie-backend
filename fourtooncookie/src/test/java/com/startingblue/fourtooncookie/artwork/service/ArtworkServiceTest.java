@@ -44,7 +44,7 @@ class ArtworkServiceTest {
 
     @Test
     @DisplayName("새로운 Artwork를 성공적으로 저장한다")
-    void testCreateArtworkSuccess() throws MalformedURLException {
+    void testAddArtworkSuccess() throws MalformedURLException {
         // Given
         ArtworkSaveRequest request = new ArtworkSaveRequest("New Artwork", new URL("http://example.com/new_image.jpg"));
 
@@ -53,7 +53,7 @@ class ArtworkServiceTest {
         when(artworkRepository.existsByThumbnailUrl(any(URL.class))).thenReturn(false);
 
         // When
-        artworkService.createArtwork(request);
+        artworkService.addArtwork(request);
 
         // Then
         verify(artworkRepository, times(1)).save(any(Artwork.class));
@@ -61,22 +61,23 @@ class ArtworkServiceTest {
 
     @Test
     @DisplayName("중복된 제목으로 Artwork 저장 시도 시 예외 발생")
-    void testCreateArtworkWithDuplicateTitle() throws MalformedURLException {
+    void testAddArtworkWithDuplicateTitle() throws MalformedURLException {
         // Given
         ArtworkSaveRequest request = new ArtworkSaveRequest("Duplicate Artwork", new URL("http://example.com/image.jpg"));
 
         // 중복된 제목 존재
         when(artworkRepository.existsByTitle(anyString())).thenReturn(true);
+        when(artworkRepository.existsByThumbnailUrl(any())).thenReturn(true);
 
         // When & Then
-        assertThatThrownBy(() -> artworkService.createArtwork(request))
+        assertThatThrownBy(() -> artworkService.addArtwork(request))
                 .isInstanceOf(ArtworkDuplicateException.class)
-                .hasMessage("Artwork with title 'Duplicate Artwork' already exists.");
+                .hasMessage("Artwork with title, thumbnail URL already exists.");
     }
 
     @Test
     @DisplayName("존재하는 모든 Artwork를 성공적으로 가져온다")
-    void testReadAllArtworks() throws MalformedURLException {
+    void testGetAllArtworks() throws MalformedURLException {
         // Given
         List<Artwork> artworks = Arrays.asList(
                 new Artwork( "Artwork 1", new URL("http://example.com/image1.jpg")),
@@ -86,7 +87,7 @@ class ArtworkServiceTest {
         when(artworkRepository.findAll()).thenReturn(artworks);
 
         // When
-        List<Artwork> result = artworkService.readAllArtworks();
+        List<Artwork> result = artworkService.getAllArtworks();
 
         // Then
         assertThat(result).hasSize(2);
@@ -102,7 +103,7 @@ class ArtworkServiceTest {
 
     @Test
     @DisplayName("Artwork 업데이트 성공")
-    void testUpdateArtwork() throws MalformedURLException {
+    void testModifyArtwork() throws MalformedURLException {
         // Given
         Artwork existingArtwork = new Artwork("Old Title", new URL("http://example.com/old_image.jpg"));
         ArtworkUpdateRequest request = new ArtworkUpdateRequest("Updated Title", new URL("http://example.com/new_image.jpg"));
@@ -110,7 +111,7 @@ class ArtworkServiceTest {
         when(artworkRepository.findById(1L)).thenReturn(Optional.of(existingArtwork));
 
         // When
-        artworkService.updateArtwork(1L, request);
+        artworkService.modifyArtwork(1L, request);
 
         // Then
         assertThat(existingArtwork.getTitle()).isEqualTo("Updated Title");
@@ -126,20 +127,20 @@ class ArtworkServiceTest {
         when(artworkRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // When & Then
-        assertThatThrownBy(() -> artworkService.updateArtwork(1L, request))
+        assertThatThrownBy(() -> artworkService.modifyArtwork(1L, request))
                 .isInstanceOf(ArtworkNotFoundException.class)
                 .hasMessage("Artwork with ID 1 not found");
     }
 
     @Test
     @DisplayName("Artwork 삭제 성공")
-    void testDeleteArtwork() throws MalformedURLException {
+    void testRemoveArtwork() throws MalformedURLException {
         // Given
         Artwork artwork = new Artwork("Artwork", new URL("http://example.com/image.jpg"));
         when(artworkRepository.findById(1L)).thenReturn(Optional.of(artwork));
 
         // When
-        artworkService.deleteArtwork(1L);
+        artworkService.removeArtwork(1L);
 
         // Then
         verify(artworkRepository, times(1)).delete(artwork);
@@ -152,7 +153,7 @@ class ArtworkServiceTest {
         when(artworkRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // When & Then
-        assertThatThrownBy(() -> artworkService.deleteArtwork(1L))
+        assertThatThrownBy(() -> artworkService.removeArtwork(1L))
                 .isInstanceOf(ArtworkNotFoundException.class)
                 .hasMessage("Artwork with ID 1 not found");
     }

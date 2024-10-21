@@ -48,14 +48,14 @@ class DiaryOwnerAuthorizationInterceptorTest {
         request.setRequestURI("/diary/" + validDiaryId);
         request.setAttribute("memberId", validMemberId);
 
-        when(diaryService.verifyDiaryOwner(UUID.fromString(validMemberId), validDiaryId)).thenReturn(true);
+        when(diaryService.isDiaryOwner(UUID.fromString(validMemberId), validDiaryId)).thenReturn(true);
 
         // When
         boolean result = diaryOwnerAuthorizationInterceptor.preHandle(request, response, new Object());
 
         // Then
         assertTrue(result);
-        verify(diaryService, times(1)).verifyDiaryOwner(UUID.fromString(validMemberId), validDiaryId);
+        verify(diaryService, times(1)).isDiaryOwner(UUID.fromString(validMemberId), validDiaryId);
     }
 
     @Test
@@ -71,7 +71,7 @@ class DiaryOwnerAuthorizationInterceptorTest {
         // Then
         assertFalse(result);
         assertTrue(response.getStatus() == HttpServletResponse.SC_FORBIDDEN);
-        verify(diaryService, never()).verifyDiaryOwner(any(UUID.class), anyLong());
+        verify(diaryService, never()).isDiaryOwner(any(UUID.class), anyLong());
     }
 
     @Test
@@ -88,7 +88,7 @@ class DiaryOwnerAuthorizationInterceptorTest {
         // Then
         assertFalse(result);
         assertTrue(response.getStatus() == HttpServletResponse.SC_FORBIDDEN);
-        verify(diaryService, never()).verifyDiaryOwner(any(UUID.class), anyLong());
+        verify(diaryService, never()).isDiaryOwner(any(UUID.class), anyLong());
     }
 
     @Test
@@ -101,7 +101,7 @@ class DiaryOwnerAuthorizationInterceptorTest {
         request.setRequestURI("/diary/" + validDiaryId);
         request.setAttribute("memberId", validMemberId);
 
-        when(diaryService.verifyDiaryOwner(UUID.fromString(validMemberId), validDiaryId)).thenReturn(false);
+        when(diaryService.isDiaryOwner(UUID.fromString(validMemberId), validDiaryId)).thenReturn(false);
 
         // When
         boolean result = diaryOwnerAuthorizationInterceptor.preHandle(request, response, new Object());
@@ -109,7 +109,7 @@ class DiaryOwnerAuthorizationInterceptorTest {
         // Then
         assertFalse(result);
         assertTrue(response.getStatus() == HttpServletResponse.SC_FORBIDDEN);
-        verify(diaryService, times(1)).verifyDiaryOwner(UUID.fromString(validMemberId), validDiaryId);
+        verify(diaryService, times(1)).isDiaryOwner(UUID.fromString(validMemberId), validDiaryId);
     }
 
     @ParameterizedTest
@@ -131,6 +131,6 @@ class DiaryOwnerAuthorizationInterceptorTest {
         // Then
         assertFalse(result);
         assertTrue(response.getStatus() == HttpServletResponse.SC_FORBIDDEN); // 403 Forbidden 응답
-        verify(diaryService, never()).verifyDiaryOwner(any(UUID.class), anyLong()); // diaryService는 호출되지 않아야 함
+        verify(diaryService, never()).isDiaryOwner(any(UUID.class), anyLong()); // diaryService는 호출되지 않아야 함
     }
 }

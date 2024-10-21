@@ -11,8 +11,8 @@ public class DiaryCharacterService {
 
     private final CharacterService characterService;
 
-    public Character readById(Long characterId) {
-        return characterService.readById(characterId);
+    public Character getById(Long characterId) {
+        return characterService.getById(characterId);
     }
 
 }

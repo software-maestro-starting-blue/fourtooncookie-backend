@@ -22,10 +22,8 @@ public class MemberService {
     private final MemberDiaryService memberDiaryService;
     private final NotificationService notificationService;
 
-    public void save(UUID memberId, MemberSaveRequest memberSaveRequest) {
-        if (verifyMemberExists(memberId)) {
-            throw new MemberDuplicateException("Member with id " + memberId + " already exists");
-        }
+    public void addMember(UUID memberId, MemberSaveRequest memberSaveRequest) {
+        validateMemberExists(memberId);
 
         Member member = Member.builder()
                 .id(memberId)
@@ -34,30 +32,32 @@ public class MemberService {
                 .gender(memberSaveRequest.gender())
                 .role(Role.MEMBER)
                 .build();
+
         memberRepository.save(member);
     }
 
-    public Member readById(UUID memberId) {
+    public Member getById(UUID memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException("member not found"));
     }
 
-    public void hardDeleteById(UUID memberId) {
-        memberDiaryService.deleteDiariesByMemberId(memberId);
+    public void removeById(UUID memberId) {
+        memberDiaryService.removeDiariesByMemberId(memberId);
         notificationService.removeAllNotificationTokenFromMember(memberId);
         memberRepository.deleteById(memberId);
     }
 
-    public boolean verifyMemberExists(UUID memberId) {
-        return memberRepository.existsById(memberId);
+    public void validateMemberExists(UUID memberId) {
+        if (memberRepository.existsById(memberId)) {
+            throw new MemberDuplicateException("Member with id " + memberId + " already exists");
+        }
     }
 
-    public boolean verifyMemberSignUp(UUID memberId) {
-        Member member = readById(memberId);
+    public boolean isMemberSignUp(UUID memberId) {
+        Member member = getById(memberId);
         return member != null && member.getName() != null && !member.getName().isEmpty();
     }
 
-    public boolean verifyMemberAdmin(UUID memberId) {
-        Member member = readById(memberId);
-        return member.isAdmin();
+    public boolean isMemberAdmin(UUID memberId) {
+        return getById(memberId).isAdmin();
     }
 }

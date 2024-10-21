@@ -62,7 +62,7 @@ class MemberSignedUpAuthorizationInterceptorTest {
     void whenAdminMemberIdThenTrue() {
         //given & then
         UUID uuid = UUID.randomUUID();
-        when(memberService.verifyMemberSignUp(uuid)).thenReturn(true);
+        when(memberService.isMemberSignUp(uuid)).thenReturn(true);
         boolean result = memberSignedUpAuthorizationInterceptor.isAuthorized(uuid);
 
         //then
@@ -74,7 +74,7 @@ class MemberSignedUpAuthorizationInterceptorTest {
     void whenNotAdminMemberIdThenFalse() {
         //given & then
         UUID uuid = UUID.randomUUID();
-        when(memberService.verifyMemberSignUp(uuid)).thenReturn(false);
+        when(memberService.isMemberSignUp(uuid)).thenReturn(false);
         boolean result = memberSignedUpAuthorizationInterceptor.isAuthorized(uuid);
 
         //then

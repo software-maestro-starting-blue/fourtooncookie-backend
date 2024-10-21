@@ -44,7 +44,7 @@ public class DiaryS3Service {
         return String.format("%s/%s.%s", diaryId, gridPosition, imageFormat);
     }
 
-    public void deleteImagesByDiaryId(Long diaryId) {
+    public void removeImagesByDiaryId(Long diaryId) {
         s3Service.deleteObjectsInFolder(bucketName, String.valueOf(diaryId));
     }
 

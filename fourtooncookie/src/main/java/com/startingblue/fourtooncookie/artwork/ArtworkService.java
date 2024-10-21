@@ -15,7 +15,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,55 +24,49 @@ public class ArtworkService {
     private final ArtworkRepository artworkRepository;
     private final ArtworkTranslationService artworkTranslationService;
 
-    public void createArtwork(ArtworkSaveRequest request) {
-        verifyUniqueArtwork(request.title(), request.thumbnailUrl());
+    public void addArtwork(ArtworkSaveRequest request) {
+        validateUniqueArtwork(request.title(), request.thumbnailUrl());
         artworkRepository.save(new Artwork(request.title(), request.thumbnailUrl()));
     }
 
     @Transactional(readOnly = true)
-    public List<Artwork> readAllArtworks() {
+    public Artwork getById(Long artworkId) {
+        return artworkRepository.findById(artworkId)
+                .orElseThrow(() -> new ArtworkNotFoundException("Artwork with ID " + artworkId + " not found"));
+    }
+  
+    @Transactional(readOnly = true)
+    public Artwork getById(Long artworkId, Locale locale) {
+        return artworkTranslationService.translateArtwork(getById(artworkId), locale);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Artwork> getAllArtworks() {
         return artworkRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public List<Artwork> readAllArtworks(Locale locale) {
-        return readAllArtworks().stream()
+    public List<Artwork> getAllArtworks(Locale locale) {
+        return getAllArtworks().stream()
                 .map(artwork -> artworkTranslationService.translateArtwork(artwork, locale))
                 .toList();
     }
 
-    public void updateArtwork(Long artworkId, ArtworkUpdateRequest request) {
-        Artwork artwork = readById(artworkId);
+    public void modifyArtwork(Long artworkId, ArtworkUpdateRequest request) {
+        Artwork artwork = getById(artworkId);
         artwork.update(request.title(), request.thumbnailUrl());
         artworkRepository.save(artwork);
     }
 
-    public void deleteArtwork(Long artworkId) {
-        Artwork artwork = readById(artworkId);
+    public void removeArtwork(Long artworkId) {
+        Artwork artwork = getById(artworkId);
         artworkRepository.delete(artwork);
     }
 
     @Transactional(readOnly = true)
-    public Artwork readById(Long artworkId) {
-        return artworkRepository.findById(artworkId)
-                .orElseThrow(() -> new ArtworkNotFoundException("Artwork with ID " + artworkId + " not found"));
-    }
-
-    @Transactional(readOnly = true)
-    public Artwork readById(Long artworkId, Locale locale) {
-        return artworkTranslationService.translateArtwork(
-                readById(artworkId),
-                locale
-        );
-    }
-
-    @Transactional(readOnly = true)
-    public void verifyUniqueArtwork(String title, URL thumbnailUrl) {
-        if (artworkRepository.existsByTitle(title)) {
-            throw new ArtworkDuplicateException("Artwork with title '" + title + "' already exists.");
-        }
-        if (artworkRepository.existsByThumbnailUrl(thumbnailUrl)) {
-            throw new ArtworkDuplicateException("Artwork with thumbnail URL '" + thumbnailUrl + "' already exists.");
+    public void validateUniqueArtwork(String title, URL thumbnailUrl) {
+        if (artworkRepository.existsByTitle(title) && artworkRepository.existsByThumbnailUrl(thumbnailUrl)) {
+            throw new ArtworkDuplicateException("Artwork with title, thumbnail URL already exists.");
         }
     }
 

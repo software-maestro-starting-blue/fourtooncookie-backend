@@ -5,15 +5,13 @@ import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Locale;
-
 @Service
 @RequiredArgsConstructor
 public class CharacterArtworkService {
 
     private final ArtworkService artworkService;
 
-    public Artwork readById(Long artworkId) {
-        return artworkService.readById(artworkId);
+    public Artwork getById(Long artworkId) {
+        return artworkService.getById(artworkId);
     }
 }
