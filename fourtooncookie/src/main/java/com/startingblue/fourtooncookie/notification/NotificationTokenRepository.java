@@ -14,4 +14,8 @@ public interface NotificationTokenRepository extends JpaRepository<NotificationT
     Optional<NotificationToken> findByToken(String token);
 
     void deleteByModifiedDateTimeBefore(LocalDateTime dateTime);
+
+    Optional<NotificationToken> findByMemberIdAndToken(UUID memberId, String token);
+
+    void deleteByMemberId(UUID memberId);
 }
