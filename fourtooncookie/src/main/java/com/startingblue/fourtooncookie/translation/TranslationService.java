@@ -1,16 +1,17 @@
 package com.startingblue.fourtooncookie.translation;
 
-import com.startingblue.fourtooncookie.translation.annotation.TranslatableClass;
 import com.startingblue.fourtooncookie.translation.annotation.TranslatableField;
 import com.startingblue.fourtooncookie.translation.domain.Translation;
 import com.startingblue.fourtooncookie.translation.domain.TranslationId;
 import com.startingblue.fourtooncookie.translation.exception.TranslationDuplicateException;
 import com.startingblue.fourtooncookie.translation.exception.TranslationNotFoundException;
 import com.startingblue.fourtooncookie.translation.exception.TranslationObjectClassIdNotFoundException;
-import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
+import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -24,7 +25,10 @@ public class TranslationService {
 
     private static final Map<String, List<Field>> cachedTranslatableField = new ConcurrentHashMap<>();
 
-    public <T> T getTranslatedObject(T object, Locale locale) {
+    @Transactional(readOnly = true)
+    public <T> T getTranslatedObject(T unInitializedObject, Locale locale) {
+        T object = initializeAndUnproxy(unInitializedObject);
+
         getTranslatableFields(object).forEach(field -> {
             try {
                 String fieldName = field.getName();
@@ -34,9 +38,7 @@ public class TranslationService {
                     String translatedValue = getTranslationContent(object, fieldName, locale);
 
                     field.set(object, translatedValue);
-                }
-
-                if (fieldValue != null) {
+                } else if (fieldValue != null) {
                     Object translatedObject = getTranslatedObject(fieldValue, locale);
 
                     field.set(object, translatedObject);
@@ -87,14 +89,23 @@ public class TranslationService {
         return translationRepository.existsById(translationId);
     }
 
-    private String getClassName(Object object) {
-        TranslatableClass translatableClassAnnotation = object.getClass().getAnnotation(TranslatableClass.class);
-        if (translatableClassAnnotation != null) {
-            if (! StringUtils.isEmpty(translatableClassAnnotation.className())){
-                return translatableClassAnnotation.className();
-            }
+    private <T> T initializeAndUnproxy(T object) {
+        if (object == null) {
+            return null;
         }
 
+        if (!Hibernate.isInitialized(object)) {
+            Hibernate.initialize(object);
+        }
+
+        if (object instanceof HibernateProxy) {
+            return (T) Hibernate.unproxy(object);
+        }
+
+        return object;
+    }
+
+    private String getClassName(Object object) {
         return object.getClass().getSimpleName();
     }
 
