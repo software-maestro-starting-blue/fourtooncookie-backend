@@ -71,8 +71,4 @@ public class Artwork {
         return Objects.hash(id, title, thumbnailUrl);
     }
 
-    @Override
-    public Artwork clone() {
-        return new Artwork(id, title, thumbnailUrl);
-    }
 }
