@@ -13,7 +13,7 @@ public class CharacterArtworkService {
 
     private final ArtworkService artworkService;
 
-    public Artwork readById(Long artworkId) {
+    public Artwork getById(Long artworkId) {
         return artworkService.getById(artworkId);
     }
 
