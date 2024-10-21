@@ -32,7 +32,7 @@ public class AuthenticationFilter extends HttpFilter {
         String requestURI = request.getRequestURI();
         String method = request.getMethod();
 
-        if (shouldBypassAuthentication(requestURI, method)) {
+        if (isPassAuthentication(requestURI, method)) {
             chain.doFilter(request, response);
             return;
         }
@@ -56,7 +56,7 @@ public class AuthenticationFilter extends HttpFilter {
         }
     }
 
-    private boolean shouldBypassAuthentication(String requestURI, String method) {
+    private boolean isPassAuthentication(String requestURI, String method) {
         return requestURI.startsWith("/h2-console") || requestURI.startsWith("/health") ||
                 (method.equalsIgnoreCase("GET") && (requestURI.startsWith("/character") || requestURI.startsWith("/artwork")));
     }
