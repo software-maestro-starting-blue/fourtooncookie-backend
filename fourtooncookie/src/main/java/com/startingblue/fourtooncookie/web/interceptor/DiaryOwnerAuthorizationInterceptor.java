@@ -34,7 +34,13 @@ public class DiaryOwnerAuthorizationInterceptor implements HandlerInterceptor {
         validateExistsId(diaryId, response);
 
         try {
-            return handleAuthorization(UUID.fromString(memberId), Long.parseLong(diaryId), response);
+            boolean isAuthorized = isAuthorized(UUID.fromString(memberId), Long.parseLong(diaryId));
+
+            if (! isAuthorized) {
+                response.setStatus(SC_FORBIDDEN);
+            }
+
+            return isAuthorized;
         } catch (IllegalArgumentException e) {
             log.warn("Invalid UUID format for memberId: {}", memberId);
             response.setStatus(SC_FORBIDDEN);
@@ -47,17 +53,6 @@ public class DiaryOwnerAuthorizationInterceptor implements HandlerInterceptor {
             log.warn("Missing or empty path variable '{}': {}", PATH_VARIABLE_MEMBER_KEY, id);
             response.setStatus(SC_FORBIDDEN);
         }
-    }
-
-    private boolean handleAuthorization(UUID memberId, long diaryId, HttpServletResponse response) {
-        if (isAuthorized(memberId, diaryId)) {
-            log.info("Member with id {} is authorized", memberId);
-            return true;
-        }
-
-        log.warn("Member with id {} is not authorized for diary {}", memberId, diaryId);
-        response.setStatus(SC_FORBIDDEN);
-        return false;
     }
 
     private boolean isAuthorized(UUID memberId, long diaryId) {
