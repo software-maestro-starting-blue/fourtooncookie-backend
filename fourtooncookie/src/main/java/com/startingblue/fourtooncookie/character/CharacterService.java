@@ -9,6 +9,7 @@ import com.startingblue.fourtooncookie.character.dto.CharacterUpdateRequest;
 import com.startingblue.fourtooncookie.character.exception.CharacterDuplicateException;
 import com.startingblue.fourtooncookie.character.exception.CharacterNotFoundException;
 import com.startingblue.fourtooncookie.character.service.CharacterArtworkService;
+import com.startingblue.fourtooncookie.character.service.CharacterTranslationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class CharacterService {
 
     private final CharacterRepository characterRepository;
     private final CharacterArtworkService characterArtworkService;
-    private final MessageSource xmlMessageSource;
+    private final CharacterTranslationService characterTranslationService;
 
     public void createCharacter(final CharacterSaveRequest request) {
         CharacterVisionType visionType = findByCharacterVisionType(request.characterVisionType());
@@ -51,7 +52,7 @@ public class CharacterService {
     @Transactional(readOnly = true)
     public List<Character> readAllCharacters(Locale locale) {
         return readAllCharacters().stream()
-                .map(character -> localizeCharacter(character, locale))
+                .map(character -> characterTranslationService.translateCharacter(character, locale))
                 .toList();
     }
 
@@ -82,30 +83,7 @@ public class CharacterService {
     @Transactional(readOnly = true)
     public Character readById(Long characterId, Locale locale) {
         Character foundCharacter = readById(characterId);
-        return localizeCharacter(foundCharacter, locale);
-    }
-
-    private Character localizeCharacter(Character character, Locale locale) {
-        Artwork localizedArtwork = characterArtworkService.getArtworkWithNameChange(character.getArtwork(), locale);
-
-        String localizedCharacterName = getLocalizedCharacterName(character.getId(), locale);
-        return getCharacterWithNameChangeAndArtworkChange(character, localizedCharacterName, localizedArtwork);
-    }
-
-    private Character getCharacterWithNameChangeAndArtworkChange(Character character, String localizedName, Artwork localizedArtwork ) {
-        return Character.builder()
-                .id(character.getId())
-                .characterVisionType(character.getCharacterVisionType())
-                .paymentType(character.getPaymentType())
-                .name(localizedName)
-                .artwork(localizedArtwork)
-                .selectionThumbnailUrl(character.getSelectionThumbnailUrl())
-                .basePrompt(character.getBasePrompt())
-                .build();
-    }
-
-    public String getLocalizedCharacterName(Long characterId, Locale locale) {
-        return Objects.requireNonNull(xmlMessageSource.getMessage("character.name." + characterId, null, locale));
+        return characterTranslationService.translateCharacter(foundCharacter, locale);
     }
 
     private CharacterVisionType findByCharacterVisionType(CharacterVisionType characterVisionType) {
