@@ -30,12 +30,18 @@ public class TranslationService {
                 String fieldName = field.getName();
                 Object fieldValue = field.get(object);
 
-                if (!(fieldValue instanceof String))
-                    return;
+                if (fieldValue instanceof String) {
+                    String translatedValue = getTranslationContent(object, fieldName, locale);
 
-                String translatedValue = getTranslationContent(object, fieldName, locale);
+                    field.set(object, translatedValue);
+                }
 
-                field.set(object, translatedValue);
+                if (fieldValue != null) {
+                    Object translatedObject = getTranslatedObject(fieldValue, locale);
+
+                    field.set(object, translatedObject);
+                }
+
             } catch (Exception ignored) {}
         });
 
