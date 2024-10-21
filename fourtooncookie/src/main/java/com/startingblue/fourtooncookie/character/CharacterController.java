@@ -20,31 +20,31 @@ public final class CharacterController {
     private final CharacterService characterService;
 
     @PostMapping
-    public ResponseEntity<HttpStatus> createCharacter(@Valid @RequestBody final CharacterSaveRequest request) {
-        characterService.createCharacter(request);
+    public ResponseEntity<HttpStatus> postCharacter(@Valid @RequestBody final CharacterSaveRequest request) {
+        characterService.addCharacter(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .build();
     }
 
-    @GetMapping
-    public ResponseEntity<CharacterSavedResponses> readAllCharacters(Locale locale) {
-        CharacterSavedResponses responses = CharacterSavedResponses.of(characterService.readAllCharacters(locale));
-        return ResponseEntity
-                .ok(responses);
-    }
-
     @GetMapping("/{characterId}")
-    public ResponseEntity<CharacterSavedResponse> readCharacter(@PathVariable final Long characterId, Locale locale) {
-        CharacterSavedResponse response = CharacterSavedResponse.of(characterService.readById(characterId, locale));
+    public ResponseEntity<CharacterSavedResponse> getCharacter(@PathVariable final Long characterId, Locale locale) {
+        CharacterSavedResponse response = CharacterSavedResponse.of(characterService.getById(characterId, locale));
         return ResponseEntity
                 .ok(response);
     }
 
+    @GetMapping
+    public ResponseEntity<CharacterSavedResponses> getAllCharacters(Locale locale) {
+        CharacterSavedResponses responses = CharacterSavedResponses.of(characterService.getAllCharacters(locale));
+        return ResponseEntity
+                .ok(responses);
+    }
+
     @PutMapping("/{characterId}")
-    public ResponseEntity<HttpStatus> updateCharacter(@PathVariable final Long characterId,
-                                                        @Valid @RequestBody final CharacterUpdateRequest request) {
-        characterService.updateCharacter(characterId, request);
+    public ResponseEntity<HttpStatus> putCharacter(@PathVariable final Long characterId,
+                                                   @Valid @RequestBody final CharacterUpdateRequest request) {
+        characterService.modifyCharacter(characterId, request);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();
@@ -52,7 +52,7 @@ public final class CharacterController {
 
     @DeleteMapping("/{characterId}")
     public ResponseEntity<HttpStatus> deleteCharacter(@PathVariable final Long characterId) {
-        characterService.deleteCharacter(characterId);
+        characterService.removeCharacter(characterId);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();
