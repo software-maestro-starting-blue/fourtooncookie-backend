@@ -20,7 +20,7 @@ public class ArtworkController {
 
     @PostMapping
     public ResponseEntity<HttpStatus> postArtwork(@Valid @RequestBody final ArtworkSaveRequest request) {
-        artworkService.createArtwork(request);
+        artworkService.addArtwork(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .build();
@@ -29,12 +29,12 @@ public class ArtworkController {
     @GetMapping
     public ResponseEntity<ArtworkSavedResponses> getAllArtwork(Locale locale) {
         return ResponseEntity
-                .ok(ArtworkSavedResponses.of(artworkService.readAllArtworks(locale)));
+                .ok(ArtworkSavedResponses.of(artworkService.getAllArtworks(locale)));
     }
 
     @PutMapping("/{artworkId}")
     public ResponseEntity<HttpStatus> putArtwork(@PathVariable final Long artworkId, @Valid @RequestBody final ArtworkUpdateRequest request) {
-        artworkService.updateArtwork(artworkId, request);
+        artworkService.modifyArtwork(artworkId, request);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();
@@ -42,7 +42,7 @@ public class ArtworkController {
 
     @DeleteMapping("/{artworkId}")
     public ResponseEntity<HttpStatus> deleteArtwork(@PathVariable final Long artworkId) {
-        artworkService.deleteArtwork(artworkId);
+        artworkService.removeArtwork(artworkId);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();
