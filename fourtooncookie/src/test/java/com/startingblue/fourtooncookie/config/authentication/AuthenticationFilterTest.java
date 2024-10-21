@@ -62,7 +62,7 @@ class AuthenticationFilterTest {
         when(jwtExtractor.parseToken("validToken")).thenReturn(claims);
         when(claims.getSubject()).thenReturn(memberId.toString());
 
-        when(memberService.verifyMemberExists(memberId)).thenReturn(true);
+        when(memberService.isMemberSignUp(memberId)).thenReturn(true);
 
         // When
         authenticationFilter.doFilter(request, response, filterChain);
@@ -99,7 +99,7 @@ class AuthenticationFilterTest {
         when(jwtExtractor.parseToken("validToken")).thenReturn(claims);
         when(claims.getSubject()).thenReturn(memberId.toString());
 
-        when(memberService.verifyMemberExists(memberId)).thenReturn(false);
+        when(memberService.isMemberSignUp(memberId)).thenReturn(false);
 
         // When
         authenticationFilter.doFilter(request, response, filterChain);
@@ -142,7 +142,7 @@ class AuthenticationFilterTest {
         when(claims.getSubject()).thenReturn(memberId.toString());
 
         // Mock 회원 존재 여부
-        when(memberService.verifyMemberExists(memberId)).thenReturn(true);
+        when(memberService.isMemberSignUp(memberId)).thenReturn(true);
 
         // When
         authenticationFilter.doFilter(request, response, filterChain);

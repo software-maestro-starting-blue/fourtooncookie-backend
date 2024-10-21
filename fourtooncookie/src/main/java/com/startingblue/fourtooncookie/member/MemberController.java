@@ -17,19 +17,19 @@ public final class MemberController {
 
     @PostMapping("/member")
     public ResponseEntity<HttpStatus> postMember(UUID memberId, @RequestBody MemberSaveRequest memberSaveRequest) {
-        memberService.add(memberId, memberSaveRequest);
+        memberService.addMember(memberId, memberSaveRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/member")
     public ResponseEntity<MemberSavedResponse> getMember(UUID memberId) {
-        MemberSavedResponse response = MemberSavedResponse.of(memberService.readById(memberId));
+        MemberSavedResponse response = MemberSavedResponse.of(memberService.getById(memberId));
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/member")
-    public ResponseEntity<HttpStatus> hardDeleteMember(UUID memberId) {
-        memberService.hardDeleteById(memberId);
+    public ResponseEntity<HttpStatus> deleteMember(UUID memberId) {
+        memberService.removeById(memberId);
         return ResponseEntity
                 .noContent()
                 .build();

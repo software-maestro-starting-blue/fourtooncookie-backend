@@ -30,7 +30,7 @@ public class MemberAdminAuthorizationInterceptor extends MemberAuthorizationInte
 
     @Override
     public boolean isAuthorized(UUID memberId) {
-        boolean isAuthorized = memberService.verifyMemberAdmin(memberId);
+        boolean isAuthorized = memberService.isMemberAdmin(memberId);
 
         if (isAuthorized) {
             log.info("Authorization success: Member with ID [{}] has admin privileges.", memberId);

@@ -88,6 +88,6 @@ public class AuthenticationFilter extends HttpFilter {
     }
 
     private boolean isExistsMember(UUID memberId) {
-        return memberService.verifyMemberExists(memberId);
+        return memberService.isMemberSignUp(memberId);
     }
 }

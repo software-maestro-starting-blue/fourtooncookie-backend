@@ -16,7 +16,7 @@ public class MemberSignedUpAuthorizationInterceptor extends MemberAuthorizationI
 
     @Override
     public boolean isAuthorized(UUID memberId) {
-        boolean isAuthorized = memberService.verifyMemberSignUp(memberId);
+        boolean isAuthorized = memberService.isMemberSignUp(memberId);
 
         if (isAuthorized) {
             log.info("Authorization success: Member with ID [{}] is already signed up.", memberId);
