@@ -1,11 +1,13 @@
 package com.startingblue.fourtooncookie.translation;
 
+import com.startingblue.fourtooncookie.translation.annotation.TranslatableClass;
 import com.startingblue.fourtooncookie.translation.annotation.TranslatableField;
 import com.startingblue.fourtooncookie.translation.domain.Translation;
 import com.startingblue.fourtooncookie.translation.domain.TranslationId;
 import com.startingblue.fourtooncookie.translation.exception.TranslationDuplicateException;
 import com.startingblue.fourtooncookie.translation.exception.TranslationNotFoundException;
 import com.startingblue.fourtooncookie.translation.exception.TranslationObjectClassIdNotFoundException;
+import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -80,6 +82,13 @@ public class TranslationService {
     }
 
     private String getClassName(Object object) {
+        TranslatableClass translatableClassAnnotation = object.getClass().getAnnotation(TranslatableClass.class);
+        if (translatableClassAnnotation != null) {
+            if (! StringUtils.isEmpty(translatableClassAnnotation.className())){
+                return translatableClassAnnotation.className();
+            }
+        }
+
         return object.getClass().getSimpleName();
     }
 

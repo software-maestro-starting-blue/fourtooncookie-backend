@@ -1,6 +1,7 @@
 package com.startingblue.fourtooncookie.character.domain;
 
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
+import com.startingblue.fourtooncookie.translation.annotation.TranslatableClass;
 import com.startingblue.fourtooncookie.translation.annotation.TranslatableField;
 import jakarta.persistence.*;
 import jakarta.validation.*;
@@ -21,6 +22,7 @@ import java.util.Set;
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@TranslatableClass(className = "Character")
 public class Character {
 
     @Id
