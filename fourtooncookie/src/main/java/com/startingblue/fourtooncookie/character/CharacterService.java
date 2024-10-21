@@ -10,6 +10,7 @@ import com.startingblue.fourtooncookie.character.exception.CharacterDuplicateExc
 import com.startingblue.fourtooncookie.character.exception.CharacterNotFoundException;
 import com.startingblue.fourtooncookie.character.service.CharacterArtworkService;
 import com.startingblue.fourtooncookie.character.service.CharacterTranslationService;
+import com.startingblue.fourtooncookie.translation.annotation.TranslateMethodReturn;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +44,7 @@ public class CharacterService {
     }
 
     @Transactional(readOnly = true)
+    @TranslateMethodReturn
     public Character getById(Long characterId) {
         return characterRepository.findById(characterId)
                 .orElseThrow(() -> new CharacterNotFoundException("Character with ID " + characterId + " not found"));
@@ -56,6 +58,7 @@ public class CharacterService {
 
 
     @Transactional(readOnly = true)
+    @TranslateMethodReturn
     public List<Character> getAllCharacters() {
         return characterRepository.findAll();
     }
