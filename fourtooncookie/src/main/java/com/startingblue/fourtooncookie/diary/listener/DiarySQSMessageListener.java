@@ -36,7 +36,7 @@ public class DiarySQSMessageListener {
                     return;
                 }
 
-                DiaryStatus currentDiaryStatus = diaryService.readById(response.diaryId()).getStatus();
+                DiaryStatus currentDiaryStatus = diaryService.getById(response.diaryId()).getStatus();
 
                 diaryService.processImageGenerationResponse(response);
 
@@ -44,7 +44,7 @@ public class DiarySQSMessageListener {
                     return;
                 }
 
-                Diary diary = diaryService.readById(response.diaryId());
+                Diary diary = diaryService.getById(response.diaryId());
                 if (!DiaryStatus.IN_PROGRESS.equals(diary.getStatus())) {
                     notificationService.sendNotificationToMember(diary.getMemberId(), diary);
                 }

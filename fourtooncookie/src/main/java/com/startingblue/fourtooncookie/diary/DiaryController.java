@@ -28,7 +28,7 @@ public class DiaryController {
     @PostMapping
     public ResponseEntity<DiaryCreatedResponse> createDiary(UUID memberId,
                                                             @RequestBody final DiarySaveRequest request) {
-        DiaryCreatedResponse createdDiaryId = new DiaryCreatedResponse(diaryService.createDiary(request, memberId));
+        DiaryCreatedResponse createdDiaryId = new DiaryCreatedResponse(diaryService.addDiary(request, memberId));
         return ResponseEntity.ok(createdDiaryId);
     }
 
@@ -38,7 +38,7 @@ public class DiaryController {
             @RequestParam(defaultValue = "0") @Min(0) @Max(200) final int pageNumber,
             @RequestParam(defaultValue = "10") @Min(1) @Max(10) final int pageSize) {
 
-        DiarySavedResponses responses = DiarySavedResponses.of(diaryService.readDiariesByMemberId(memberId, pageNumber, pageSize));
+        DiarySavedResponses responses = DiarySavedResponses.of(diaryService.getDiariesByMemberId(memberId, pageNumber, pageSize));
 
         if (responses.diarySavedResponses().isEmpty()) {
             return noContent().build();
@@ -49,27 +49,27 @@ public class DiaryController {
     @GetMapping("/{diaryId}")
     public ResponseEntity<DiarySavedResponse> readDiaryById (
             @PathVariable final Long diaryId) {
-        DiarySavedResponse response = DiarySavedResponse.of(diaryService.readDiaryById(diaryId));
+        DiarySavedResponse response = DiarySavedResponse.of(diaryService.getById(diaryId));
         return ok(response);
     }
 
     @PutMapping("/{diaryId}")
     public ResponseEntity<HttpStatus> updateDiary(@PathVariable final Long diaryId,
                                             @RequestBody final DiaryUpdateRequest request) {
-        diaryService.updateDiary(diaryId, request);
+        diaryService.modifyDiary(diaryId, request);
         return ok().build();
     }
 
     @PatchMapping("/{diaryId}/favorite")
     public ResponseEntity<HttpStatus> updateDiaryFavorite(@PathVariable final Long diaryId,
                                                     @RequestBody final DiaryFavoriteRequest diaryFavoriteRequest) {
-        diaryService.updateDiaryFavorite(diaryId, diaryFavoriteRequest.isFavorite());
+        diaryService.modifyDiaryFavorite(diaryId, diaryFavoriteRequest.isFavorite());
         return ok().build();
     }
 
     @DeleteMapping("/{diaryId}")
     public ResponseEntity<HttpStatus> deleteDiary(@PathVariable final Long diaryId) {
-        diaryService.deleteDiaryById(diaryId);
+        diaryService.removeDiaryById(diaryId);
         return noContent().build();
     }
 
@@ -80,7 +80,7 @@ public class DiaryController {
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(diaryService.readDiaryFullImage(diaryId));
+                .body(diaryService.getDiaryFullImage(diaryId));
     }
 
 }

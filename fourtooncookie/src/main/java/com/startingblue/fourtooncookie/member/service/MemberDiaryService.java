@@ -2,7 +2,6 @@ package com.startingblue.fourtooncookie.member.service;
 
 import com.startingblue.fourtooncookie.diary.DiaryRepository;
 import com.startingblue.fourtooncookie.diary.DiaryService;
-import com.startingblue.fourtooncookie.diary.service.DiaryS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +20,7 @@ public class MemberDiaryService {
     public void deleteDiariesByMemberId(UUID memberId) {
         List<Long> diaryIds = diaryRepository.findDiaryIdsByMemberId(memberId);
         for (Long diaryId : diaryIds) {
-            diaryService.deleteDiaryById(diaryId);
+            diaryService.removeDiaryById(diaryId);
         }
     }
 }

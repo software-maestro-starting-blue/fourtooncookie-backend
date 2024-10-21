@@ -90,14 +90,14 @@ class DiaryServiceTest {
 
     @DisplayName("저장된 일기를 삭제한다.")
     @Test
-    void deleteDiaryByIdTest() throws MalformedURLException {
+    void removeDiaryByIdTest() throws MalformedURLException {
         // given
-        Diary diary = createDiary(LocalDate.of(2024, 7, 21), character, member);
+        Diary diary = addDiary(LocalDate.of(2024, 7, 21), character, member);
         diaryRepository.save(diary);
         doNothing().when(diaryS3Service).deleteImagesByDiaryId(anyLong());
 
         // when
-        diaryService.deleteDiaryById(diary.getId());
+        diaryService.removeDiaryById(diary.getId());
 
         // then
         boolean exists = diaryRepository.existsById(diary.getId());
@@ -108,11 +108,11 @@ class DiaryServiceTest {
     @Test
     void findById() throws MalformedURLException {
         // given
-        Diary diary = createDiary(LocalDate.of(2024, 7, 21), character, member);
+        Diary diary = addDiary(LocalDate.of(2024, 7, 21), character, member);
         diaryRepository.save(diary);
 
         // when
-        Diary foundDiary = diaryService.readById(diary.getId());
+        Diary foundDiary = diaryService.getById(diary.getId());
 
         // then
         assertThat(foundDiary).isEqualTo(diary);
@@ -125,7 +125,7 @@ class DiaryServiceTest {
         Long unsavedDiaryId = -1L;
 
         // when & then
-        assertThatThrownBy(() -> diaryService.readById(unsavedDiaryId))
+        assertThatThrownBy(() -> diaryService.getById(unsavedDiaryId))
                 .isInstanceOf(DiaryNotFoundException.class);
     }
 
@@ -133,13 +133,13 @@ class DiaryServiceTest {
     @Test
     void 존재하지_않는_일기는_삭제하지_못한다() throws MalformedURLException {
         // given
-        Diary diary = createDiary(LocalDate.of(2024, 7, 21), character, member);
+        Diary diary = addDiary(LocalDate.of(2024, 7, 21), character, member);
         diaryRepository.save(diary);
 
         Long notExistingId = -1L;
 
         // when & then
-        assertThatThrownBy(() -> diaryService.deleteDiaryById(notExistingId));
+        assertThatThrownBy(() -> diaryService.removeDiaryById(notExistingId));
 
         boolean exists = diaryRepository.existsById(diary.getId());
         assertThat(exists).isTrue();
@@ -147,12 +147,12 @@ class DiaryServiceTest {
 
     @DisplayName("일기를 생성하면 저장된 ID를 반환한다.")
     @Test
-    void createDiaryTest() throws MalformedURLException {
+    void addDiaryTest() throws MalformedURLException {
         // given
         DiarySaveRequest request = new DiarySaveRequest("오늘의 일기", LocalDate.now(), character.getId());
 
         // when
-        Long diaryId = diaryService.createDiary(request, member.getId());
+        Long diaryId = diaryService.addDiary(request, member.getId());
 
         // then
         Diary savedDiary = diaryRepository.findById(diaryId).orElseThrow(DiaryNotFoundException::new);
@@ -163,28 +163,28 @@ class DiaryServiceTest {
 
     @DisplayName("일기를 즐겨찾기로 설정한다.")
     @Test
-    void updateDiaryFavoriteTest() throws MalformedURLException {
+    void modifyDiaryFavoriteTest() throws MalformedURLException {
         // given
-        Diary diary = createDiary(LocalDate.of(2024, 7, 21), character, member);
+        Diary diary = addDiary(LocalDate.of(2024, 7, 21), character, member);
         diaryRepository.save(diary);
 
         // when
-        diaryService.updateDiaryFavorite(diary.getId(), true);
+        diaryService.modifyDiaryFavorite(diary.getId(), true);
 
         // then
-        Diary updatedDiary = diaryService.readById(diary.getId());
+        Diary updatedDiary = diaryService.getById(diary.getId());
         assertThat(updatedDiary.isFavorite()).isTrue();
     }
 
     @DisplayName("일기의 소유자가 맞는지 확인한다.")
     @Test
-    void verifyDiaryOwnerTest() throws MalformedURLException {
+    void isDiaryOwnerTest() throws MalformedURLException {
         // given
-        Diary diary = createDiary(LocalDate.now(), character, member);
+        Diary diary = addDiary(LocalDate.now(), character, member);
         diaryRepository.save(diary);
 
         // when
-        boolean isOwner = diaryService.verifyDiaryOwner(member.getId(), diary.getId());
+        boolean isOwner = diaryService.isDiaryOwner(member.getId(), diary.getId());
 
         // then
         assertThat(isOwner).isTrue();
@@ -192,23 +192,23 @@ class DiaryServiceTest {
 
     @DisplayName("다른 사용자는 일기의 소유자가 아니므로 false를 반환한다.")
     @Test
-    void verifyDiaryOwnerFalseTest() throws MalformedURLException {
+    void isDiaryOwnerFalseTest() throws MalformedURLException {
         // given
-        Diary diary = createDiary(LocalDate.now(), character, member);
+        Diary diary = addDiary(LocalDate.now(), character, member);
         diaryRepository.save(diary);
 
         Member otherMember = createMember("다른 사람", LocalDate.of(1995, 1, 1), Gender.FEMALE);
         memberRepository.save(otherMember);
 
         // when
-        boolean isOwner = diaryService.verifyDiaryOwner(otherMember.getId(), diary.getId());
+        boolean isOwner = diaryService.isDiaryOwner(otherMember.getId(), diary.getId());
 
         // then
         assertThat(isOwner).isFalse();
     }
 
 
-    private Diary createDiary(LocalDate diaryDate, Character character, Member member) throws MalformedURLException {
+    private Diary addDiary(LocalDate diaryDate, Character character, Member member) throws MalformedURLException {
         return Diary.builder()
                 .content("Initial content")
                 .diaryDate(diaryDate)

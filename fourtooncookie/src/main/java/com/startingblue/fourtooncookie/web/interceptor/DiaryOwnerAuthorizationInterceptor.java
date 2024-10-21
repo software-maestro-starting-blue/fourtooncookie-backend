@@ -76,7 +76,7 @@ public class DiaryOwnerAuthorizationInterceptor implements HandlerInterceptor {
     }
 
     private boolean isAuthorized(UUID memberId, long diaryId) {
-        return diaryService.verifyDiaryOwner(memberId, diaryId);
+        return diaryService.isDiaryOwner(memberId, diaryId);
     }
 
     private String extractPathVariable(String requestURI) {
