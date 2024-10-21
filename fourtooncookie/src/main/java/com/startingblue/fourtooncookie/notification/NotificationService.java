@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,11 +27,11 @@ public class NotificationService {
     private static final String EXPO_PUSH_SEND_API = "https://exp.host/--/api/v2/push/send";
     private final NotificationTokenRepository notificationTokenRepository;
 
-    public void assignNotificationTokenToMember(final UUID memberId, final NotificationTokenAssignRequest notificationTokenAssignRequest) {
+    public void assignNotificationTokenToMember(final Locale locale, final UUID memberId, final NotificationTokenAssignRequest notificationTokenAssignRequest) {
         notificationTokenRepository.findByToken(notificationTokenAssignRequest.notificationToken())
                 .ifPresentOrElse(
                         token -> token.updateMember(memberId),
-                        () -> notificationTokenRepository.save(new NotificationToken(notificationTokenAssignRequest.notificationToken(), memberId))
+                        () -> notificationTokenRepository.save(new NotificationToken(notificationTokenAssignRequest.notificationToken(), memberId, locale))
                 );
     }
 
