@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @AllArgsConstructor
-@Slf4j
 public class TranslationService {
 
     private final TranslationRepository translationRepository;
