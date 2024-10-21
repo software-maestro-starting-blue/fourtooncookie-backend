@@ -8,6 +8,4 @@ import java.net.URL;
 public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
     boolean existsByTitle(String title);
     boolean existsByThumbnailUrl(URL thumbnailUrl);
-
-    boolean existsByTitleAndThumbnailUrl(String title, URL thumbnailUrl);
 }

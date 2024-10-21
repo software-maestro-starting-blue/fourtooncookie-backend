@@ -67,7 +67,7 @@ public class ArtworkService {
 
     @Transactional(readOnly = true)
     public void validateUniqueArtwork(String title, URL thumbnailUrl) {
-        if (artworkRepository.existsByTitleAndThumbnailUrl(title, thumbnailUrl)) {
+        if (artworkRepository.existsByTitle(title) && artworkRepository.existsByThumbnailUrl(thumbnailUrl)) {
             throw new ArtworkDuplicateException("Artwork with title, thumbnail URL already exists.");
         }
     }

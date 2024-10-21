@@ -49,8 +49,8 @@ class ArtworkServiceTest {
         ArtworkSaveRequest request = new ArtworkSaveRequest("New Artwork", new URL("http://example.com/new_image.jpg"));
 
         // 중복 확인을 위한 Mock
-        when(artworkRepository.existsByTitle(anyString())).thenReturn(false);
-        when(artworkRepository.existsByThumbnailUrl(any(URL.class))).thenReturn(false);
+        when(artworkRepository.existsByTitle(anyString())).thenReturn(true);
+        when(artworkRepository.existsByThumbnailUrl(any(URL.class))).thenReturn(true);
 
         // When
         artworkService.addArtwork(request);
@@ -66,7 +66,8 @@ class ArtworkServiceTest {
         ArtworkSaveRequest request = new ArtworkSaveRequest("Duplicate Artwork", new URL("http://example.com/image.jpg"));
 
         // 중복된 제목 존재
-        when(artworkRepository.existsByTitleAndThumbnailUrl(anyString(), any())).thenReturn(true);
+        when(artworkRepository.existsByTitle(anyString())).thenReturn(false);
+        when(artworkRepository.existsByThumbnailUrl(any())).thenReturn(false);
 
         // When & Then
         assertThatThrownBy(() -> artworkService.addArtwork(request))
