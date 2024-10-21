@@ -44,7 +44,7 @@ public class DiaryService {
     private final DiaryLambdaService diaryImageGenerationLambdaInvoker;
 
     public Long addDiary(final DiarySaveRequest request, final UUID memberId) {
-        Character character = diaryCharacterService.readById(request.characterId());
+        Character character = diaryCharacterService.getById(request.characterId());
         
         Diary diary = buildDiary(request, memberId, character);
         diaryRepository.save(diary);
@@ -112,7 +112,7 @@ public class DiaryService {
 
     public void modifyDiary(Long diaryId, DiaryUpdateRequest request) {
         Diary existedDiary = getById(diaryId);
-        Character character = diaryCharacterService.readById(request.characterId());
+        Character character = diaryCharacterService.getById(request.characterId());
         existedDiary.update(request.content(), character);
         diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(existedDiary, character);
         diaryPaintingImageCloudFrontService.invalidateCache(diaryId);
