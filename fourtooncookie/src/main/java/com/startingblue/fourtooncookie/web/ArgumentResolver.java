@@ -26,7 +26,7 @@ public class ArgumentResolver implements HandlerMethodArgumentResolver {
                                   NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) {
         HttpServletRequest request = getRequest(webRequest);
-        String memberIdString = getMemberIdString(request);
+        String memberIdString = getMemberId(request);
         return parseMemberId(memberIdString);
     }
 
@@ -38,7 +38,7 @@ public class ArgumentResolver implements HandlerMethodArgumentResolver {
         return request;
     }
 
-    private String getMemberIdString(HttpServletRequest request) {
+    private String getMemberId(HttpServletRequest request) {
         String memberIdString = String.valueOf(request.getAttribute("memberId"));
         if (memberIdString == null || memberIdString.isEmpty()) {
             throw new AuthenticationException("Member ID is missing");
