@@ -31,6 +31,9 @@ import java.util.UUID;
 public class NotificationService {
 
     private static final String EXPO_PUSH_SEND_API = "https://exp.host/--/api/v2/push/send";
+    private static final String EXPO_NOTIFICATION_TO = "to";
+    private static final String EXPO_NOTIFICATION_TITLE = "title";
+    private static final String EXPO_NOTIFICATION_BODY = "body";
     private final NotificationTokenRepository notificationTokenRepository;
     private final XmlMessageSource xmlMessageSource;
 
@@ -65,9 +68,9 @@ public class NotificationService {
 
     private void sendMessageByPushMessage(final List<String> to, final String title, final String body) {
         final Map<String, Object> pushMessage = new HashMap<>();
-        pushMessage.put("to", to);
-        pushMessage.put("title", title);
-        pushMessage.put("body", body);
+        pushMessage.put(EXPO_NOTIFICATION_TO, to);
+        pushMessage.put(EXPO_NOTIFICATION_TITLE, title);
+        pushMessage.put(EXPO_NOTIFICATION_BODY, body);
 
         final RestTemplate restTemplate = new RestTemplate();
         final HttpHeaders headers = new HttpHeaders();
