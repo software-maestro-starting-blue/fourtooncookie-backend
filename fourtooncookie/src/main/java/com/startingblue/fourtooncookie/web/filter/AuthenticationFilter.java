@@ -38,7 +38,7 @@ public class AuthenticationFilter extends HttpFilter {
         }
 
         try {
-            UUID memberId = extractUUIDFromToken(request);
+            UUID memberId = getUUIDByExtractingToken(request);
             log.info("Login attempt for memberId: {}", memberId);
 
             if (isSignupRequest(requestURI, method)) {
@@ -61,7 +61,7 @@ public class AuthenticationFilter extends HttpFilter {
                 (method.equalsIgnoreCase("GET") && (requestURI.startsWith("/character") || requestURI.startsWith("/artwork")));
     }
 
-    private UUID extractUUIDFromToken(HttpServletRequest request) {
+    private UUID getUUIDByExtractingToken(HttpServletRequest request) {
         String token = jwtExtractor.resolveToken(request);
         Claims claims = jwtExtractor.parseToken(token);
         return UUID.fromString(claims.getSubject());
