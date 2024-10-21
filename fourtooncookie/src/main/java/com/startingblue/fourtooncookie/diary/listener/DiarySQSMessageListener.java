@@ -30,7 +30,7 @@ public class DiarySQSMessageListener {
             try {
                 DiaryImageResponseMessage response = parseMessage(message);
                 log.info("received message: {}", response);
-                if (!diaryService.existsById(response.diaryId())) {
+                if (!diaryService.isExistsById(response.diaryId())) {
                     log.info("Diary ID {} does not exist. Message will be ignored.", response.diaryId());
                     // 다이어리 ID가 없을 경우 처리를 하지 않음 (메시지 삭제)
                     return;
