@@ -1,6 +1,7 @@
 package com.startingblue.fourtooncookie.notification;
 
 import com.startingblue.fourtooncookie.diary.domain.Diary;
+import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
 import com.startingblue.fourtooncookie.locale.XmlMessageSource;
 import com.startingblue.fourtooncookie.notification.domain.NotificationToken;
 import com.startingblue.fourtooncookie.notification.dto.NotificationTokenAssignRequest;
@@ -57,13 +58,16 @@ public class NotificationService {
             }
             pushNotification.get(token.getLocale()).add(token.getToken());
         });
-        
-        for (final Locale locale : pushNotification.keySet()) {
-            final String title = xmlMessageSource.resolveCode("notification.title." + diary.getStatus().toString().toLowerCase(), locale).toString();
-            final String content = xmlMessageSource.resolveCode("notification.content." + diary.getStatus().toString().toLowerCase(), locale).toString();
 
+        pushNotification.keySet().forEach(locale -> {
+            final String title = resolveMessage("notification.title.", diary.getStatus(), locale);
+            final String content = resolveMessage("notification.content.", diary.getStatus(), locale);
             sendMessageByPushMessage(pushNotification.get(locale), title, content);
-        }
+        });
+    }
+
+    private String resolveMessage(final String codePrefix, final DiaryStatus diaryStatus, final Locale locale) {
+        return xmlMessageSource.resolveCode(codePrefix + diaryStatus.toString().toLowerCase(), locale).toString();
     }
 
     private void sendMessageByPushMessage(final List<String> to, final String title, final String body) {
