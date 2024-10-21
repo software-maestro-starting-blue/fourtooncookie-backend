@@ -94,7 +94,7 @@ class DiaryServiceTest {
         // given
         Diary diary = addDiary(LocalDate.of(2024, 7, 21), character, member);
         diaryRepository.save(diary);
-        doNothing().when(diaryS3Service).deleteImagesByDiaryId(anyLong());
+        doNothing().when(diaryS3Service).removeImagesByDiaryId(anyLong());
 
         // when
         diaryService.removeDiaryById(diary.getId());

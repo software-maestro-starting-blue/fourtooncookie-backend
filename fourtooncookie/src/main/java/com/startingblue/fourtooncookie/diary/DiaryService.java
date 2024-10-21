@@ -125,7 +125,7 @@ public class DiaryService {
 
     public void removeDiaryById(Long diaryId) {
         Diary foundDiary = getById(diaryId);
-        diaryS3Service.deleteImagesByDiaryId(diaryId);
+        diaryS3Service.removeImagesByDiaryId(diaryId);
         diaryRepository.delete(foundDiary);
     }
 
