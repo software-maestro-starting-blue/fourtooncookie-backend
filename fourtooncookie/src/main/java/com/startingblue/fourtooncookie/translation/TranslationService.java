@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @AllArgsConstructor
@@ -19,7 +20,7 @@ public class TranslationService {
 
     private final TranslationRepository translationRepository;
 
-    private static final Map<String, List<Field>> cachedTranslatableField = new HashMap<>();
+    private static final Map<String, List<Field>> cachedTranslatableField = new ConcurrentHashMap<>();
 
     public <T> T getTranslatedObject(T object, Locale locale) {
         getTranslatableFields(object).forEach(field -> {
