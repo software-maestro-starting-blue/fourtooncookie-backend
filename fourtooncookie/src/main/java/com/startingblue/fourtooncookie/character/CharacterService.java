@@ -11,13 +11,11 @@ import com.startingblue.fourtooncookie.character.exception.CharacterNotFoundExce
 import com.startingblue.fourtooncookie.character.service.CharacterArtworkService;
 import com.startingblue.fourtooncookie.character.service.CharacterTranslationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 @RequiredArgsConstructor
 @Transactional
@@ -29,7 +27,7 @@ public class CharacterService {
     private final CharacterTranslationService characterTranslationService;
 
     public void addCharacter(final CharacterSaveRequest request) {
-        CharacterVisionType visionType = getByCharacterVisionType(request.characterVisionType());
+        CharacterVisionType visionType = getCharacterVisionType(request.characterVisionType());
         Artwork artwork = characterArtworkService.getById(request.artworkId());
 
         validateUniqueCharacter(request.name(), artwork, request.paymentType(), visionType);
@@ -87,7 +85,7 @@ public class CharacterService {
         characterRepository.delete(foundCharacter);
     }
 
-    private CharacterVisionType getByCharacterVisionType(CharacterVisionType characterVisionType) {
+    private CharacterVisionType getCharacterVisionType(CharacterVisionType characterVisionType) {
         return CharacterVisionType.valueOf(characterVisionType.name());
     }
 
