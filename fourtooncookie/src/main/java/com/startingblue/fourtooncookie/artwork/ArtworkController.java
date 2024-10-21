@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Locale;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/artwork")
@@ -27,9 +25,9 @@ public class ArtworkController {
     }
 
     @GetMapping
-    public ResponseEntity<ArtworkSavedResponses> getAllArtwork(Locale locale) {
+    public ResponseEntity<ArtworkSavedResponses> getAllArtwork() {
         return ResponseEntity
-                .ok(ArtworkSavedResponses.of(artworkService.getAllArtworks(locale)));
+                .ok(ArtworkSavedResponses.of(artworkService.getAllArtworks()));
     }
 
     @PutMapping("/{artworkId}")
