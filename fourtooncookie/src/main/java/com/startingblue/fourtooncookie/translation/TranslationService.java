@@ -90,9 +90,11 @@ public class TranslationService {
 
     private Long getClassId(Object object) {
         try {
-            return (Long) Arrays.stream(object.getClass().getDeclaredFields())
-                    .filter(field -> field.isAnnotationPresent(Id.class))
-                    .findFirst().get().get(object);
+            Field field = Arrays.stream(object.getClass().getDeclaredFields())
+                    .filter(currentField -> currentField.isAnnotationPresent(Id.class))
+                    .findFirst().get();
+            field.setAccessible(true);
+            return (Long) field.get(object);
         } catch (Exception e) {
             throw new TranslationObjectClassIdNotFoundException();
         }
