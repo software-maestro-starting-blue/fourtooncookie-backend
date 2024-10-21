@@ -6,10 +6,8 @@ import com.startingblue.fourtooncookie.translation.domain.TranslationId;
 import com.startingblue.fourtooncookie.translation.exception.TranslationDuplicateException;
 import com.startingblue.fourtooncookie.translation.exception.TranslationNotFoundException;
 import com.startingblue.fourtooncookie.translation.exception.TranslationObjectClassIdNotFoundException;
-import io.sentry.Sentry;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
