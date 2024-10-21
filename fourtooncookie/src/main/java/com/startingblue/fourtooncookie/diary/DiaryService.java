@@ -46,8 +46,7 @@ public class DiaryService {
 
     public Long createDiary(final DiarySaveRequest request, final UUID memberId) {
         Character character = diaryCharacterService.readById(request.characterId());
-        verifyUniqueDiary(memberId, request.diaryDate());
-
+        
         Diary diary = buildDiary(request, memberId, character);
         diaryRepository.save(diary);
         diaryImageGenerationLambdaInvoker.invokeDiaryImageGenerationLambda(diary, character);

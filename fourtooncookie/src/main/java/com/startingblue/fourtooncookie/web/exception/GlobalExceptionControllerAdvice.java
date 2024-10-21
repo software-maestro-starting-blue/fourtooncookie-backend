@@ -28,8 +28,4 @@ public class GlobalExceptionControllerAdvice {
         return errors;
     }
 
-    @ExceptionHandler(Exception.class)
-    public void handleException(Exception e) {
-        log.error(e.getMessage(), e);
-    }
 }
