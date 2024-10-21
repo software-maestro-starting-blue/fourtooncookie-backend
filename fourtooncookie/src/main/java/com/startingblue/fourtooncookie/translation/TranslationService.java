@@ -37,9 +37,7 @@ public class TranslationService {
                 String translatedValue = getTranslationContent(object, fieldName, locale);
 
                 field.set(object, translatedValue);
-            } catch (Exception ignored) {
-                Sentry.captureException(ignored);
-            }
+            } catch (Exception ignored) {}
         });
 
         return object;
@@ -114,9 +112,7 @@ public class TranslationService {
                     try {
                         field.setAccessible(true);
                         translatableFields.add(field);
-                    } catch (Exception ignored) {
-                        Sentry.captureException(ignored);
-                    }
+                    } catch (Exception ignored) {}
                 });
 
         cachedTranslatableField.put(className, translatableFields);
