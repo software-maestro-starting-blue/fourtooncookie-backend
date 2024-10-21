@@ -75,11 +75,8 @@ class TranslationServiceTest {
                 .build()
         );
 
-        SampleEntity sampleEntityInEnglish = translationService.getTranslatedObject(sampleEntity, Locale.ENGLISH);
-
-        SampleEntity sampleEntityInFrench = translationService.getTranslatedObject(sampleEntity, Locale.FRENCH);
-
         // then 1
+        SampleEntity sampleEntityInEnglish = translationService.getTranslatedObject(sampleEntity, Locale.ENGLISH);
         // Translatable Field가 변경되었는가
         assertThat(sampleEntityInEnglish.translatableField).isEqualTo(translatableFieldInEnglish);
         assertThat(sampleEntityInEnglish.translatableField2).isEqualTo(translatableField2InEnglish);
@@ -88,6 +85,7 @@ class TranslationServiceTest {
         assertThat(sampleEntityInEnglish.unTranslatableField2).isEqualTo(defaultField);
 
         // then 2
+        SampleEntity sampleEntityInFrench = translationService.getTranslatedObject(sampleEntity, Locale.FRENCH);
         // Translatable Field가 변경되었는가
         assertThat(sampleEntityInFrench.translatableField).isEqualTo(translatableFieldInFrench);
         assertThat(sampleEntityInFrench.translatableField2).isEqualTo(translatableField2InFrench);
