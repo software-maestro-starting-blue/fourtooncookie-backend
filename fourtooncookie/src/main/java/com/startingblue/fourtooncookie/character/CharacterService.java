@@ -114,12 +114,10 @@ public class CharacterService {
     }
 
     private void validateUniqueCharacter(String name, Artwork artwork, PaymentType paymentType, CharacterVisionType visionType) {
-        boolean isDuplicate = characterRepository.existsByName(name) &&
+        if (characterRepository.existsByName(name) &&
                 characterRepository.existsByArtwork(artwork) &&
                 characterRepository.existsByPaymentType(paymentType) &&
-                characterRepository.existsByCharacterVisionType(visionType);
-
-        if (isDuplicate) {
+                characterRepository.existsByCharacterVisionType(visionType)) {
             throw new CharacterDuplicateException("Duplicate character. A character with the same name, work, payment type, and character vision type already exists.");
         }
     }
