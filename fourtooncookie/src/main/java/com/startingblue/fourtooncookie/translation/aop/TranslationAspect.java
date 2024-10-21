@@ -29,19 +29,8 @@ public class TranslationAspect {
 
         Locale currentLocale = LocaleContextHolder.getLocale();
 
-        System.out.println("AOP");
-        System.out.println(currentLocale.toString());
-
         if (result instanceof List<?>){
-            return ((List<?>) result).stream().map(element -> {
-                Object translatedObject = translationService.getTranslatedObject(element, currentLocale);
-                System.out.println(translatedObject.toString());
-                if (translatedObject instanceof Artwork){
-                    System.out.println("insan");
-                    System.out.println(((Artwork) translatedObject).getTitle());
-                }
-                return translatedObject;
-            }).toList();
+            return ((List<?>) result).stream().map(element -> translationService.getTranslatedObject(element, currentLocale)).toList();
         }
 
         return translationService.getTranslatedObject(result, currentLocale);
