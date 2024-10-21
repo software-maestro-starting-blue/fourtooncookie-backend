@@ -1,6 +1,5 @@
 package com.startingblue.fourtooncookie.character.service;
 
-import com.startingblue.fourtooncookie.artwork.ArtworkService;
 import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.character.CharacterService;
 import com.startingblue.fourtooncookie.character.domain.Character;
@@ -74,7 +73,7 @@ class CharacterServiceTest {
         when(characterRepository.save(any(Character.class))).thenReturn(character);
 
         // when
-        characterService.createCharacter(request);
+        characterService.addCharacter(request);
 
         // then
         assertThat(character.getCharacterVisionType()).isEqualTo(characterVisionType);
@@ -103,7 +102,7 @@ class CharacterServiceTest {
         when(characterRepository.findById(characterId)).thenReturn(Optional.of(character));
 
         // when
-        Character foundCharacter = characterService.readById(characterId);
+        Character foundCharacter = characterService.getById(characterId);
 
         // then
         assertThat(foundCharacter).isNotNull();
@@ -124,7 +123,7 @@ class CharacterServiceTest {
         when(characterRepository.findById(notFoundCharacterId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(CharacterNotFoundException.class, () -> characterService.readById(notFoundCharacterId));
+        assertThrows(CharacterNotFoundException.class, () -> characterService.getById(notFoundCharacterId));
         verify(characterRepository, times(1)).findById(notFoundCharacterId);
     }
 
@@ -163,7 +162,7 @@ class CharacterServiceTest {
         when(characterRepository.findAll()).thenReturn(List.of(character1, character2));
 
         // when
-        CharacterSavedResponses characterSavedResponses = CharacterSavedResponses.of(characterService.readAllCharacters(Locale.KOREAN));
+        CharacterSavedResponses characterSavedResponses = CharacterSavedResponses.of(characterService.getAllCharacters(Locale.KOREAN));
 
         // then
         assertThat(characterSavedResponses.characterSavedResponses()).hasSize(2);
@@ -202,7 +201,7 @@ class CharacterServiceTest {
 
     @DisplayName("캐릭터를 수정한다.")
     @Test
-    void updateCharacterSuccessfully() throws MalformedURLException {
+    void modifyCharacterSuccessfully() throws MalformedURLException {
         // given
         Artwork artwork = new Artwork("Test Artwork", new URL("https://test.png"));
         Character character = Character.builder()
@@ -227,8 +226,8 @@ class CharacterServiceTest {
         when(characterArtworkService.readById(request.artworkId())).thenReturn(updateArtwork);
 
         // when
-        characterService.updateCharacter(characterId, request);
-        Character updatedCharacter = characterService.readById(characterId);
+        characterService.modifyCharacter(characterId, request);
+        Character updatedCharacter = characterService.getById(characterId);
 
         // then
         assertThat(updatedCharacter.getCharacterVisionType()).isEqualTo(updateCharacterVisionType);
@@ -255,13 +254,13 @@ class CharacterServiceTest {
         when(characterRepository.findById(notFoundCharacterId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(CharacterNotFoundException.class, () -> characterService.updateCharacter(notFoundCharacterId, request));
+        assertThrows(CharacterNotFoundException.class, () -> characterService.modifyCharacter(notFoundCharacterId, request));
         verify(characterRepository, times(1)).findById(notFoundCharacterId);
     }
 
     @DisplayName("캐릭터를 삭제한다.")
     @Test
-    void deleteCharacterSuccessfully() throws MalformedURLException {
+    void removeCharacterSuccessfully() throws MalformedURLException {
         // given
         Long characterId = 1L;
         String basePrompt = "This is a base prompt";
@@ -277,7 +276,7 @@ class CharacterServiceTest {
         when(characterRepository.findById(characterId)).thenReturn(Optional.of(character));
 
         // when
-        characterService.deleteCharacter(characterId);
+        characterService.removeCharacter(characterId);
         when(characterRepository.findById(characterId)).thenReturn(Optional.empty());
 
         // then
@@ -295,7 +294,7 @@ class CharacterServiceTest {
         when(characterRepository.findById(notFoundCharacterId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(CharacterNotFoundException.class, () -> characterService.deleteCharacter(notFoundCharacterId));
+        assertThrows(CharacterNotFoundException.class, () -> characterService.removeCharacter(notFoundCharacterId));
         verify(characterRepository, times(1)).findById(notFoundCharacterId);
     }
 }

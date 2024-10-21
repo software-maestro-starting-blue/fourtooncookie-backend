@@ -12,7 +12,7 @@ public class DiaryCharacterService {
     private final CharacterService characterService;
 
     public Character getById(Long characterId) {
-        return characterService.readById(characterId);
+        return characterService.getById(characterId);
     }
 
 }

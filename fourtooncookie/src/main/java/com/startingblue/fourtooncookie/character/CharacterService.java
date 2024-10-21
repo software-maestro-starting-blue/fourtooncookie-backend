@@ -27,11 +27,11 @@ public class CharacterService {
     private final CharacterArtworkService characterArtworkService;
     private final MessageSource xmlMessageSource;
 
-    public void createCharacter(final CharacterSaveRequest request) {
+    public void addCharacter(final CharacterSaveRequest request) {
         CharacterVisionType visionType = findByCharacterVisionType(request.characterVisionType());
         Artwork artwork = characterArtworkService.readById(request.artworkId());
 
-        verifyUniqueCharacter(request.name(), artwork, request.paymentType(), visionType);
+        validateUniqueCharacter(request.name(), artwork, request.paymentType(), visionType);
 
         characterRepository.save(Character.builder()
                 .characterVisionType(visionType)
@@ -44,19 +44,32 @@ public class CharacterService {
     }
 
     @Transactional(readOnly = true)
-    public List<Character> readAllCharacters() {
+    public Character getById(Long characterId) {
+        return characterRepository.findById(characterId)
+                .orElseThrow(() -> new CharacterNotFoundException("Character with ID " + characterId + " not found"));
+    }
+
+    @Transactional(readOnly = true)
+    public Character getById(Long characterId, Locale locale) {
+        Character foundCharacter = getById(characterId);
+        return localizeCharacter(foundCharacter, locale);
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<Character> getAllCharacters() {
         return characterRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public List<Character> readAllCharacters(Locale locale) {
-        return readAllCharacters().stream()
+    public List<Character> getAllCharacters(Locale locale) {
+        return getAllCharacters().stream()
                 .map(character -> localizeCharacter(character, locale))
                 .toList();
     }
 
-    public void updateCharacter(final Long characterId, final CharacterUpdateRequest request) {
-        Character character = readById(characterId);
+    public void modifyCharacter(final Long characterId, final CharacterUpdateRequest request) {
+        Character character = getById(characterId);
         Artwork artwork = characterArtworkService.readById(request.artworkId());
 
         character.update(request.characterVisionType(),
@@ -68,21 +81,9 @@ public class CharacterService {
         characterRepository.save(character);
     }
 
-    public void deleteCharacter(final Long characterId) {
-        Character foundCharacter = readById(characterId);
+    public void removeCharacter(final Long characterId) {
+        Character foundCharacter = getById(characterId);
         characterRepository.delete(foundCharacter);
-    }
-
-    @Transactional(readOnly = true)
-    public Character readById(Long characterId) {
-        return characterRepository.findById(characterId)
-                .orElseThrow(() -> new CharacterNotFoundException("Character with ID " + characterId + " not found"));
-    }
-
-    @Transactional(readOnly = true)
-    public Character readById(Long characterId, Locale locale) {
-        Character foundCharacter = readById(characterId);
-        return localizeCharacter(foundCharacter, locale);
     }
 
     private Character localizeCharacter(Character character, Locale locale) {
@@ -112,14 +113,14 @@ public class CharacterService {
         return CharacterVisionType.valueOf(characterVisionType.name());
     }
 
-    private void verifyUniqueCharacter(String name, Artwork artwork, PaymentType paymentType, CharacterVisionType visionType) {
+    private void validateUniqueCharacter(String name, Artwork artwork, PaymentType paymentType, CharacterVisionType visionType) {
         boolean isDuplicate = characterRepository.existsByName(name) &&
                 characterRepository.existsByArtwork(artwork) &&
                 characterRepository.existsByPaymentType(paymentType) &&
                 characterRepository.existsByCharacterVisionType(visionType);
 
         if (isDuplicate) {
-            throw new CharacterDuplicateException("중복된 캐릭터입니다. 동일한 이름, 작품, 결제 유형, 캐릭터 비전 유형을 가진 캐릭터가 이미 존재합니다.");
+            throw new CharacterDuplicateException("Duplicate character. A character with the same name, work, payment type, and character vision type already exists.");
         }
     }
 
