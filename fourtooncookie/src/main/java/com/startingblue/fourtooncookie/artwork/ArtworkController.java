@@ -18,22 +18,22 @@ public class ArtworkController {
 
     private final ArtworkService artworkService;
 
-    @GetMapping
-    public ResponseEntity<ArtworkSavedResponses> readAllArtwork(Locale locale) {
-        return ResponseEntity
-                .ok(ArtworkSavedResponses.of(artworkService.readAllArtworks(locale)));
-    }
-
     @PostMapping
-    public ResponseEntity<HttpStatus> createArtwork(@Valid @RequestBody final ArtworkSaveRequest request) {
+    public ResponseEntity<HttpStatus> postArtwork(@Valid @RequestBody final ArtworkSaveRequest request) {
         artworkService.createArtwork(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .build();
     }
 
+    @GetMapping
+    public ResponseEntity<ArtworkSavedResponses> getAllArtwork(Locale locale) {
+        return ResponseEntity
+                .ok(ArtworkSavedResponses.of(artworkService.readAllArtworks(locale)));
+    }
+
     @PutMapping("/{artworkId}")
-    public ResponseEntity<HttpStatus> updateArtwork(@PathVariable final Long artworkId, @Valid @RequestBody final ArtworkUpdateRequest request) {
+    public ResponseEntity<HttpStatus> putArtwork(@PathVariable final Long artworkId, @Valid @RequestBody final ArtworkUpdateRequest request) {
         artworkService.updateArtwork(artworkId, request);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
