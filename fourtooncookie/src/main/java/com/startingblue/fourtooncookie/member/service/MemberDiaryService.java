@@ -17,7 +17,7 @@ public class MemberDiaryService {
     private final DiaryRepository diaryRepository;
     private final DiaryService diaryService;
 
-    public void deleteDiariesByMemberId(UUID memberId) {
+    public void removeDiariesByMemberId(UUID memberId) {
         List<Long> diaryIds = diaryRepository.findDiaryIdsByMemberId(memberId);
         for (Long diaryId : diaryIds) {
             diaryService.removeDiaryById(diaryId);

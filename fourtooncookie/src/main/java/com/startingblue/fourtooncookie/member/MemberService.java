@@ -39,7 +39,7 @@ public class MemberService {
     }
 
     public void removeById(UUID memberId) {
-        memberDiaryService.deleteDiariesByMemberId(memberId);
+        memberDiaryService.removeDiariesByMemberId(memberId);
         memberRepository.deleteById(memberId);
     }
 

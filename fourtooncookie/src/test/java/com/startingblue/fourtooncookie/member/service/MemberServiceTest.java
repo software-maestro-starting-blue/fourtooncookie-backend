@@ -115,7 +115,7 @@ class MemberServiceTest {
     @Test
     @DisplayName("멤버를 성공적으로 삭제")
     void removeById_DeletesMember_WhenCalled() {
-        doNothing().when(memberDiaryService).deleteDiariesByMemberId(memberId);
+        doNothing().when(memberDiaryService).removeDiariesByMemberId(memberId);
 
         // when
         memberService.removeById(memberId);
