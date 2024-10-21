@@ -17,13 +17,7 @@ public class CharacterTranslationService {
 
     @Transactional(readOnly = true)
     public Character translateCharacter(Character character, Locale locale) {
-        Artwork localizedArtwork = translationService.getTranslatedObject(character.getArtwork(), locale);
-
-        Character clonedCharacter = character.toBuilder()
-                .artwork(localizedArtwork)
-                .build();
-
-        return translationService.getTranslatedObject(clonedCharacter, locale);
+        return translationService.getTranslatedObject(character, locale);
     }
 
 }

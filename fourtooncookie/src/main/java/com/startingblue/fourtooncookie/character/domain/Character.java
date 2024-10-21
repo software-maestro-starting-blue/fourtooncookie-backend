@@ -41,6 +41,7 @@ public class Character {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artwork_id")
     @NotNull(message = "캐릭터 작품은 필수 입니다.")
+    @TranslatableField
     private Artwork artwork;
 
     @NotBlank(message = "캐릭터 이름은 필수 입니다.")
