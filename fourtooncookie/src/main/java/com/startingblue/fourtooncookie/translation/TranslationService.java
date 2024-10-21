@@ -10,8 +10,8 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Locale;
+import java.lang.reflect.Field;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -19,24 +19,22 @@ public class TranslationService {
 
     private final TranslationRepository translationRepository;
 
+    private static final Map<String, List<Field>> cachedTranslatableField = new HashMap<>();
+
     public <T> T getTranslatedObject(T object, Locale locale) {
-        Arrays.stream(object.getClass().getDeclaredFields())
-            .filter(field -> field.isAnnotationPresent(TranslatableField.class))
-            .forEach(field -> {
-                try {
-                    field.setAccessible(true);
+        getTranslatableFields(object).forEach(field -> {
+            try {
+                String fieldName = field.getName();
+                Object fieldValue = field.get(object);
 
-                    String fieldName = field.getName();
-                    Object fieldValue = field.get(object);
+                if (!(fieldValue instanceof String))
+                    return;
 
-                    if (!(fieldValue instanceof String))
-                        return;
+                String translatedValue = getTranslationContent(object, fieldName, locale);
 
-                    String translatedValue = getTranslationContent(object, fieldName, locale);
-
-                    field.set(object, translatedValue);
-                } catch (Exception ignored) {}
-            });
+                field.set(object, translatedValue);
+            } catch (Exception ignored) {}
+        });
 
         return object;
     }
@@ -64,7 +62,7 @@ public class TranslationService {
 
         TranslationId translationId = new TranslationId(className, fieldName, classId, locale);
 
-        if (! isTranslationExists(translationId)){
+        if (!isTranslationExists(translationId)) {
             throw new TranslationDuplicateException();
         }
 
@@ -94,4 +92,26 @@ public class TranslationService {
         }
     }
 
+    private List<Field> getTranslatableFields(Object object) {
+        String className = getClassName(object);
+
+        if (cachedTranslatableField.containsKey(className)) {
+            return cachedTranslatableField.get(className);
+        }
+
+        List<Field> translatableFields = new ArrayList<>();
+        Arrays.stream(object.getClass().getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(TranslatableField.class))
+                .forEach(field -> {
+                    try {
+                        field.setAccessible(true);
+                        translatableFields.add(field);
+                    } catch (Exception ignored) {
+                    }
+                });
+
+        cachedTranslatableField.put(className, translatableFields);
+
+        return translatableFields;
+    }
 }
