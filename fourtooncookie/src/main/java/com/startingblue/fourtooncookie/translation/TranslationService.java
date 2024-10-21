@@ -6,8 +6,10 @@ import com.startingblue.fourtooncookie.translation.domain.TranslationId;
 import com.startingblue.fourtooncookie.translation.exception.TranslationDuplicateException;
 import com.startingblue.fourtooncookie.translation.exception.TranslationNotFoundException;
 import com.startingblue.fourtooncookie.translation.exception.TranslationObjectClassIdNotFoundException;
+import io.sentry.Sentry;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -16,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class TranslationService {
 
     private final TranslationRepository translationRepository;
@@ -34,7 +37,9 @@ public class TranslationService {
                 String translatedValue = getTranslationContent(object, fieldName, locale);
 
                 field.set(object, translatedValue);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                Sentry.captureException(ignored);
+            }
         });
 
         return object;
@@ -108,6 +113,7 @@ public class TranslationService {
                         field.setAccessible(true);
                         translatableFields.add(field);
                     } catch (Exception ignored) {
+                        Sentry.captureException(ignored);
                     }
                 });
 
