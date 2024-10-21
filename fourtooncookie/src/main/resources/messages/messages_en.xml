@@ -4,4 +4,8 @@
     <entry key="character.name.1">random</entry>
     <entry key="character.name.2">malang</entry>
     <entry key="artwork.name.2">malang</entry>
+    <entry key="notification.title.completed">fourtooncookie</entry>
+    <entry key="notification.content.completed">The drawing is completed.</entry>
+    <entry key="notification.title.failed">fourtooncookie</entry>
+    <entry key="notification.content.failed">The drawing generation failed.</entry>
 </messages>

@@ -4,4 +4,8 @@
     <entry key="character.name.1">랜덤</entry>
     <entry key="character.name.2">말랑</entry>
     <entry key="artwork.name.2">말랑</entry>
+    <entry key="notification.title.completed">포툰쿠키</entry>
+    <entry key="notification.content.completed">그림이 완성되었습니다.</entry>
+    <entry key="notification.title.failed">포툰쿠키</entry>
+    <entry key="notification.content.failed">그림 생성이 실패했습니다.</entry>
 </messages>
