@@ -6,6 +6,7 @@ import com.startingblue.fourtooncookie.member.dto.MemberSaveRequest;
 import com.startingblue.fourtooncookie.member.exception.MemberDuplicateException;
 import com.startingblue.fourtooncookie.member.exception.MemberNotFoundException;
 import com.startingblue.fourtooncookie.member.service.MemberDiaryService;
+import com.startingblue.fourtooncookie.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberDiaryService memberDiaryService;
+    private final NotificationService notificationService;
 
     public void addMember(UUID memberId, MemberSaveRequest memberSaveRequest) {
         validateMemberExists(memberId);
@@ -40,6 +42,7 @@ public class MemberService {
 
     public void removeById(UUID memberId) {
         memberDiaryService.removeDiariesByMemberId(memberId);
+        notificationService.removeAllNotificationTokenFromMember(memberId);
         memberRepository.deleteById(memberId);
     }
 

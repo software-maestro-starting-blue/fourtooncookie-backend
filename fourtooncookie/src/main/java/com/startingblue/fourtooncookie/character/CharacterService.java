@@ -9,6 +9,7 @@ import com.startingblue.fourtooncookie.character.dto.CharacterUpdateRequest;
 import com.startingblue.fourtooncookie.character.exception.CharacterDuplicateException;
 import com.startingblue.fourtooncookie.character.exception.CharacterNotFoundException;
 import com.startingblue.fourtooncookie.character.service.CharacterArtworkService;
+import com.startingblue.fourtooncookie.character.service.CharacterTranslationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -25,10 +26,10 @@ public class CharacterService {
 
     private final CharacterRepository characterRepository;
     private final CharacterArtworkService characterArtworkService;
-    private final MessageSource xmlMessageSource;
+    private final CharacterTranslationService characterTranslationService;
 
     public void addCharacter(final CharacterSaveRequest request) {
-        CharacterVisionType visionType = findByCharacterVisionType(request.characterVisionType());
+        CharacterVisionType visionType = getByCharacterVisionType(request.characterVisionType());
         Artwork artwork = characterArtworkService.getById(request.artworkId());
 
         validateUniqueCharacter(request.name(), artwork, request.paymentType(), visionType);
@@ -52,7 +53,7 @@ public class CharacterService {
     @Transactional(readOnly = true)
     public Character getById(Long characterId, Locale locale) {
         Character foundCharacter = getById(characterId);
-        return localizeCharacter(foundCharacter, locale);
+        return characterTranslationService.translateCharacter(foundCharacter, locale);
     }
 
 
@@ -64,7 +65,7 @@ public class CharacterService {
     @Transactional(readOnly = true)
     public List<Character> getAllCharacters(Locale locale) {
         return getAllCharacters().stream()
-                .map(character -> localizeCharacter(character, locale))
+                .map(character -> characterTranslationService.translateCharacter(character, locale))
                 .toList();
     }
 
@@ -86,30 +87,7 @@ public class CharacterService {
         characterRepository.delete(foundCharacter);
     }
 
-    private Character localizeCharacter(Character character, Locale locale) {
-        Artwork localizedArtwork = characterArtworkService.getArtworkWithNameChange(character.getArtwork(), locale);
-
-        String localizedCharacterName = getLocalizedCharacterName(character.getId(), locale);
-        return getCharacterWithNameChangeAndArtworkChange(character, localizedCharacterName, localizedArtwork);
-    }
-
-    private Character getCharacterWithNameChangeAndArtworkChange(Character character, String localizedName, Artwork localizedArtwork ) {
-        return Character.builder()
-                .id(character.getId())
-                .characterVisionType(character.getCharacterVisionType())
-                .paymentType(character.getPaymentType())
-                .name(localizedName)
-                .artwork(localizedArtwork)
-                .selectionThumbnailUrl(character.getSelectionThumbnailUrl())
-                .basePrompt(character.getBasePrompt())
-                .build();
-    }
-
-    public String getLocalizedCharacterName(Long characterId, Locale locale) {
-        return Objects.requireNonNull(xmlMessageSource.getMessage("character.name." + characterId, null, locale));
-    }
-
-    private CharacterVisionType findByCharacterVisionType(CharacterVisionType characterVisionType) {
+    private CharacterVisionType getByCharacterVisionType(CharacterVisionType characterVisionType) {
         return CharacterVisionType.valueOf(characterVisionType.name());
     }
 

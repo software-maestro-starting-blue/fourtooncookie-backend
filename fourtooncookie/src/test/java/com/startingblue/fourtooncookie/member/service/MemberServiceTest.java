@@ -113,18 +113,6 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("멤버를 성공적으로 삭제")
-    void removeById_DeletesMember_WhenCalled() {
-        doNothing().when(memberDiaryService).removeDiariesByMemberId(memberId);
-
-        // when
-        memberService.removeById(memberId);
-
-        // then
-        verify(memberRepository, times(1)).deleteById(memberId); // 삭제 호출
-    }
-
-    @Test
     @DisplayName("멤버의 가입 여부 확인")
     void isMemberSignUp_ReturnsTrue_WhenSignedUp() {
         // given

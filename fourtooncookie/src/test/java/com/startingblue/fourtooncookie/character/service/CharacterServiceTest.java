@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -36,9 +37,6 @@ import static org.mockito.Mockito.*;
 class CharacterServiceTest {
 
     @Mock
-    MessageSource messageSource;
-
-    @Mock
     private CharacterRepository characterRepository;
 
     @Mock
@@ -46,6 +44,9 @@ class CharacterServiceTest {
 
     @InjectMocks
     private CharacterService characterService;
+
+    @Mock
+    CharacterTranslationService characterTranslationService;
 
     @BeforeEach
     void setUp() {
@@ -154,11 +155,8 @@ class CharacterServiceTest {
                 .basePrompt("This is a base prompt2")
                 .build();
 
-        when(characterArtworkService.getArtworkWithNameChange(artwork1, Locale.KOREAN)).thenReturn(new Artwork("랜덤", new URL("https://test.png")));
-        when(characterArtworkService.getArtworkWithNameChange(artwork2, Locale.KOREAN)).thenReturn(new Artwork("말랑", new URL("https://test2.png")));
-
-        when(messageSource.getMessage(eq("character.name." + character1.getId()), any(), any())).thenReturn(character1.getName());
-        when(messageSource.getMessage(eq("character.name." + character2.getId()), any(), any())).thenReturn(character2.getName());
+        when(characterTranslationService.translateCharacter(character1, Locale.KOREAN)).thenReturn(character1);
+        when(characterTranslationService.translateCharacter(character2, Locale.KOREAN)).thenReturn(character2);
         when(characterRepository.findAll()).thenReturn(List.of(character1, character2));
 
         // when

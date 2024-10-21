@@ -3,6 +3,7 @@ package com.startingblue.fourtooncookie.notification;
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.notification.domain.NotificationToken;
 import com.startingblue.fourtooncookie.notification.dto.NotificationTokenAssignRequest;
+import com.startingblue.fourtooncookie.notification.dto.NotificationTokenUnassignRequest;
 import com.startingblue.fourtooncookie.notification.exeption.NotificationSendException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -59,5 +60,14 @@ public class NotificationService {
     @Transactional
     public void cleanupOldRecords() {
         notificationTokenRepository.deleteByModifiedDateTimeBefore(LocalDateTime.now().minusMinutes(1));
+    }
+
+    public void removeNotificationTokenFromMember(final UUID memberId, final NotificationTokenUnassignRequest notificationTokenAssignRequest) {
+        notificationTokenRepository.findByMemberIdAndToken(memberId, notificationTokenAssignRequest.notificationToken())
+                .ifPresent(notificationTokenRepository::delete);
+    }
+
+    public void removeAllNotificationTokenFromMember(final UUID memberId) {
+        notificationTokenRepository.deleteByMemberId(memberId);
     }
 }
