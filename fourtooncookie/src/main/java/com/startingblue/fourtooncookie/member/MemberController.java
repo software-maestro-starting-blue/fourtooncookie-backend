@@ -15,16 +15,16 @@ public final class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/member")
-    public ResponseEntity<MemberSavedResponse> readMember(UUID memberId) {
-        MemberSavedResponse response = MemberSavedResponse.of(memberService.readById(memberId));
-        return ResponseEntity.ok(response);
+    @PostMapping("/member")
+    public ResponseEntity<HttpStatus> postMember(UUID memberId, @RequestBody MemberSaveRequest memberSaveRequest) {
+        memberService.add(memberId, memberSaveRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PostMapping("/member")
-    public ResponseEntity<HttpStatus> saveMember(UUID memberId, @RequestBody MemberSaveRequest memberSaveRequest) {
-        memberService.save(memberId, memberSaveRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    @GetMapping("/member")
+    public ResponseEntity<MemberSavedResponse> getMember(UUID memberId) {
+        MemberSavedResponse response = MemberSavedResponse.of(memberService.readById(memberId));
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/member")
