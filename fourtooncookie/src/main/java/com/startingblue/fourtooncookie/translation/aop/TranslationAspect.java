@@ -1,11 +1,8 @@
 package com.startingblue.fourtooncookie.translation.aop;
 
-import com.startingblue.fourtooncookie.artwork.domain.Artwork;
 import com.startingblue.fourtooncookie.translation.TranslationService;
 import lombok.AllArgsConstructor;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.context.i18n.LocaleContextHolder;
