@@ -73,7 +73,7 @@ public class TranslationService {
 
         TranslationId translationId = new TranslationId(className, fieldName, classId, locale);
 
-        if (!isTranslationExists(translationId)) {
+        if (isTranslationExists(translationId)) {
             throw new TranslationDuplicateException();
         }
 
