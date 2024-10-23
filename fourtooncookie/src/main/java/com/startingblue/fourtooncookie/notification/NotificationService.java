@@ -59,8 +59,8 @@ public class NotificationService {
         });
 
         pushNotification.keySet().forEach(locale -> {
-            String title = notificationMessageSourceService.getMessage("notification.title." + diary.getStatus().toString().toLowerCase());
-            String content = notificationMessageSourceService.getMessage("notification.content." + diary.getStatus().toString().toLowerCase());
+            String title = notificationMessageSourceService.getMessage("notification.title." + diary.getStatus().toString().toLowerCase(), locale);
+            String content = notificationMessageSourceService.getMessage("notification.content." + diary.getStatus().toString().toLowerCase(), locale);
             sendMessageByPushMessage(pushNotification.get(locale), title, content);
         });
     }
