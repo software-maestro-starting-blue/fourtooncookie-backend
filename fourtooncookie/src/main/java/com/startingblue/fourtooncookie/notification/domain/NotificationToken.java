@@ -55,7 +55,8 @@ public class NotificationToken {
         this.locale = locale;
     }
 
-    public void updateMember(UUID memberId) {
+    public void updateMemberAndLocale(UUID memberId, Locale locale) {
         this.memberId = memberId;
+        this.locale = locale;
     }
 }

@@ -40,7 +40,7 @@ public class NotificationService {
     public void assignNotificationTokenToMember(final UUID memberId, final Locale locale, final NotificationTokenAssignRequest notificationTokenAssignRequest) {
         notificationTokenRepository.findByToken(notificationTokenAssignRequest.notificationToken())
                 .ifPresentOrElse(
-                        token -> token.updateMember(memberId),
+                        token -> token.updateMemberAndLocale(memberId, locale),
                         () -> notificationTokenRepository.save(new NotificationToken(notificationTokenAssignRequest.notificationToken(), memberId, locale))
                 );
     }
