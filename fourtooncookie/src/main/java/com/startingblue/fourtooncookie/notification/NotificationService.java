@@ -2,7 +2,7 @@ package com.startingblue.fourtooncookie.notification;
 
 import com.startingblue.fourtooncookie.diary.domain.Diary;
 import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
-import com.startingblue.fourtooncookie.locale.XmlMessageSource;
+import com.startingblue.fourtooncookie.messagesource.XmlMessageSource;
 import com.startingblue.fourtooncookie.notification.domain.NotificationToken;
 import com.startingblue.fourtooncookie.notification.dto.NotificationTokenAssignRequest;
 import com.startingblue.fourtooncookie.notification.dto.NotificationTokenUnassignRequest;
