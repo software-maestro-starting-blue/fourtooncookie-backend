@@ -1,8 +1,7 @@
 package com.startingblue.fourtooncookie.notification;
 
 import com.startingblue.fourtooncookie.diary.domain.Diary;
-import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
-import com.startingblue.fourtooncookie.messagesource.XmlMessageSource;
+import com.startingblue.fourtooncookie.messagesource.MessageSourceService;
 import com.startingblue.fourtooncookie.notification.domain.NotificationToken;
 import com.startingblue.fourtooncookie.notification.dto.NotificationTokenAssignRequest;
 import com.startingblue.fourtooncookie.notification.dto.NotificationTokenUnassignRequest;
@@ -36,7 +35,7 @@ public class NotificationService {
     private static final String EXPO_NOTIFICATION_TITLE = "title";
     private static final String EXPO_NOTIFICATION_BODY = "body";
     private final NotificationTokenRepository notificationTokenRepository;
-    private final XmlMessageSource xmlMessageSource;
+    private final MessageSourceService messageSourceService;
 
     public void assignNotificationTokenToMember(final Locale locale, final UUID memberId, final NotificationTokenAssignRequest notificationTokenAssignRequest) {
         notificationTokenRepository.findByToken(notificationTokenAssignRequest.notificationToken())
@@ -60,14 +59,14 @@ public class NotificationService {
         });
 
         pushNotification.keySet().forEach(locale -> {
-            final String title = resolveMessage("notification.title.", diary.getStatus(), locale);
-            final String content = resolveMessage("notification.content.", diary.getStatus(), locale);
+            String title = getNotificationMessage("notification.title" + diary.getStatus().toString().toLowerCase(), locale);
+            String content = getNotificationMessage("notification.content" + diary.getStatus().toString().toLowerCase(), locale);
             sendMessageByPushMessage(pushNotification.get(locale), title, content);
         });
     }
 
-    private String resolveMessage(final String codePrefix, final DiaryStatus diaryStatus, final Locale locale) {
-        return xmlMessageSource.resolveCode(codePrefix + diaryStatus.toString().toLowerCase(), locale).toString();
+    private String getNotificationMessage(String code, Locale locale) {
+        return messageSourceService.getMessage(code, locale);
     }
 
     private void sendMessageByPushMessage(final List<String> to, final String title, final String body) {
