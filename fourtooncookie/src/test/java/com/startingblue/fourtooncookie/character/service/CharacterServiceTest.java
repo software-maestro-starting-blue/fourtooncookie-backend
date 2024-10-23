@@ -45,9 +45,6 @@ class CharacterServiceTest {
     @InjectMocks
     private CharacterService characterService;
 
-    @Mock
-    CharacterTranslationService characterTranslationService;
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -155,12 +152,10 @@ class CharacterServiceTest {
                 .basePrompt("This is a base prompt2")
                 .build();
 
-        when(characterTranslationService.translateCharacter(character1, Locale.KOREAN)).thenReturn(character1);
-        when(characterTranslationService.translateCharacter(character2, Locale.KOREAN)).thenReturn(character2);
         when(characterRepository.findAll()).thenReturn(List.of(character1, character2));
 
         // when
-        CharacterSavedResponses characterSavedResponses = CharacterSavedResponses.of(characterService.getAllCharacters(Locale.KOREAN));
+        CharacterSavedResponses characterSavedResponses = CharacterSavedResponses.of(characterService.getAllCharacters());
 
         // then
         assertThat(characterSavedResponses.characterSavedResponses()).hasSize(2);

@@ -9,13 +9,12 @@ import com.startingblue.fourtooncookie.character.dto.CharacterUpdateRequest;
 import com.startingblue.fourtooncookie.character.exception.CharacterDuplicateException;
 import com.startingblue.fourtooncookie.character.exception.CharacterNotFoundException;
 import com.startingblue.fourtooncookie.character.service.CharacterArtworkService;
-import com.startingblue.fourtooncookie.character.service.CharacterTranslationService;
+import com.startingblue.fourtooncookie.translation.annotation.TranslateMethodReturn;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Locale;
 
 @RequiredArgsConstructor
 @Transactional
@@ -24,7 +23,6 @@ public class CharacterService {
 
     private final CharacterRepository characterRepository;
     private final CharacterArtworkService characterArtworkService;
-    private final CharacterTranslationService characterTranslationService;
 
     public void addCharacter(final CharacterSaveRequest request) {
         CharacterVisionType visionType = getCharacterVisionType(request.characterVisionType());
@@ -43,28 +41,17 @@ public class CharacterService {
     }
 
     @Transactional(readOnly = true)
+    @TranslateMethodReturn
     public Character getById(Long characterId) {
         return characterRepository.findById(characterId)
                 .orElseThrow(() -> new CharacterNotFoundException("Character with ID " + characterId + " not found"));
     }
 
-    @Transactional(readOnly = true)
-    public Character getById(Long characterId, Locale locale) {
-        Character foundCharacter = getById(characterId);
-        return characterTranslationService.translateCharacter(foundCharacter, locale);
-    }
-
 
     @Transactional(readOnly = true)
+    @TranslateMethodReturn
     public List<Character> getAllCharacters() {
         return characterRepository.findAll();
-    }
-
-    @Transactional(readOnly = true)
-    public List<Character> getAllCharacters(Locale locale) {
-        return getAllCharacters().stream()
-                .map(character -> characterTranslationService.translateCharacter(character, locale))
-                .toList();
     }
 
     public void modifyCharacter(final Long characterId, final CharacterUpdateRequest request) {

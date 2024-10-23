@@ -8,7 +8,10 @@ import com.startingblue.fourtooncookie.translation.exception.TranslationNotFound
 import com.startingblue.fourtooncookie.translation.exception.TranslationObjectClassIdNotFoundException;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
+import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -22,18 +25,25 @@ public class TranslationService {
 
     private static final Map<String, List<Field>> cachedTranslatableField = new ConcurrentHashMap<>();
 
-    public <T> T getTranslatedObject(T object, Locale locale) {
+    @Transactional(readOnly = true)
+    public <T> T getTranslatedObject(T unInitializedObject, Locale locale) {
+        T object = initializeAndUnproxy(unInitializedObject);
+
         getTranslatableFields(object).forEach(field -> {
             try {
                 String fieldName = field.getName();
                 Object fieldValue = field.get(object);
 
-                if (!(fieldValue instanceof String))
-                    return;
+                if (fieldValue instanceof String) {
+                    String translatedValue = getTranslationContent(object, fieldName, locale);
 
-                String translatedValue = getTranslationContent(object, fieldName, locale);
+                    field.set(object, translatedValue);
+                } else if (fieldValue != null) {
+                    Object translatedObject = getTranslatedObject(fieldValue, locale);
 
-                field.set(object, translatedValue);
+                    field.set(object, translatedObject);
+                }
+
             } catch (Exception ignored) {}
         });
 
@@ -63,7 +73,7 @@ public class TranslationService {
 
         TranslationId translationId = new TranslationId(className, fieldName, classId, locale);
 
-        if (!isTranslationExists(translationId)) {
+        if (isTranslationExists(translationId)) {
             throw new TranslationDuplicateException();
         }
 
@@ -77,6 +87,22 @@ public class TranslationService {
 
     private boolean isTranslationExists(TranslationId translationId) {
         return translationRepository.existsById(translationId);
+    }
+
+    private <T> T initializeAndUnproxy(T object) {
+        if (object == null) {
+            return null;
+        }
+
+        if (!Hibernate.isInitialized(object)) {
+            Hibernate.initialize(object);
+        }
+
+        if (object instanceof HibernateProxy) {
+            return (T) Hibernate.unproxy(object);
+        }
+
+        return object;
     }
 
     private String getClassName(Object object) {
