@@ -13,7 +13,7 @@ import java.util.Locale;
 public class MessageSourceConfig implements WebMvcConfigurer {
 
     private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
-    private static final List<Locale> SUPPORTED_LOCALES = List.of(Locale.KOREAN);
+    private static final List<Locale> SUPPORTED_LOCALES = List.of(Locale.KOREAN, DEFAULT_LOCALE);
 
     @Bean
     public MessageSource messageSource() {
