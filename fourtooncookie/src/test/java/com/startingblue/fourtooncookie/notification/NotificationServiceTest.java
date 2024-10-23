@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Locale;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,7 +29,7 @@ class NotificationServiceTest {
         final NotificationTokenAssignRequest notificationTokenAssignRequest = new NotificationTokenAssignRequest(token);
 
         //when
-        notificationService.assignNotificationTokenToMember(memberId, notificationTokenAssignRequest);
+        notificationService.assignNotificationTokenToMember(memberId, Locale.KOREAN, notificationTokenAssignRequest);
 
         //then
         final String actual = notificationTokenRepository.findByMemberId(memberId).get(0).getToken();
@@ -48,8 +49,8 @@ class NotificationServiceTest {
         final NotificationTokenAssignRequest notificationTokenAssignRequest2 = new NotificationTokenAssignRequest(token2);
 
         //when
-        notificationService.assignNotificationTokenToMember(memberId, notificationTokenAssignRequest);
-        notificationService.assignNotificationTokenToMember(memberId, notificationTokenAssignRequest2);
+        notificationService.assignNotificationTokenToMember(memberId, Locale.KOREAN, notificationTokenAssignRequest);
+        notificationService.assignNotificationTokenToMember(memberId, Locale.KOREAN, notificationTokenAssignRequest2);
 
         //then
         assertEquals(2, notificationTokenRepository.findByMemberId(memberId).size());
@@ -66,8 +67,8 @@ class NotificationServiceTest {
         final NotificationTokenAssignRequest notificationTokenAssignRequest = new NotificationTokenAssignRequest(token);
 
         //when
-        notificationService.assignNotificationTokenToMember(beforeMemberId, notificationTokenAssignRequest);
-        notificationService.assignNotificationTokenToMember(afterMemberId, notificationTokenAssignRequest);
+        notificationService.assignNotificationTokenToMember(beforeMemberId, Locale.KOREAN, notificationTokenAssignRequest);
+        notificationService.assignNotificationTokenToMember(afterMemberId, Locale.KOREAN, notificationTokenAssignRequest);
 
         //then
         assertEquals(0, notificationTokenRepository.findByMemberId(beforeMemberId).size());

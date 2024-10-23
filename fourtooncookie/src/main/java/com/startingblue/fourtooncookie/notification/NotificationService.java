@@ -1,12 +1,11 @@
 package com.startingblue.fourtooncookie.notification;
 
 import com.startingblue.fourtooncookie.diary.domain.Diary;
-import com.startingblue.fourtooncookie.diary.domain.DiaryStatus;
-import com.startingblue.fourtooncookie.locale.XmlMessageSource;
 import com.startingblue.fourtooncookie.notification.domain.NotificationToken;
 import com.startingblue.fourtooncookie.notification.dto.NotificationTokenAssignRequest;
 import com.startingblue.fourtooncookie.notification.dto.NotificationTokenUnassignRequest;
 import com.startingblue.fourtooncookie.notification.exeption.NotificationSendException;
+import com.startingblue.fourtooncookie.notification.service.NotificationMessageSourceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -36,9 +35,9 @@ public class NotificationService {
     private static final String EXPO_NOTIFICATION_TITLE = "title";
     private static final String EXPO_NOTIFICATION_BODY = "body";
     private final NotificationTokenRepository notificationTokenRepository;
-    private final XmlMessageSource xmlMessageSource;
+    private final NotificationMessageSourceService notificationMessageSourceService;
 
-    public void assignNotificationTokenToMember(final Locale locale, final UUID memberId, final NotificationTokenAssignRequest notificationTokenAssignRequest) {
+    public void assignNotificationTokenToMember(final UUID memberId, final Locale locale, final NotificationTokenAssignRequest notificationTokenAssignRequest) {
         notificationTokenRepository.findByToken(notificationTokenAssignRequest.notificationToken())
                 .ifPresentOrElse(
                         token -> token.updateMember(memberId),
@@ -60,14 +59,10 @@ public class NotificationService {
         });
 
         pushNotification.keySet().forEach(locale -> {
-            final String title = resolveMessage("notification.title.", diary.getStatus(), locale);
-            final String content = resolveMessage("notification.content.", diary.getStatus(), locale);
+            String title = notificationMessageSourceService.getMessage("notification.title" + diary.getStatus().toString().toLowerCase());
+            String content = notificationMessageSourceService.getMessage("notification.content" + diary.getStatus().toString().toLowerCase());
             sendMessageByPushMessage(pushNotification.get(locale), title, content);
         });
-    }
-
-    private String resolveMessage(final String codePrefix, final DiaryStatus diaryStatus, final Locale locale) {
-        return xmlMessageSource.resolveCode(codePrefix + diaryStatus.toString().toLowerCase(), locale).toString();
     }
 
     private void sendMessageByPushMessage(final List<String> to, final String title, final String body) {
