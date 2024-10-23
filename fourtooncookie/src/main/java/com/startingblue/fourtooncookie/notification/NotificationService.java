@@ -7,6 +7,7 @@ import com.startingblue.fourtooncookie.notification.dto.NotificationTokenAssignR
 import com.startingblue.fourtooncookie.notification.dto.NotificationTokenUnassignRequest;
 import com.startingblue.fourtooncookie.notification.exeption.NotificationSendException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -37,7 +38,7 @@ public class NotificationService {
     private final NotificationTokenRepository notificationTokenRepository;
     private final MessageSourceService messageSourceService;
 
-    public void assignNotificationTokenToMember(final Locale locale, final UUID memberId, final NotificationTokenAssignRequest notificationTokenAssignRequest) {
+    public void assignNotificationTokenToMember(final UUID memberId, final Locale locale, final NotificationTokenAssignRequest notificationTokenAssignRequest) {
         notificationTokenRepository.findByToken(notificationTokenAssignRequest.notificationToken())
                 .ifPresentOrElse(
                         token -> token.updateMember(memberId),
@@ -59,14 +60,14 @@ public class NotificationService {
         });
 
         pushNotification.keySet().forEach(locale -> {
-            String title = getNotificationMessage("notification.title" + diary.getStatus().toString().toLowerCase(), locale);
-            String content = getNotificationMessage("notification.content" + diary.getStatus().toString().toLowerCase(), locale);
+            String title = getNotificationMessage("notification.title" + diary.getStatus().toString().toLowerCase());
+            String content = getNotificationMessage("notification.content" + diary.getStatus().toString().toLowerCase());
             sendMessageByPushMessage(pushNotification.get(locale), title, content);
         });
     }
 
-    private String getNotificationMessage(String code, Locale locale) {
-        return messageSourceService.getMessage(code, locale);
+    private String getNotificationMessage(String code) {
+        return messageSourceService.getMessage(code);
     }
 
     private void sendMessageByPushMessage(final List<String> to, final String title, final String body) {

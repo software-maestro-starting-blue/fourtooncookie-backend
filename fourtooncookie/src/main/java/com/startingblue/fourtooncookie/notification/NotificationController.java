@@ -18,8 +18,8 @@ public final class NotificationController {
     private final NotificationService notificationService;
 
     @PostMapping("/notification")
-    public void assignNotificationToken(final Locale locale, final UUID memberId, @RequestBody final NotificationTokenAssignRequest notificationTokenAssignRequest) {
-        notificationService.assignNotificationTokenToMember(locale, memberId, notificationTokenAssignRequest);
+    public void assignNotificationToken(final UUID memberId, final Locale locale, @RequestBody final NotificationTokenAssignRequest notificationTokenAssignRequest) {
+        notificationService.assignNotificationTokenToMember(memberId, locale, notificationTokenAssignRequest);
     }
 
     @DeleteMapping("/notification")
