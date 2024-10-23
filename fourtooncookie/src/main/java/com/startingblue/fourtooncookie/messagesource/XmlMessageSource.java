@@ -1,5 +1,7 @@
 package com.startingblue.fourtooncookie.messagesource;
 
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.AbstractMessageSource;
 import org.w3c.dom.Document;
@@ -18,6 +20,7 @@ import lombok.Getter;
 
 @Slf4j
 @Getter
+@NoArgsConstructor
 public class XmlMessageSource extends AbstractMessageSource {
 
     private static final String ENTRY_TAG_NAME = "entry";
@@ -27,8 +30,6 @@ public class XmlMessageSource extends AbstractMessageSource {
     private static final Map<String, Map<String, String>> messages = new ConcurrentHashMap<>();
 
     private Locale defaultLocale;
-
-    public XmlMessageSource() {}
 
     public void setDefaultLocale(Locale locale) {
         this.defaultLocale = locale;
