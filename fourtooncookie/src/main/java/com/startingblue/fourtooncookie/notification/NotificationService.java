@@ -59,14 +59,10 @@ public class NotificationService {
         });
 
         pushNotification.keySet().forEach(locale -> {
-            String title = getNotificationMessage("notification.title" + diary.getStatus().toString().toLowerCase());
-            String content = getNotificationMessage("notification.content" + diary.getStatus().toString().toLowerCase());
+            String title = notificationMessageSourceService.getMessage("notification.title" + diary.getStatus().toString().toLowerCase());
+            String content = notificationMessageSourceService.getMessage("notification.content" + diary.getStatus().toString().toLowerCase());
             sendMessageByPushMessage(pushNotification.get(locale), title, content);
         });
-    }
-
-    private String getNotificationMessage(String code) {
-        return notificationMessageSourceService.getMessage(code);
     }
 
     private void sendMessageByPushMessage(final List<String> to, final String title, final String body) {
